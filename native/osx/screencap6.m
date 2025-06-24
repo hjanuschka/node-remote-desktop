@@ -8,21 +8,35 @@
 #import <CoreGraphics/CoreGraphics.h>
 #import <ApplicationServices/ApplicationServices.h>
 
+typedef enum {
+    CaptureTypeFullDesktop = 0,
+    CaptureTypeApplication = 1,
+    CaptureTypeWindow = 2
+} CaptureType;
+
 @interface ScreenCapture : NSObject <SCStreamOutput>
 @property (nonatomic, strong) SCStream *stream;
 @property (nonatomic, strong) dispatch_queue_t outputQueue;
 @property (nonatomic, strong) dispatch_queue_t inputQueue;
 @property (nonatomic, assign) CMTime firstSampleTime;
+@property (nonatomic, assign) CaptureType captureType;
+@property (nonatomic, assign) int targetIndex;
 @end
 
 @implementation ScreenCapture
 
 - (instancetype)init {
+    return [self initWithCaptureType:CaptureTypeFullDesktop targetIndex:0];
+}
+
+- (instancetype)initWithCaptureType:(CaptureType)captureType targetIndex:(int)targetIndex {
     self = [super init];
     if (self) {
         self.outputQueue = dispatch_queue_create("screencap.output", DISPATCH_QUEUE_SERIAL);
         self.inputQueue = dispatch_queue_create("screencap.input", DISPATCH_QUEUE_SERIAL);
         self.firstSampleTime = kCMTimeZero;
+        self.captureType = captureType;
+        self.targetIndex = targetIndex;
         [self setupCapture];
         [self startInputListener];
     }
@@ -57,7 +71,6 @@
 }
 
 - (void)continueSetup {
-    
     // Get available content
     [SCShareableContent getShareableContentWithCompletionHandler:^(SCShareableContent * _Nullable content, NSError * _Nullable error) {
         if (error) {
@@ -65,24 +78,115 @@
             return;
         }
         
-        // Use the first display (main display)
-        if (content.displays.count == 0) {
-            NSLog(@"❌ No displays found!");
+        SCContentFilter *filter = nil;
+        CGSize captureSize = CGSizeMake(1920, 1080); // Default size
+        
+        if (self.captureType == CaptureTypeFullDesktop) {
+            // Full desktop capture (existing logic)
+            if (content.displays.count == 0) {
+                NSLog(@"❌ No displays found!");
+                return;
+            }
+            
+            SCDisplay *display = content.displays.firstObject;
+            NSLog(@"✅ Found display: %u (%d x %d)", display.displayID, (int)display.width, (int)display.height);
+            captureSize = CGSizeMake(display.width, display.height);
+            filter = [[SCContentFilter alloc] initWithDisplay:display excludingWindows:@[]];
+            
+        } else if (self.captureType == CaptureTypeApplication) {
+            // Application capture - get applications with visible names
+            NSArray *allApplications = content.applications;
+            NSMutableArray *visibleApplications = [NSMutableArray array];
+            
+            for (SCRunningApplication *app in allApplications) {
+                if (app.applicationName && ![app.applicationName isEqualToString:@""]) {
+                    [visibleApplications addObject:app];
+                }
+            }
+            
+            if (self.targetIndex <= 0 || self.targetIndex > visibleApplications.count) {
+                NSLog(@"❌ Invalid application index: %d (available: 1-%lu)", self.targetIndex, (unsigned long)visibleApplications.count);
+                return;
+            }
+            
+            SCRunningApplication *targetApp = visibleApplications[self.targetIndex - 1];
+            NSLog(@"✅ Capturing application: %@ (PID: %d)", targetApp.applicationName, targetApp.processID);
+            
+            // Get all visible windows for this application
+            NSMutableArray *appWindows = [NSMutableArray array];
+            for (SCWindow *window in content.windows) {
+                if (window.owningApplication.processID == targetApp.processID && 
+                    window.title && ![window.title isEqualToString:@""] &&
+                    window.frame.size.width > 100 && window.frame.size.height > 100) {
+                    [appWindows addObject:window];
+                }
+            }
+            
+            if (appWindows.count == 0) {
+                NSLog(@"❌ No visible windows found for application: %@", targetApp.applicationName);
+                return;
+            }
+            
+            // Sort windows by size (largest first)
+            [appWindows sortUsingComparator:^NSComparisonResult(SCWindow *a, SCWindow *b) {
+                CGFloat areaA = a.frame.size.width * a.frame.size.height;
+                CGFloat areaB = b.frame.size.width * b.frame.size.height;
+                return areaB > areaA ? NSOrderedAscending : NSOrderedDescending;
+            }];
+            
+            SCWindow *mainWindow = appWindows.firstObject;
+            NSLog(@"📏 Main window: %@ (%.0fx%.0f)", mainWindow.title, mainWindow.frame.size.width, mainWindow.frame.size.height);
+            
+            captureSize = mainWindow.frame.size;
+            
+            // Use display-based filter with included applications to avoid CGS issues
+            SCDisplay *display = content.displays.firstObject;
+            NSMutableArray *excludedWindows = [NSMutableArray array];
+            
+            // Exclude windows from other applications
+            for (SCWindow *window in content.windows) {
+                if (window.owningApplication.processID != targetApp.processID) {
+                    [excludedWindows addObject:window];
+                }
+            }
+            
+            filter = [[SCContentFilter alloc] initWithDisplay:display excludingWindows:excludedWindows];
+            
+        } else if (self.captureType == CaptureTypeWindow) {
+            // Individual window capture
+            NSArray *windows = content.windows;
+            NSArray *visibleWindows = [windows filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(SCWindow *window, NSDictionary *bindings) {
+                return window.title && ![window.title isEqualToString:@""];
+            }]];
+            
+            int windowIndex = self.targetIndex - (int)content.applications.count - 1;
+            if (windowIndex < 0 || windowIndex >= visibleWindows.count) {
+                NSLog(@"❌ Invalid window index: %d (available visible windows: %lu)", windowIndex, (unsigned long)visibleWindows.count);
+                return;
+            }
+            
+            SCWindow *targetWindow = visibleWindows[windowIndex];
+            NSLog(@"✅ Capturing window: %@ - %@ (%.0fx%.0f)", 
+                  targetWindow.owningApplication.applicationName ?: @"Unknown", 
+                  targetWindow.title, 
+                  targetWindow.frame.size.width, 
+                  targetWindow.frame.size.height);
+            
+            captureSize = targetWindow.frame.size;
+            filter = [[SCContentFilter alloc] initWithDesktopIndependentWindow:targetWindow];
+        }
+        
+        if (!filter) {
+            NSLog(@"❌ Failed to create content filter");
             return;
         }
         
-        SCDisplay *display = content.displays.firstObject;
-        NSLog(@"✅ Found display: %u (%d x %d)", display.displayID, (int)display.width, (int)display.height);
-        
-        // Create content filter for the display
-        SCContentFilter *filter = [[SCContentFilter alloc] initWithDisplay:display excludingWindows:@[]];
-        
-        // Configure stream - increased to 30 FPS
+        // Configure stream - 30 FPS for all capture types
         SCStreamConfiguration *config = [[SCStreamConfiguration alloc] init];
-        config.width = display.width;
-        config.height = display.height;
-        config.queueDepth = 6; // Critical: minimum 4 to avoid stuttering
-        config.pixelFormat = kCVPixelFormatType_32BGRA; // Best for JPEG conversion
+        config.width = (int)captureSize.width;
+        config.height = (int)captureSize.height;
+        config.queueDepth = 6;
+        config.pixelFormat = kCVPixelFormatType_32BGRA;
         config.colorSpaceName = kCGColorSpaceSRGB;
         config.showsCursor = YES;
         config.minimumFrameInterval = CMTimeMake(1, 30); // 30 FPS
@@ -103,7 +207,9 @@
             if (startError) {
                 NSLog(@"❌ Error starting capture: %@", startError.localizedDescription);
             } else {
-                NSLog(@"✅ Screen capture started successfully at 30 FPS!");
+                NSString *captureTypeStr = self.captureType == CaptureTypeFullDesktop ? @"full desktop" : 
+                                          self.captureType == CaptureTypeApplication ? @"application" : @"window";
+                NSLog(@"✅ %@ capture started successfully at 30 FPS!", captureTypeStr);
                 NSLog(@"📝 Send commands via stdin: 'click x y' or 'key character'");
             }
         }];
@@ -340,9 +446,66 @@
 
 @end
 
+void listApplicationsAndWindows() {
+    NSLog(@"🔍 Listing all available applications and windows...");
+    
+    [SCShareableContent getShareableContentWithCompletionHandler:^(SCShareableContent * _Nullable content, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"❌ Error getting shareable content: %@", error.localizedDescription);
+            return;
+        }
+        
+        NSLog(@"📱 Available Applications:");
+        NSLog(@"0: 📺 FULL DESKTOP (all displays)");
+        
+        // Filter visible applications
+        NSMutableArray *visibleApplications = [NSMutableArray array];
+        for (SCRunningApplication *app in content.applications) {
+            if (app.applicationName && ![app.applicationName isEqualToString:@""]) {
+                [visibleApplications addObject:app];
+            }
+        }
+        
+        int index = 1;
+        for (SCRunningApplication *app in visibleApplications) {
+            NSLog(@"%d: 🚀 %@ (PID: %d)", index, app.applicationName, app.processID);
+            index++;
+        }
+        
+        NSLog(@"📂 Available Windows:");
+        for (SCWindow *window in content.windows) {
+            if (window.title && ![window.title isEqualToString:@""]) {
+                SCRunningApplication *ownerApp = window.owningApplication;
+                NSString *appName = ownerApp.applicationName ?: @"Unknown";
+                NSLog(@"%d: 🪟 %@ - %@ (%.0fx%.0f)", index, appName, window.title, window.frame.size.width, window.frame.size.height);
+                index++;
+            }
+        }
+        
+        NSLog(@"📝 Usage: ./screencap6 [option]");
+        NSLog(@"   ./screencap6           - Full desktop capture (default)");
+        NSLog(@"   ./screencap6 list      - Show this list");
+        NSLog(@"   ./screencap6 app N     - Capture application N");
+        NSLog(@"   ./screencap6 window N  - Capture window N");
+        
+        exit(0);
+    }];
+}
+
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
         NSLog(@"🔥 macOS ScreenCaptureKit Tool v6 Starting with Input Support...");
+        
+        // Parse command line arguments
+        if (argc > 1) {
+            NSString *command = [NSString stringWithUTF8String:argv[1]];
+            
+            if ([command isEqualToString:@"list"]) {
+                listApplicationsAndWindows();
+                [[NSRunLoop currentRunLoop] run];
+                return 0;
+            }
+        }
         
         // Check initial permissions
         BOOL hasScreenPermission = CGPreflightScreenCaptureAccess();
@@ -359,7 +522,24 @@ int main(int argc, const char * argv[]) {
             NSLog(@"🔒 Accessibility permission required for mouse/keyboard input");
         }
         
-        ScreenCapture *capture = [[ScreenCapture alloc] init];
+        ScreenCapture *capture;
+        
+        // Create capture with specified parameters
+        if (argc > 1) {
+            NSString *command = [NSString stringWithUTF8String:argv[1]];
+            
+            if ([command isEqualToString:@"app"] && argc > 2) {
+                int appIndex = atoi(argv[2]);
+                capture = [[ScreenCapture alloc] initWithCaptureType:CaptureTypeApplication targetIndex:appIndex];
+            } else if ([command isEqualToString:@"window"] && argc > 2) {
+                int windowIndex = atoi(argv[2]);
+                capture = [[ScreenCapture alloc] initWithCaptureType:CaptureTypeWindow targetIndex:windowIndex];
+            } else {
+                capture = [[ScreenCapture alloc] init]; // Default full desktop
+            }
+        } else {
+            capture = [[ScreenCapture alloc] init]; // Default full desktop
+        }
         
         // Keep running
         [[NSRunLoop currentRunLoop] run];

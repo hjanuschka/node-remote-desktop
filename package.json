@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js --watch native/osx/*.m --ext js,m"
   },
   "dependencies": {
     "cors": "^2.8.5",
