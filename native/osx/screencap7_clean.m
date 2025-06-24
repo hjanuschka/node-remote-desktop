@@ -294,36 +294,160 @@ typedef enum {
 }
 
 - (void)performClick:(int)x y:(int)y {
-    NSLog(@"🖱️ Clicking at %d,%d", x, y);
+    [self performClick:x y:y targetWindowID:0];
+}
+
+- (void)performClick:(int)x y:(int)y targetWindowID:(UInt32)windowID {
+    [self performClick:x y:y targetWindowID:windowID activateWindow:YES];
+}
+
+- (void)performClick:(int)x y:(int)y targetWindowID:(UInt32)windowID activateWindow:(BOOL)activate {
+    NSLog(@"🖱️ Clicking at %d,%d (target window: %u, activate: %@)", x, y, windowID, activate ? @"YES" : @"NO");
     
-    // Check accessibility permissions
-    if (!AXIsProcessTrusted()) {
-        NSLog(@"❌ No accessibility permission for mouse events!");
-        NSLog(@"🔒 Please enable accessibility for this app in System Preferences > Privacy & Security > Accessibility");
+    @try {
+        // Check accessibility permissions
+        if (!AXIsProcessTrusted()) {
+            NSLog(@"❌ No accessibility permission for mouse events!");
+            NSLog(@"🔒 Please enable accessibility for this app in System Preferences > Privacy & Security > Accessibility");
+            return;
+        }
+        
+        NSLog(@"✅ Accessibility permission verified");
+        
+        CGPoint clickPoint = CGPointMake(x, y);
+        
+        // If we have a target window, bring it to front and convert coordinates
+        if (windowID != 0) {
+            NSLog(@"🎯 Targeting specific window ID: %u", windowID);
+            
+            // Always activate the window to bring it to front
+            [self activateWindowIfNeeded:windowID];
+            
+            // Get window info for coordinate conversion
+            CFArrayRef windowList = CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
+            if (windowList) {
+                CFIndex count = CFArrayGetCount(windowList);
+                for (CFIndex i = 0; i < count; i++) {
+                    CFDictionaryRef window = (CFDictionaryRef)CFArrayGetValueAtIndex(windowList, i);
+                    CFNumberRef windowNumber = (CFNumberRef)CFDictionaryGetValue(window, kCGWindowNumber);
+                    
+                    UInt32 currentWindowID;
+                    CFNumberGetValue(windowNumber, kCFNumberSInt32Type, &currentWindowID);
+                    
+                    if (currentWindowID == windowID) {
+                        // Get window bounds
+                        CFDictionaryRef bounds = (CFDictionaryRef)CFDictionaryGetValue(window, kCGWindowBounds);
+                        if (bounds) {
+                            CGRect windowRect;
+                            CGRectMakeWithDictionaryRepresentation(bounds, &windowRect);
+                            
+                            // Convert relative coordinates to absolute
+                            clickPoint.x += windowRect.origin.x;
+                            clickPoint.y += windowRect.origin.y;
+                            
+                            NSLog(@"🗂️ Window bounds: %.0f,%.0f %.0fx%.0f", 
+                                  windowRect.origin.x, windowRect.origin.y, 
+                                  windowRect.size.width, windowRect.size.height);
+                            NSLog(@"🎯 Adjusted click point: %.0f,%.0f", clickPoint.x, clickPoint.y);
+                        }
+                        break;
+                    }
+                }
+                CFRelease(windowList);
+            }
+        }
+        
+        // Always use global events now that the window is in focus
+        CGEventRef mouseDown = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseDown, clickPoint, kCGMouseButtonLeft);
+        CGEventRef mouseUp = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseUp, clickPoint, kCGMouseButtonLeft);
+        
+        NSLog(@"📝 Created mouse events: down=%p, up=%p", mouseDown, mouseUp);
+        
+        if (mouseDown && mouseUp) {
+            NSLog(@"📤 Posting global mouse events...");
+            CGEventPost(kCGHIDEventTap, mouseDown);
+            CGEventPost(kCGHIDEventTap, mouseUp);
+            
+            CFRelease(mouseDown);
+            CFRelease(mouseUp);
+            NSLog(@"✅ Click executed and events released");
+        } else {
+            NSLog(@"❌ Failed to create mouse events");
+            if (mouseDown) CFRelease(mouseDown);
+            if (mouseUp) CFRelease(mouseUp);
+        }
+    } @catch (NSException *exception) {
+        NSLog(@"❌ Exception in performClick: %@", exception);
+    }
+}
+
+- (pid_t)getProcessIDForWindowID:(UInt32)windowID {
+    CFArrayRef windowList = CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
+    pid_t targetPID = 0;
+    
+    if (windowList) {
+        CFIndex count = CFArrayGetCount(windowList);
+        for (CFIndex i = 0; i < count; i++) {
+            CFDictionaryRef window = (CFDictionaryRef)CFArrayGetValueAtIndex(windowList, i);
+            CFNumberRef windowNumber = (CFNumberRef)CFDictionaryGetValue(window, kCGWindowNumber);
+            
+            UInt32 currentWindowID;
+            CFNumberGetValue(windowNumber, kCFNumberSInt32Type, &currentWindowID);
+            
+            if (currentWindowID == windowID) {
+                CFNumberRef ownerPID = (CFNumberRef)CFDictionaryGetValue(window, kCGWindowOwnerPID);
+                if (ownerPID) {
+                    CFNumberGetValue(ownerPID, kCFNumberSInt32Type, &targetPID);
+                }
+                break;
+            }
+        }
+        CFRelease(windowList);
+    }
+    
+    return targetPID;
+}
+
+- (void)activateWindowIfNeeded:(UInt32)windowID {
+    NSLog(@"🎯 Attempting to activate window %u for better event delivery", windowID);
+    
+    // Get the process ID for this window
+    pid_t targetPID = [self getProcessIDForWindowID:windowID];
+    if (targetPID <= 0) {
+        NSLog(@"❌ Could not find process for window %u", windowID);
         return;
     }
     
-    // Create a mouse click event
-    CGEventRef mouseDown = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseDown, CGPointMake(x, y), kCGMouseButtonLeft);
-    CGEventRef mouseUp = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseUp, CGPointMake(x, y), kCGMouseButtonLeft);
-    
-    if (mouseDown && mouseUp) {
-        // Post the events
-        CGEventPost(kCGHIDEventTap, mouseDown);
-        CGEventPost(kCGHIDEventTap, mouseUp);
+    // Try to activate the application using NSRunningApplication
+    NSRunningApplication *app = [NSRunningApplication runningApplicationWithProcessIdentifier:targetPID];
+    if (app) {
+        NSLog(@"🎯 Activating application: %@ (PID: %d)", app.localizedName, targetPID);
         
-        CFRelease(mouseDown);
-        CFRelease(mouseUp);
-        NSLog(@"✅ Click executed");
+        // Activate the application to bring it to front
+        BOOL success = [app activateWithOptions:0];
+        if (success) {
+            NSLog(@"✅ Successfully activated application");
+            // Give it a moment to activate
+            usleep(100000); // 100ms
+        } else {
+            NSLog(@"❌ Failed to activate application");
+        }
     } else {
-        NSLog(@"❌ Failed to create mouse events");
+        NSLog(@"❌ Could not find NSRunningApplication for PID %d", targetPID);
     }
 }
 
 - (void)performKeyPress:(NSString *)key {
-    NSLog(@"⌨️ Key press: %@", key);
+    [self performKeyPress:key targetWindowID:0];
+}
+
+- (void)performKeyPress:(NSString *)key targetWindowID:(UInt32)windowID {
+    NSLog(@"⌨️ Key press: %@ (target window: %u)", key, windowID);
     
-    if (key.length == 0) return;
+    if (!key || key.length == 0) {
+        NSLog(@"❌ Empty key string");
+        return;
+    }
     
     // Check accessibility permissions
     if (!AXIsProcessTrusted()) {
@@ -332,9 +456,16 @@ typedef enum {
         return;
     }
     
+    // If targeting a specific window, bring it to front first
+    if (windowID != 0) {
+        NSLog(@"🎯 Targeting specific window ID: %u", windowID);
+        [self activateWindowIfNeeded:windowID];
+    }
+    
     CGKeyCode keyCode = 0;
     unichar character = [key characterAtIndex:0];
-    
+    NSLog(@"🔤 Processing character: '%c' (unicode: %d)", character, character);
+
     // Complete key mapping for all letters and common keys
     switch (character) {
         case 'a': case 'A': keyCode = 0; break;
@@ -367,12 +498,12 @@ typedef enum {
         case '8': keyCode = 28; break;
         case '0': keyCode = 29; break;
         case ']': keyCode = 30; break;
-        case 'o': case 'O': keyCode = 31; break;  // Added 'o'
+        case 'o': case 'O': keyCode = 31; break;
         case 'u': case 'U': keyCode = 32; break;
         case '[': keyCode = 33; break;
         case 'i': case 'I': keyCode = 34; break;
         case 'p': case 'P': keyCode = 35; break;
-        case 'l': case 'L': keyCode = 37; break;  // Added 'l'
+        case 'l': case 'L': keyCode = 37; break;
         case 'j': case 'J': keyCode = 38; break;
         case '\'': keyCode = 39; break;
         case 'k': case 'K': keyCode = 40; break;
@@ -389,16 +520,27 @@ typedef enum {
             return;
     }
     
-    // Create key events
+    NSLog(@"📤 Creating keyboard events for keyCode: %d", keyCode);
+    
+    // Create key events synchronously and post them
     CGEventRef keyDown = CGEventCreateKeyboardEvent(NULL, keyCode, true);
     CGEventRef keyUp = CGEventCreateKeyboardEvent(NULL, keyCode, false);
     
+    NSLog(@"📝 Created keyboard events: down=%p, up=%p", keyDown, keyUp);
+    
     if (keyDown && keyUp) {
+        // Always use global events now that the target window is in focus
+        NSLog(@"📤 Posting global keyboard events...");
         CGEventPost(kCGHIDEventTap, keyDown);
         CGEventPost(kCGHIDEventTap, keyUp);
         
         CFRelease(keyDown);
         CFRelease(keyUp);
+        NSLog(@"✅ Key press completed and events released");
+    } else {
+        NSLog(@"❌ Failed to create keyboard events");
+        if (keyDown) CFRelease(keyDown);
+        if (keyUp) CFRelease(keyUp);
     }
 }
 
@@ -876,7 +1018,12 @@ void listApplicationsAndWindows() {
     NSLog(@"   GET  /frame          - Get current frame (JPEG)");
     NSLog(@"   POST /capture        - Start capture {type, index}");
     NSLog(@"   POST /click          - Send click {x, y}");
+    NSLog(@"   POST /click-window   - Send click to window {x, y, cgWindowID}");
+    NSLog(@"   POST /click-background - Send click to background window {x, y, cgWindowID}");
     NSLog(@"   POST /key            - Send key {key}");
+    NSLog(@"   POST /key-window     - Send key to window {key, cgWindowID}");
+    NSLog(@"   POST /key-background - Send key to background window {key, cgWindowID}");
+    NSLog(@"   POST /screenshot     - Get window screenshot {cgWindowID}");
     NSLog(@"   POST /stop           - Stop capture");
     
     [self startSocketServer];
@@ -969,8 +1116,12 @@ void listApplicationsAndWindows() {
         [self sendFrameResponse:client_fd];
     } else if ([method isEqualToString:@"POST"] && [path isEqualToString:@"/click"]) {
         [self handleClickRequest:client_fd request:request];
+    } else if ([method isEqualToString:@"POST"] && [path isEqualToString:@"/click-window"]) {
+        [self handleWindowClickRequest:client_fd request:request];
     } else if ([method isEqualToString:@"POST"] && [path isEqualToString:@"/key"]) {
         [self handleKeyRequest:client_fd request:request];
+    } else if ([method isEqualToString:@"POST"] && [path isEqualToString:@"/key-window"]) {
+        [self handleWindowKeyRequest:client_fd request:request];
     } else if ([method isEqualToString:@"POST"] && [path isEqualToString:@"/capture"]) {
         [self handleCaptureRequest:client_fd request:request];
     } else if ([method isEqualToString:@"POST"] && [path isEqualToString:@"/capture-window"]) {
@@ -978,6 +1129,10 @@ void listApplicationsAndWindows() {
     } else if ([method isEqualToString:@"POST"] && [path isEqualToString:@"/stop"]) {
         [self.captureServer stopCapture];
         [self sendJSONResponse:client_fd data:@{@"status": @"stopped"}];
+    } else if ([method isEqualToString:@"POST"] && [path isEqualToString:@"/screenshot"]) {
+        [self handleScreenshotRequest:client_fd request:request];
+    } else if ([method isEqualToString:@"OPTIONS"]) {
+        [self sendCORSResponse:client_fd];
     } else {
         [self send404Response:client_fd];
     }
@@ -1024,23 +1179,33 @@ void listApplicationsAndWindows() {
 - (void)handleClickRequest:(int)client_fd request:(NSString *)request {
     NSRange bodyRange = [request rangeOfString:@"\r\n\r\n"];
     if (bodyRange.location == NSNotFound) {
+        NSLog(@"❌ Click request: No body separator found");
         [self send400Response:client_fd];
         return;
     }
     
     NSString *body = [request substringFromIndex:bodyRange.location + bodyRange.length];
+    NSLog(@"📦 Click request body: %@", body);
     NSData *jsonData = [body dataUsingEncoding:NSUTF8StringEncoding];
     
-    NSError *error;
+    NSError *error = nil;
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
     
-    if (error || !json[@"x"] || !json[@"y"]) {
+    if (error || !json) {
+        NSLog(@"❌ Click JSON parse error: %@", error ? [error description] : @"nil result");
+        [self send400Response:client_fd];
+        return;
+    }
+    
+    if (!json[@"x"] || !json[@"y"]) {
+        NSLog(@"❌ Click request missing x or y: %@", json);
         [self send400Response:client_fd];
         return;
     }
     
     int x = [json[@"x"] intValue];
     int y = [json[@"y"] intValue];
+    NSLog(@"🖱️ Click at (%d, %d)", x, y);
     
     [self.captureServer performClick:x y:y];
     [self sendJSONResponse:client_fd data:@{@"status": @"clicked", @"x": @(x), @"y": @(y)}];
@@ -1049,24 +1214,124 @@ void listApplicationsAndWindows() {
 - (void)handleKeyRequest:(int)client_fd request:(NSString *)request {
     NSRange bodyRange = [request rangeOfString:@"\r\n\r\n"];
     if (bodyRange.location == NSNotFound) {
+        NSLog(@"❌ Key request: No body separator found");
         [self send400Response:client_fd];
         return;
     }
     
     NSString *body = [request substringFromIndex:bodyRange.location + bodyRange.length];
+    NSLog(@"📦 Key request body: %@", body);
     NSData *jsonData = [body dataUsingEncoding:NSUTF8StringEncoding];
     
-    NSError *error;
+    NSError *error = nil;
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
     
-    if (error || !json[@"key"]) {
+    if (error || !json) {
+        NSLog(@"❌ Key JSON parse error: %@", error ? [error description] : @"nil result");
+        [self send400Response:client_fd];
+        return;
+    }
+    
+    if (!json[@"key"]) {
+        NSLog(@"❌ Key request missing key field: %@", json);
         [self send400Response:client_fd];
         return;
     }
     
     NSString *key = json[@"key"];
-    [self.captureServer performKeyPress:key];
-    [self sendJSONResponse:client_fd data:@{@"status": @"key_pressed", @"key": key}];
+    NSLog(@"⌨️ Key press: %@", key);
+    
+    @try {
+        [self.captureServer performKeyPress:key];
+        [self sendJSONResponse:client_fd data:@{@"status": @"key_pressed", @"key": key}];
+        NSLog(@"✅ Key press response sent");
+    } @catch (NSException *exception) {
+        NSLog(@"❌ Exception in key press: %@", exception);
+        [self send500Response:client_fd];
+    }
+}
+
+- (void)handleWindowClickRequest:(int)client_fd request:(NSString *)request {
+    NSRange bodyRange = [request rangeOfString:@"\r\n\r\n"];
+    if (bodyRange.location == NSNotFound) {
+        NSLog(@"❌ Window click request: No body separator found");
+        [self send400Response:client_fd];
+        return;
+    }
+    
+    NSString *body = [request substringFromIndex:bodyRange.location + bodyRange.length];
+    NSLog(@"📦 Window click request body: %@", body);
+    NSData *jsonData = [body dataUsingEncoding:NSUTF8StringEncoding];
+    
+    NSError *error = nil;
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
+    
+    if (error || !json) {
+        NSLog(@"❌ Window click JSON parse error: %@", error ? [error description] : @"nil result");
+        [self send400Response:client_fd];
+        return;
+    }
+    
+    if (!json[@"x"] || !json[@"y"] || !json[@"cgWindowID"]) {
+        NSLog(@"❌ Window click request missing x, y, or cgWindowID: %@", json);
+        [self send400Response:client_fd];
+        return;
+    }
+    
+    int x = [json[@"x"] intValue];
+    int y = [json[@"y"] intValue];
+    UInt32 windowID = [json[@"cgWindowID"] unsignedIntValue];
+    NSLog(@"🖱️ Window click at (%d, %d) targeting window %u", x, y, windowID);
+    
+    @try {
+        [self.captureServer performClick:x y:y targetWindowID:windowID];
+        [self sendJSONResponse:client_fd data:@{@"status": @"clicked", @"x": @(x), @"y": @(y), @"cgWindowID": @(windowID)}];
+        NSLog(@"✅ Window click response sent");
+    } @catch (NSException *exception) {
+        NSLog(@"❌ Exception in window click: %@", exception);
+        [self send500Response:client_fd];
+    }
+}
+
+- (void)handleWindowKeyRequest:(int)client_fd request:(NSString *)request {
+    NSRange bodyRange = [request rangeOfString:@"\r\n\r\n"];
+    if (bodyRange.location == NSNotFound) {
+        NSLog(@"❌ Window key request: No body separator found");
+        [self send400Response:client_fd];
+        return;
+    }
+    
+    NSString *body = [request substringFromIndex:bodyRange.location + bodyRange.length];
+    NSLog(@"📦 Window key request body: %@", body);
+    NSData *jsonData = [body dataUsingEncoding:NSUTF8StringEncoding];
+    
+    NSError *error = nil;
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
+    
+    if (error || !json) {
+        NSLog(@"❌ Window key JSON parse error: %@", error ? [error description] : @"nil result");
+        [self send400Response:client_fd];
+        return;
+    }
+    
+    if (!json[@"key"] || !json[@"cgWindowID"]) {
+        NSLog(@"❌ Window key request missing key or cgWindowID: %@", json);
+        [self send400Response:client_fd];
+        return;
+    }
+    
+    NSString *key = json[@"key"];
+    UInt32 windowID = [json[@"cgWindowID"] unsignedIntValue];
+    NSLog(@"⌨️ Window key press: %@ targeting window %u", key, windowID);
+    
+    @try {
+        [self.captureServer performKeyPress:key targetWindowID:windowID];
+        [self sendJSONResponse:client_fd data:@{@"status": @"key_pressed", @"key": key, @"cgWindowID": @(windowID)}];
+        NSLog(@"✅ Window key press response sent");
+    } @catch (NSException *exception) {
+        NSLog(@"❌ Exception in window key press: %@", exception);
+        [self send500Response:client_fd];
+    }
 }
 
 - (void)handleCaptureRequest:(int)client_fd request:(NSString *)request {
@@ -1079,7 +1344,7 @@ void listApplicationsAndWindows() {
     NSString *body = [request substringFromIndex:bodyRange.location + bodyRange.length];
     NSData *jsonData = [body dataUsingEncoding:NSUTF8StringEncoding];
     
-    NSError *error;
+    NSError *error = nil;
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
     
     if (error) {
@@ -1172,8 +1437,61 @@ void listApplicationsAndWindows() {
     }
 }
 
+- (void)handleScreenshotRequest:(int)client_fd request:(NSString *)request {
+    NSRange bodyRange = [request rangeOfString:@"\r\n\r\n"];
+    if (bodyRange.location == NSNotFound) {
+        [self send400Response:client_fd];
+        return;
+    }
+    
+    NSString *body = [request substringFromIndex:bodyRange.location + bodyRange.length];
+    NSData *jsonData = [body dataUsingEncoding:NSUTF8StringEncoding];
+    
+    NSError *error = nil;
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
+    
+    if (error || !json[@"cgWindowID"]) {
+        [self send400Response:client_fd];
+        return;
+    }
+    
+    UInt32 windowID = [json[@"cgWindowID"] unsignedIntValue];
+    NSLog(@"📸 Taking screenshot of window %u using screencapture command", windowID);
+    
+    // Use system screencapture command - simple and always works
+    NSString *tempFile = [NSString stringWithFormat:@"/tmp/window_%u.jpg", windowID];
+    NSString *command = [NSString stringWithFormat:@"/usr/sbin/screencapture -l %u -t jpg '%@'", windowID, tempFile];
+    
+    int result = system([command UTF8String]);
+    
+    if (result != 0) {
+        NSLog(@"❌ screencapture command failed for window %u", windowID);
+        [self send500Response:client_fd];
+        return;
+    }
+    
+    // Read the captured file
+    NSData *jpegData = [NSData dataWithContentsOfFile:tempFile];
+    
+    // Clean up temp file
+    [[NSFileManager defaultManager] removeItemAtPath:tempFile error:nil];
+    
+    if (!jpegData || jpegData.length == 0) {
+        NSLog(@"❌ Failed to read screenshot file for window %u", windowID);
+        [self send500Response:client_fd];
+        return;
+    }
+    
+    // Convert to base64
+    NSString *base64String = [jpegData base64EncodedStringWithOptions:0];
+    NSString *dataURL = [NSString stringWithFormat:@"data:image/jpeg;base64,%@", base64String];
+    
+    NSLog(@"✅ Window screenshot captured: %lu bytes", jpegData.length);
+    [self sendJSONResponse:client_fd data:@{@"screenshot": dataURL, @"cgWindowID": @(windowID)}];
+}
+
 - (void)sendJSONResponse:(int)client_fd data:(NSDictionary *)data {
-    NSError *error;
+    NSError *error = nil;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:data options:0 error:&error];
     NSString *json = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     
@@ -1195,6 +1513,15 @@ void listApplicationsAndWindows() {
 
 - (void)send500Response:(int)client_fd {
     NSString *response = @"HTTP/1.1 500 Internal Server Error\r\nContent-Length: 21\r\n\r\nInternal Server Error";
+    send(client_fd, [response UTF8String], response.length, 0);
+}
+
+- (void)sendCORSResponse:(int)client_fd {
+    NSString *response = @"HTTP/1.1 200 OK\r\n"
+                         @"Access-Control-Allow-Origin: *\r\n"
+                         @"Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n"
+                         @"Access-Control-Allow-Headers: Content-Type\r\n"
+                         @"Content-Length: 0\r\n\r\n";
     send(client_fd, [response UTF8String], response.length, 0);
 }
 
