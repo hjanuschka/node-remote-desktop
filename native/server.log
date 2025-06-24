@@ -1,0 +1,478 @@
+
+> node-remote-desktop@1.0.0 dev
+> nodemon server.js --watch native/osx/*.m --ext js,m
+
+[33m[nodemon] 3.1.10[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): native/osx/list_windows_cg.m[39m
+[33m[nodemon] watching extensions: js,m[39m
+[32m[nodemon] starting `node server.js native/osx/screencap7_clean.m`[39m
+/Users/hjanuschka/node-sharer/server.js:57
+      await compileScreencap;
+      ^^^^^
+
+SyntaxError: await is only valid in async functions and the top level bodies of modules
+    at wrapSafe (node:internal/modules/cjs/loader:1666:18)
+    at Module._compile (node:internal/modules/cjs/loader:1708:20)
+    at Object..js (node:internal/modules/cjs/loader:1899:10)
+    at Module.load (node:internal/modules/cjs/loader:1469:32)
+    at Module._load (node:internal/modules/cjs/loader:1286:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:152:5)
+    at node:internal/main/run_main_module:33:47
+
+Node.js v24.2.0
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+
+> node-remote-desktop@1.0.0 dev
+> nodemon server.js --watch native/osx/*.m --ext js,m
+
+[33m[nodemon] 3.1.10[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): native/osx/list_windows_cg.m[39m
+[33m[nodemon] watching extensions: js,m[39m
+[32m[nodemon] starting `node server.js native/osx/screencap7_clean.m`[39m
+/Users/hjanuschka/node-sharer/server.js:57
+      await compileScreencap;
+      ^^^^^
+
+SyntaxError: await is only valid in async functions and the top level bodies of modules
+    at wrapSafe (node:internal/modules/cjs/loader:1666:18)
+    at Module._compile (node:internal/modules/cjs/loader:1708:20)
+    at Object..js (node:internal/modules/cjs/loader:1899:10)
+    at Module.load (node:internal/modules/cjs/loader:1469:32)
+    at Module._load (node:internal/modules/cjs/loader:1286:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:152:5)
+    at node:internal/main/run_main_module:33:47
+
+Node.js v24.2.0
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+
+> node-remote-desktop@1.0.0 dev
+> nodemon server.js --watch native/osx/*.m --ext js,m
+
+[33m[nodemon] 3.1.10[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): native/osx/list_windows_cg.m[39m
+[33m[nodemon] watching extensions: js,m[39m
+[32m[nodemon] starting `node server.js native/osx/screencap7_clean.m`[39m
+/Users/hjanuschka/node-sharer/server.js:104
+  } else if (platform === 'linux') {
+    ^^^^
+
+SyntaxError: Unexpected token 'else'
+    at wrapSafe (node:internal/modules/cjs/loader:1666:18)
+    at Module._compile (node:internal/modules/cjs/loader:1708:20)
+    at Object..js (node:internal/modules/cjs/loader:1899:10)
+    at Module.load (node:internal/modules/cjs/loader:1469:32)
+    at Module._load (node:internal/modules/cjs/loader:1286:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:152:5)
+    at node:internal/main/run_main_module:33:47
+
+Node.js v24.2.0
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+
+> node-remote-desktop@1.0.0 dev
+> nodemon server.js --watch native/osx/*.m --ext js,m
+
+[33m[nodemon] 3.1.10[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): native/osx/list_windows_cg.m[39m
+[33m[nodemon] watching extensions: js,m[39m
+[32m[nodemon] starting `node server.js native/osx/screencap7_clean.m`[39m
+/Users/hjanuschka/node-sharer/server.js:104
+  } else if (platform === 'linux') {
+    ^^^^
+
+SyntaxError: Unexpected token 'else'
+    at wrapSafe (node:internal/modules/cjs/loader:1666:18)
+    at Module._compile (node:internal/modules/cjs/loader:1708:20)
+    at Object..js (node:internal/modules/cjs/loader:1899:10)
+    at Module.load (node:internal/modules/cjs/loader:1469:32)
+    at Module._load (node:internal/modules/cjs/loader:1286:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:152:5)
+    at node:internal/main/run_main_module:33:47
+
+Node.js v24.2.0
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+
+> node-remote-desktop@1.0.0 dev
+> nodemon server.js --watch native/osx/*.m --ext js,m
+
+[33m[nodemon] 3.1.10[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): native/osx/list_windows_cg.m[39m
+[33m[nodemon] watching extensions: js,m[39m
+[32m[nodemon] starting `node server.js native/osx/screencap7_clean.m`[39m
+🚀 Starting HTTP API screen capture server...
+🔨 Recompiling native binaries...
+
+╔════════════════════════════════════════╗
+║      Remote Desktop VNC v2 (HTTP)     ║
+╠════════════════════════════════════════╣
+║  URL: http://0.0.0.0:3030               ║
+║  Platform: darwin                    ║
+║  Method: ScreenCaptureKit HTTP API    ║
+║  Native API: http://0.0.0.0:8080       ║
+║  Display: default              ║
+╚════════════════════════════════════════╝
+  
+✅ list_windows_cg compiled successfully
+✅ screencap7 compiled successfully
+🔥 Starting native macOS ScreenCaptureKit HTTP server...
+✅ Native macOS HTTP server started on port 8080!
+ScreenCap: 2025-06-24 21:35:39.867 screencap7[83493:94811751] 🔥 ScreenCaptureKit HTTP Server v7 Starting...
+
+ScreenCap: 2025-06-24 21:35:39.890 screencap7[83493:94811751] 📋 Permission Status:
+2025-06-24 21:35:39.890 screencap7[83493:94811751]    Screen Recording: ✅ GRANTED
+2025-06-24 21:35:39.890 screencap7[83493:94811751]    Accessibility: ✅ GRANTED
+
+ScreenCap: 2025-06-24 21:35:39.890 screencap7[83493:94811751] 🚀 Setting up ScreenCaptureKit...
+
+ScreenCap: 2025-06-24 21:35:39.901 screencap7[83493:94811751] 🌐 Starting HTTP server on port 8080...
+2025-06-24 21:35:39.901 screencap7[83493:94811751] 🚀 Setting up ScreenCaptureKit...
+
+ScreenCap: 2025-06-24 21:35:39.911 screencap7[83493:94811751] 📝 API Endpoints:
+2025-06-24 21:35:39.911 screencap7[83493:94811751]    GET  /apps           - List applications
+2025-06-24 21:35:39.911 screencap7[83493:94811751]    GET  /windows        - List windows (Core Graphics)
+2025-06-24 21:35:39.911 screencap7[83493:94811751]    GET  /display        - Get display info (resolution, scaling)
+2025-06-24 21:35:39.911 screencap7[83493:94811751]    GET  /frame          - Get current frame (JPEG)
+2025-06-24 21:35:39.911 screencap7[83493:94811751]    POST /capture        - Start capture {type, index}
+2025-06-24 21:35:39.911 screencap7[83493:94811751]    POST /click          - Send click {x, y}
+2025-06-24 21:35:39.911 screencap7[83493:94811751]    POST /click-window   - Send click to window {x, y, cgWindowID}
+2025-06-24 21:35:39.911 screencap7[83493:94811751]    POST /click-background - Send click to background window {x, y, cgWindowID}
+2025-06-24 21:35:39.911 screencap7[83493:94811751]    POST /key            - Send key {key}
+2025-06-24 21:35:39.911 screencap7[83493:94811751]    POST /key-window     - Send key to window {key, cgWindowID}
+2025-06-24 21:35:39.911 screencap7[83493:94811751]    POST /key-background - Send key to background window {key, cgWindowID}
+
+ScreenCap: 2025-06-24 21:35:39.911 screencap7[83493:94811751]    POST /screenshot     - Get window screenshot {cgWindowID}
+2025-06-24 21:35:39.911 screencap7[83493:94811751]    POST /stop           - Stop capture
+
+ScreenCap: 2025-06-24 21:35:39.911 screencap7[83493:94811793] ✅ HTTP server listening on port 8080
+
+ScreenCap: 2025-06-24 21:35:40.027 screencap7[83493:94811783] ❌ No displays found!
+
+ScreenCap: 2025-06-24 21:35:40.110 screencap7[83493:94811783] ❌ No displays found!
+
+✅ HTTP API streaming started at 30 FPS
+🎯 Starting coordinate test app (windowed 500x500)...
+node:events:485
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: spawn /Users/hjanuschka/node-sharer/native/osx/coordinate_test_window ENOENT
+    at ChildProcess._handle.onexit (node:internal/child_process:286:19)
+    at onErrorNT (node:internal/child_process:484:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+Emitted 'error' event on ChildProcess instance at:
+    at ChildProcess._handle.onexit (node:internal/child_process:292:12)
+    at onErrorNT (node:internal/child_process:484:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'spawn /Users/hjanuschka/node-sharer/native/osx/coordinate_test_window',
+  path: '/Users/hjanuschka/node-sharer/native/osx/coordinate_test_window',
+  spawnargs: []
+}
+
+Node.js v24.2.0
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+
+> node-remote-desktop@1.0.0 dev
+> nodemon server.js --watch native/osx/*.m --ext js,m
+
+[33m[nodemon] 3.1.10[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): native/osx/list_windows_cg.m[39m
+[33m[nodemon] watching extensions: js,m[39m
+[32m[nodemon] starting `node server.js native/osx/screencap7_clean.m`[39m
+🚀 Starting HTTP API screen capture server...
+🔨 Recompiling native binaries...
+
+╔════════════════════════════════════════╗
+║      Remote Desktop VNC v2 (HTTP)     ║
+╠════════════════════════════════════════╣
+║  URL: http://0.0.0.0:3030               ║
+║  Platform: darwin                    ║
+║  Method: ScreenCaptureKit HTTP API    ║
+║  Native API: http://0.0.0.0:8080       ║
+║  Display: default              ║
+╚════════════════════════════════════════╝
+  
+✅ list_windows_cg compiled successfully
+✅ screencap7 compiled successfully
+🔥 Starting native macOS ScreenCaptureKit HTTP server...
+✅ Native macOS HTTP server started on port 8080!
+✅ HTTP API streaming started at 30 FPS
+ScreenCap: 2025-06-24 21:36:08.078 screencap7[85568:94817021] 🔥 ScreenCaptureKit HTTP Server v7 Starting...
+
+ScreenCap: 2025-06-24 21:36:08.101 screencap7[85568:94817021] 📋 Permission Status:
+
+ScreenCap: 2025-06-24 21:36:08.101 screencap7[85568:94817021]    Screen Recording: ✅ GRANTED
+2025-06-24 21:36:08.101 screencap7[85568:94817021]    Accessibility: ✅ GRANTED
+2025-06-24 21:36:08.101 screencap7[85568:94817021] 🚀 Setting up ScreenCaptureKit...
+
+ScreenCap: 2025-06-24 21:36:08.111 screencap7[85568:94817021] 🌐 Starting HTTP server on port 8080...
+2025-06-24 21:36:08.111 screencap7[85568:94817021] 🚀 Setting up ScreenCaptureKit...
+
+ScreenCap: 2025-06-24 21:36:08.122 screencap7[85568:94817021] 📝 API Endpoints:
+2025-06-24 21:36:08.122 screencap7[85568:94817021]    GET  /apps           - List applications
+2025-06-24 21:36:08.122 screencap7[85568:94817021]    GET  /windows        - List windows (Core Graphics)
+2025-06-24 21:36:08.122 screencap7[85568:94817021]    GET  /display        - Get display info (resolution, scaling)
+2025-06-24 21:36:08.122 screencap7[85568:94817021]    GET  /frame          - Get current frame (JPEG)
+2025-06-24 21:36:08.122 screencap7[85568:94817021]    POST /capture        - Start capture {type, index}
+2025-06-24 21:36:08.122 screencap7[85568:94817021]    POST /click          - Send click {x, y}
+2025-06-24 21:36:08.122 screencap7[85568:94817021]    POST /click-window   - Send click to window {x, y, cgWindowID}
+2025-06-24 21:36:08.122 screencap7[85568:94817021]    POST /click-background - Send click to background window {x, y, cgWindowID}
+2025-06-24 21:36:08.122 screencap7[85568:94817021]    POST /key            - Send key {key}
+2025-06-24 21:36:08.122 screencap7[85568:94817021]    POST /key-window     - Send key to window {key, cgWindowID}
+2025-06-24 21:36:08.122 screencap7[85568:94817021]    POST /key-background - Send key to background window {key, cgWindowID}
+2025-06-24 21:36:08.122 screencap7[85568:94817021]    POST /screenshot     - Get window screenshot {cgWindowID}
+2025-06-24 21:36:08.122 screencap7[85568:94817021]    POST /stop           - Stop capture
+
+ScreenCap: 2025-06-24 21:36:08.122 screencap7[85568:94817721] ✅ HTTP server listening on port 8080
+
+ScreenCap: 2025-06-24 21:36:08.231 screencap7[85568:94817719] ❌ No displays found!
+
+ScreenCap: 2025-06-24 21:36:08.304 screencap7[85568:94817719] ❌ No displays found!
+
+ScreenCap: 2025-06-24 21:36:11.129 screencap7[85568:94817719] 📨 OPTIONS /capture
+
+ScreenCap: 2025-06-24 21:36:11.142 screencap7[85568:94817719] 📨 POST /capture
+
+ScreenCap: 2025-06-24 21:36:11.142 screencap7[85568:94817719] 🚀 Setting up ScreenCaptureKit...
+
+ScreenCap: 2025-06-24 21:36:11.262 screencap7[85568:94817719] ❌ No displays found!
+
+Client connected - streaming server screen automatically
+Input received: keydown undefined undefined
+ScreenCap: 2025-06-24 21:36:19.585 screencap7[85568:94817728] 🔍 Display info: Physical=1800x1169, Logical=1800x1169 (for clicks), Scale=1.0x
+
+⌨️ Sending global key: Meta
+ScreenCap: 2025-06-24 21:36:19.588 screencap7[85568:94817728] 📨 POST /key
+2025-06-24 21:36:19.588 screencap7[85568:94817728] 📦 Key request body: {"key":"Meta"}
+2025-06-24 21:36:19.588 screencap7[85568:94817728] ⌨️ Key press: Meta
+2025-06-24 21:36:19.588 screencap7[85568:94817728] ⌨️ Key press: Meta (target window: 0)
+2025-06-24 21:36:19.588 screencap7[85568:94817728] 🔤 Processing character: 'M' (unicode: 77)
+2025-06-24 21:36:19.588 screencap7[85568:94817728] 📤 Creating keyboard events for keyCode: 46
+2025-06-24 21:36:19.588 screencap7[85568:94817728] 📝 Created keyboard events: down=0x600002fa8100, up=0x600002fa8120
+2025-06-24 21:36:19.588 screencap7[85568:94817728] 📤 Posting global keyboard events...
+
+ScreenCap: 2025-06-24 21:36:19.601 screencap7[85568:94817728] ✅ Key press completed and events released
+
+ScreenCap: 2025-06-24 21:36:19.601 screencap7[85568:94817728] ✅ Key press response sent
+
+✅ Key sent via HTTP API: key_pressed
+Input received: keydown undefined undefined
+⌨️ Sending global key: r
+ScreenCap: 2025-06-24 21:36:19.704 screencap7[85568:94817728] 📨 POST /key
+
+ScreenCap: 2025-06-24 21:36:19.704 screencap7[85568:94817728] 📦 Key request body: {"key":"r"}
+2025-06-24 21:36:19.704 screencap7[85568:94817728] ⌨️ Key press: r
+2025-06-24 21:36:19.704 screencap7[85568:94817728] ⌨️ Key press: r (target window: 0)
+2025-06-24 21:36:19.704 screencap7[85568:94817728] 🔤 Processing character: 'r' (unicode: 114)
+2025-06-24 21:36:19.704 screencap7[85568:94817728] 📤 Creating keyboard events for keyCode: 15
+
+ScreenCap: 2025-06-24 21:36:19.704 screencap7[85568:94817728] 📝 Created keyboard events: down=0x600002f8c880, up=0x600002f8c980
+2025-06-24 21:36:19.704 screencap7[85568:94817728] 📤 Posting global keyboard events...
+
+ScreenCap: 2025-06-24 21:36:19.705 screencap7[85568:94817728] ✅ Key press completed and events released
+2025-06-24 21:36:19.705 screencap7[85568:94817728] ✅ Key press response sent
+
+✅ Key sent via HTTP API: key_pressed
+📝 Reset capture mode to desktop
+🪟 Window selection: 157616
+ScreenCap: 2025-06-24 21:36:24.627 screencap7[85568:94819396] 📨 POST /capture-window
+
+ScreenCap: 2025-06-24 21:36:24.627 screencap7[85568:94819396] 📦 Request body: {"cgWindowID":157616}
+
+ScreenCap: 2025-06-24 21:36:24.627 screencap7[85568:94819396] 📌 Parsed JSON successfully: {
+    cgWindowID = 157616;
+}
+2025-06-24 21:36:24.628 screencap7[85568:94819396] 📌 About to extract windowID from JSON...
+
+ScreenCap: 2025-06-24 21:36:24.628 screencap7[85568:94819396] 📌 windowID value type: __NSCFNumber, value: 157616
+2025-06-24 21:36:24.628 screencap7[85568:94819396] 🪟 Window selection request: CGWindowID 157616
+
+ScreenCap: 2025-06-24 21:36:24.628 screencap7[85568:94819396] 📌 Capture server exists, stopping current capture...
+2025-06-24 21:36:24.628 screencap7[85568:94819396] 📌 Stop capture completed, starting window capture...
+2025-06-24 21:36:24.628 screencap7[85568:94819396] 🎯 startCaptureWithWindowID called with ID: 157616
+
+ScreenCap: 2025-06-24 21:36:24.628 screencap7[85568:94819396] 🎯 About to call setupWindowCapture...
+2025-06-24 21:36:24.628 screencap7[85568:94819396] 🚀 Setting up window capture for CGWindowID: 157616
+
+ScreenCap: 2025-06-24 21:36:24.638 screencap7[85568:94819396] 🎯 setupWindowCapture returned
+2025-06-24 21:36:24.638 screencap7[85568:94819396] 📌 Window capture started successfully
+
+ScreenCap: 2025-06-24 21:36:24.638 screencap7[85568:94819396] 📌 Response sent to client
+
+✅ Successfully switched to window: { status: 'window_capture_started', cgWindowID: 157616 }
+📝 Updated capture mode: window, window: 157616
+ScreenCap: 2025-06-24 21:36:24.749 screencap7[85568:94820495] ✅ Found window: Display Shield (ID: 157616)
+
+ScreenCap: 2025-06-24 21:36:24.751 screencap7[85568:94820495] 🔧 Attempting headless window capture configuration...
+
+ScreenCap: 2025-06-24 21:36:24.751 screencap7[85568:94820495] 🔧 Configured window stream for headless capture
+
+ScreenCap: 2025-06-24 21:36:24.888 screencap7[85568:94819396] ✅ Window capture started successfully at 30 FPS! Window: Display Shield (ID: 157616)
+
+Client connected - streaming server screen automatically
+ScreenCap: 2025-06-24 21:36:26.970 screencap7[85568:94820896] 🚨 Stream stopped with error: Keine Displays oder Fenster für die Aufnahme gefunden
+2025-06-24 21:36:26.970 screencap7[85568:94820896] ❌ Stream error: -3815 - Keine Displays oder Fenster für die Aufnahme gefunden
+
+ScreenCap: 2025-06-24 21:36:30.169 screencap7[85568:94817021] 🔄 Attempting to restart stream...
+2025-06-24 21:36:30.169 screencap7[85568:94817021] 🚀 Setting up ScreenCaptureKit...
+
+📝 Reset capture mode to desktop
+ScreenCap: 2025-06-24 21:36:30.304 screencap7[85568:94819396] ❌ Window with CGWindowID 157616 not found in available windows
+2025-06-24 21:36:30.304 screencap7[85568:94819396] 💡 Available windows count: 552
+
+ScreenCap: 2025-06-24 21:36:30.304 screencap7[85568:94819396] 🔄 Falling back to full desktop capture
+2025-06-24 21:36:30.304 screencap7[85568:94819396] 🔧 Window capture: Size 1800x1169
+2025-06-24 21:36:30.304 screencap7[85568:94819396] 🔧 Attempting headless capture configuration...
+2025-06-24 21:36:30.304 screencap7[85568:94819396] 🔧 Configured stream for headless capture (locked screen / lid closed support)
+
+ScreenCap: 2025-06-24 21:36:30.376 screencap7[85568:94820490] ✅ window capture started successfully at 30 FPS!
+2025-06-24 21:36:30.376 screencap7[85568:94820490] 📝 Send commands via stdin: 'click x y' or 'key character'
+
+ScreenCap: 2025-06-24 21:36:31.863 screencap7[85568:94819396] 📨 OPTIONS /capture
+
+ScreenCap: 2025-06-24 21:36:31.873 screencap7[85568:94819396] 📨 POST /capture
+2025-06-24 21:36:31.873 screencap7[85568:94819396] 🛑 Stopping current capture...
+
+ScreenCap: 2025-06-24 21:36:31.877 screencap7[85568:94820495] ✅ Capture stopped
+
+ScreenCap: 2025-06-24 21:36:31.977 screencap7[85568:94819396] 🚀 Setting up ScreenCaptureKit...
+
+ScreenCap: 2025-06-24 21:36:32.108 screencap7[85568:94820896] ✅ Found display: 1 (1800 x 1169)
+
+ScreenCap: 2025-06-24 21:36:32.108 screencap7[85568:94820896] 🔧 Desktop capture: Size 1800x1169
+2025-06-24 21:36:32.108 screencap7[85568:94820896] 🔧 Attempting headless capture configuration...
+2025-06-24 21:36:32.108 screencap7[85568:94820896] 🔧 Configured stream for headless capture (locked screen / lid closed support)
+
+ScreenCap: 2025-06-24 21:36:32.163 screencap7[85568:94820896] ✅ full desktop capture started successfully at 30 FPS!
+2025-06-24 21:36:32.163 screencap7[85568:94820896] 📝 Send commands via stdin: 'click x y' or 'key character'
+
+Client connected - streaming server screen automatically
+Input received: click 1313 562
+Current capture mode: desktop WindowID: null
+Desktop capture direct coordinates: 1313,562 -> 1313,562 (canvas 1920x1246)
+🖱️ Sending global click: 1313,562
+ScreenCap: 2025-06-24 21:36:33.894 screencap7[85568:94819396] 📨 POST /click
+2025-06-24 21:36:33.894 screencap7[85568:94819396] 📦 Click request body: {"x":1313,"y":562}
+2025-06-24 21:36:33.894 screencap7[85568:94819396] 🖱️ Click at (1313, 562)
+2025-06-24 21:36:33.894 screencap7[85568:94819396] 🖱️ Clicking at 1313,562 (target window: 0, activate: YES)
+2025-06-24 21:36:33.894 screencap7[85568:94819396] ✅ Accessibility permission verified
+2025-06-24 21:36:33.894 screencap7[85568:94819396] 📝 Created mouse events: down=0x600002fa5b00, up=0x600002fa5b80
+2025-06-24 21:36:33.894 screencap7[85568:94819396] 📤 Posting global mouse events...
+
+ScreenCap: 2025-06-24 21:36:33.894 screencap7[85568:94819396] ✅ Click executed and events released
+
+✅ Click sent via HTTP API: clicked
+Input received: keydown undefined undefined
+⌨️ Sending global key: a
+ScreenCap: 2025-06-24 21:36:34.497 screencap7[85568:94820490] 📨 POST /key
+
+ScreenCap: 2025-06-24 21:36:34.497 screencap7[85568:94820490] 📦 Key request body: {"key":"a"}
+2025-06-24 21:36:34.497 screencap7[85568:94820490] ⌨️ Key press: a
+2025-06-24 21:36:34.497 screencap7[85568:94820490] ⌨️ Key press: a (target window: 0)
+2025-06-24 21:36:34.497 screencap7[85568:94820490] 🔤 Processing character: 'a' (unicode: 97)
+2025-06-24 21:36:34.497 screencap7[85568:94820490] 📤 Creating keyboard events for keyCode: 0
+
+ScreenCap: 2025-06-24 21:36:34.497 screencap7[85568:94820490] 📝 Created keyboard events: down=0x600002fc4940, up=0x600002fc4840
+2025-06-24 21:36:34.497 screencap7[85568:94820490] 📤 Posting global keyboard events...
+
+ScreenCap: 2025-06-24 21:36:34.497 screencap7[85568:94820490] ✅ Key press completed and events released
+2025-06-24 21:36:34.497 screencap7[85568:94820490] ✅ Key press response sent
+
+✅ Key sent via HTTP API: key_pressed
+Input received: keydown undefined undefined
+⌨️ Sending global key: s
+ScreenCap: 2025-06-24 21:36:34.513 screencap7[85568:94820490] 📨 POST /key
+
+ScreenCap: 2025-06-24 21:36:34.513 screencap7[85568:94820490] 📦 Key request body: {"key":"s"}
+2025-06-24 21:36:34.513 screencap7[85568:94820490] ⌨️ Key press: s
+2025-06-24 21:36:34.513 screencap7[85568:94820490] ⌨️ Key press: s (target window: 0)
+2025-06-24 21:36:34.513 screencap7[85568:94820490] 🔤 Processing character: 's' (unicode: 115)
+2025-06-24 21:36:34.513 screencap7[85568:94820490] 📤 Creating keyboard events for keyCode: 1
+
+ScreenCap: 2025-06-24 21:36:34.513 screencap7[85568:94820490] 📝 Created keyboard events: down=0x600002f91b00, up=0x600002f90f40
+2025-06-24 21:36:34.513 screencap7[85568:94820490] 📤 Posting global keyboard events...
+2025-06-24 21:36:34.513 screencap7[85568:94820490] ✅ Key press completed and events released
+2025-06-24 21:36:34.513 screencap7[85568:94820490] ✅ Key press response sent
+
+✅ Key sent via HTTP API: key_pressed
+Input received: keydown undefined undefined
+⌨️ Sending global key: d
+ScreenCap: 2025-06-24 21:36:34.529 screencap7[85568:94819396] 📨 POST /key
+2025-06-24 21:36:34.529 screencap7[85568:94819396] 📦 Key request body: {"key":"d"}
+2025-06-24 21:36:34.529 screencap7[85568:94819396] ⌨️ Key press: d
+
+ScreenCap: 2025-06-24 21:36:34.529 screencap7[85568:94819396] ⌨️ Key press: d (target window: 0)
+2025-06-24 21:36:34.529 screencap7[85568:94819396] 🔤 Processing character: 'd' (unicode: 100)
+2025-06-24 21:36:34.529 screencap7[85568:94819396] 📤 Creating keyboard events for keyCode: 2
+
+ScreenCap: 2025-06-24 21:36:34.529 screencap7[85568:94819396] 📝 Created keyboard events: down=0x600002f91b00, up=0x600002f915e0
+2025-06-24 21:36:34.529 screencap7[85568:94819396] 📤 Posting global keyboard events...
+2025-06-24 21:36:34.529 screencap7[85568:94819396] ✅ Key press completed and events released
+2025-06-24 21:36:34.529 screencap7[85568:94819396] ✅ Key press response sent
+
+✅ Key sent via HTTP API: key_pressed
+Input received: keydown undefined undefined
+⌨️ Sending global key: a
+ScreenCap: 2025-06-24 21:36:34.767 screencap7[85568:94819396] 📨 POST /key
+2025-06-24 21:36:34.767 screencap7[85568:94819396] 📦 Key request body: {"key":"a"}
+2025-06-24 21:36:34.767 screencap7[85568:94819396] ⌨️ Key press: a
+
+ScreenCap: 2025-06-24 21:36:34.767 screencap7[85568:94819396] ⌨️ Key press: a (target window: 0)
+2025-06-24 21:36:34.767 screencap7[85568:94819396] 🔤 Processing character: 'a' (unicode: 97)
+2025-06-24 21:36:34.767 screencap7[85568:94819396] 📤 Creating keyboard events for keyCode: 0
+
+ScreenCap: 2025-06-24 21:36:34.767 screencap7[85568:94819396] 📝 Created keyboard events: down=0x600002f872c0, up=0x600002f853c0
+2025-06-24 21:36:34.768 screencap7[85568:94819396] 📤 Posting global keyboard events...
+
+ScreenCap: 2025-06-24 21:36:34.768 screencap7[85568:94819396] ✅ Key press completed and events released
+2025-06-24 21:36:34.768 screencap7[85568:94819396] ✅ Key press response sent
+
+✅ Key sent via HTTP API: key_pressed
+Input received: keydown undefined undefined
+⌨️ Sending global key: s
+ScreenCap: 2025-06-24 21:36:34.782 screencap7[85568:94819396] 📨 POST /key
+2025-06-24 21:36:34.782 screencap7[85568:94819396] 📦 Key request body: {"key":"s"}
+2025-06-24 21:36:34.782 screencap7[85568:94819396] ⌨️ Key press: s
+2025-06-24 21:36:34.782 screencap7[85568:94819396] ⌨️ Key press: s (target window: 0)
+2025-06-24 21:36:34.782 screencap7[85568:94819396] 🔤 Processing character: 's' (unicode: 115)
+
+ScreenCap: 2025-06-24 21:36:34.782 screencap7[85568:94819396] 📤 Creating keyboard events for keyCode: 1
+
+ScreenCap: 2025-06-24 21:36:34.782 screencap7[85568:94819396] 📝 Created keyboard events: down=0x600002f853c0, up=0x600002f872c0
+2025-06-24 21:36:34.782 screencap7[85568:94819396] 📤 Posting global keyboard events...
+
+ScreenCap: 2025-06-24 21:36:34.782 screencap7[85568:94819396] ✅ Key press completed and events released
+2025-06-24 21:36:34.782 screencap7[85568:94819396] ✅ Key press response sent
+
+✅ Key sent via HTTP API: key_pressed
+Input received: keydown undefined undefined
+⌨️ Sending global key: d
+ScreenCap: 2025-06-24 21:36:34.791 screencap7[85568:94819396] 📨 POST /key
+2025-06-24 21:36:34.791 screencap7[85568:94819396] 📦 Key request body: {"key":"d"}
+2025-06-24 21:36:34.791 screencap7[85568:94819396] ⌨️ Key press: d
+2025-06-24 21:36:34.791 screencap7[85568:94819396] ⌨️ Key press: d (target window: 0)
+
+ScreenCap: 2025-06-24 21:36:34.791 screencap7[85568:94819396] 🔤 Processing character: 'd' (unicode: 100)
+2025-06-24 21:36:34.791 screencap7[85568:94819396] 📤 Creating keyboard events for keyCode: 2
+
+ScreenCap: 2025-06-24 21:36:34.791 screencap7[85568:94819396] 📝 Created keyboard events: down=0x600002f872c0, up=0x600002f853c0
+2025-06-24 21:36:34.791 screencap7[85568:94819396] 📤 Posting global keyboard events...
+
+ScreenCap: 2025-06-24 21:36:34.791 screencap7[85568:94819396] ✅ Key press completed and events released
+2025-06-24 21:36:34.791 screencap7[85568:94819396] ✅ Key press response sent
+
+✅ Key sent via HTTP API: key_pressed

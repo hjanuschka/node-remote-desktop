@@ -18,7 +18,7 @@ let captureInterval = null;
 let currentCaptureMode = 'desktop'; // 'desktop' or 'window'
 let currentWindowID = null;
 
-function startServerScreenCapture() {
+async function startServerScreenCapture() {
   console.log('🚀 Starting HTTP API screen capture server...');
   
   if (platform === 'darwin') {
@@ -26,81 +26,79 @@ function startServerScreenCapture() {
     const nativeDir = path.join(__dirname, 'native', 'osx');
     console.log('🔨 Recompiling native binaries...');
     
-    // Compile main capture binary
-    exec(`cd "${nativeDir}" && clang -o screencap7 screencap7_clean.m -framework Foundation -framework ScreenCaptureKit -framework CoreMedia -framework CoreVideo -framework ImageIO -framework UniformTypeIdentifiers -framework CoreGraphics -framework AppKit`, (error) => {
-      if (error) {
-        console.error('❌ Failed to compile screencap7:', error.message);
-      } else {
-        console.log('✅ screencap7 compiled successfully');
-      }
+    // Compile main capture binary first
+    const compileScreencap = new Promise((resolve, reject) => {
+      exec(`cd "${nativeDir}" && clang -o screencap7 screencap7_clean.m -framework Foundation -framework ScreenCaptureKit -framework CoreMedia -framework CoreVideo -framework ImageIO -framework UniformTypeIdentifiers -framework CoreGraphics -framework AppKit`, (error) => {
+        if (error) {
+          console.error('❌ Failed to compile screencap7:', error.message);
+          reject(error);
+        } else {
+          console.log('✅ screencap7 compiled successfully');
+          resolve();
+        }
+      });
     });
     
     // Compile window listing tool
-    exec(`cd "${nativeDir}" && clang -o list_windows_cg list_windows_cg.m -framework Foundation -framework CoreGraphics`, (error) => {
-      if (error) {
-        console.error('❌ Failed to compile list_windows_cg:', error.message);
-      } else {
-        console.log('✅ list_windows_cg compiled successfully');
+    const compileListWindows = new Promise((resolve, reject) => {
+      exec(`cd "${nativeDir}" && clang -o list_windows_cg list_windows_cg.m -framework Foundation -framework CoreGraphics`, (error) => {
+        if (error) {
+          console.error('❌ Failed to compile list_windows_cg:', error.message);
+          reject(error);
+        } else {
+          console.log('✅ list_windows_cg compiled successfully');
+          resolve();
+        }
+      });
+    });
+    
+    // Wait for screencap7 compilation before proceeding
+    try {
+      await compileScreencap;
+      // list_windows_cg can compile in parallel, don't wait for it
+      compileListWindows.catch(() => {}); // Ignore errors
+      
+      console.log('🔥 Starting native macOS ScreenCaptureKit HTTP server...');
+      startNativeServer();
+    } catch (error) {
+      console.error('❌ Failed to compile required screencap7 binary');
+      return;
+    }
+  } else {
+    console.error('❌ Unsupported platform:', platform);
+  }
+}
+
+function startNativeServer() {
+  const binaryPath = path.join(__dirname, 'native', 'osx', 'screencap7');
+  
+  if (!fs.existsSync(binaryPath)) {
+    console.error('❌ Native screencap7 binary not found after compilation!');
+    return;
+  }
+  
+  ffmpegProcess = spawn(binaryPath, ['8080']);
+    
+  if (ffmpegProcess) {
+    ffmpegProcess.stdout.on('data', (data) => {
+      console.log('ScreenCap:', data.toString());
+    });
+    
+    ffmpegProcess.stderr.on('data', (data) => {
+      console.log('ScreenCap:', data.toString());
+    });
+    
+    ffmpegProcess.on('close', (code) => {
+      console.log('ScreenCap HTTP server closed:', code);
+      if (code !== 0) {
+        console.log('🔄 ScreenCap crashed, restarting in 2 seconds...');
+        setTimeout(() => {
+          startServerScreenCapture();
+        }, 2000);
       }
     });
     
-    // Use our native ScreenCaptureKit HTTP server!
-    const binaryPath = path.join(__dirname, 'native', 'osx', 'screencap7');
-    
-    if (!fs.existsSync(binaryPath)) {
-      console.error('❌ Native screencap7 binary not found! Run: cd native/osx && clang -o screencap7 screencap7_clean.m');
-      return;
-    }
-    
-    console.log('🔥 Starting native macOS ScreenCaptureKit HTTP server...');
-    ffmpegProcess = spawn(binaryPath, ['8080']);
-    
-    if (ffmpegProcess) {
-      ffmpegProcess.stdout.on('data', (data) => {
-        console.log('ScreenCap:', data.toString());
-      });
-      
-      ffmpegProcess.stderr.on('data', (data) => {
-        console.log('ScreenCap:', data.toString());
-      });
-      
-      ffmpegProcess.on('close', (code) => {
-        console.log('ScreenCap HTTP server closed:', code);
-        if (code !== 0) {
-          console.log('🔄 ScreenCap crashed, restarting in 2 seconds...');
-          setTimeout(() => {
-            startServerScreenCapture();
-          }, 2000);
-        }
-      });
-      
-      console.log('✅ Native macOS HTTP server started on port 8080!');
-    }
-    
-  } else if (platform === 'linux') {
-    const display = process.env.DISPLAY || ':20.0';
-    ffmpegProcess = spawn('ffmpeg', [
-      '-f', 'x11grab',
-      '-video_size', '1600x900',
-      '-framerate', '25',
-      '-i', display,
-      '-q:v', '4',
-      '-f', 'image2pipe',
-      '-vcodec', 'mjpeg',
-      'pipe:1'
-    ]);
-    
-    if (ffmpegProcess) {
-      ffmpegProcess.stderr.on('data', (data) => {
-        console.log('FFmpeg:', data.toString());
-      });
-      
-      ffmpegProcess.on('close', (code) => {
-        console.log('FFmpeg process closed:', code);
-      });
-      
-      console.log('✅ Linux FFmpeg started!');
-    }
+    console.log('✅ Native macOS HTTP server started on port 8080!');
   }
 }
 

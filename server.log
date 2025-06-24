@@ -1,0 +1,26 @@
+
+> node-remote-desktop@1.0.0 dev
+> nodemon server.js --watch native/osx/*.m --ext js,m
+
+[33m[nodemon] 3.1.10[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): native/osx/list_windows_cg.m[39m
+[33m[nodemon] watching extensions: js,m[39m
+[32m[nodemon] starting `node server.js native/osx/screencap7_clean.m`[39m
+🚀 Starting HTTP API screen capture server...
+🔨 Recompiling native binaries...
+❌ Native screencap7 binary not found! Run: cd native/osx && clang -o screencap7 screencap7_clean.m
+
+╔════════════════════════════════════════╗
+║      Remote Desktop VNC v2 (HTTP)     ║
+╠════════════════════════════════════════╣
+║  URL: http://0.0.0.0:3030               ║
+║  Platform: darwin                    ║
+║  Method: ScreenCaptureKit HTTP API    ║
+║  Native API: http://0.0.0.0:8080       ║
+║  Display: default              ║
+╚════════════════════════════════════════╝
+  
+✅ list_windows_cg compiled successfully
+✅ screencap7 compiled successfully
+✅ HTTP API streaming started at 30 FPS
