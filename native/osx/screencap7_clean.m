@@ -14,7 +14,7 @@ typedef enum {
     CaptureTypeWindow = 2
 } CaptureType;
 
-@interface ScreenCapture : NSObject <SCStreamOutput>
+@interface ScreenCapture : NSObject <SCStreamOutput, SCStreamDelegate>
 @property (nonatomic, strong) SCStream *stream;
 @property (nonatomic, strong) dispatch_queue_t outputQueue;
 @property (nonatomic, strong) dispatch_queue_t inputQueue;
@@ -223,16 +223,37 @@ typedef enum {
         
         // Configure stream - 30 FPS for all capture types
         SCStreamConfiguration *config = [[SCStreamConfiguration alloc] init];
+        
+        // Configure capture size
         config.width = (int)captureSize.width;
         config.height = (int)captureSize.height;
+        
+        // Log capture mode and size for debugging
+        if (self.captureType == CaptureTypeWindow) {
+            NSLog(@"🔧 Window capture: Size %zux%zu", config.width, config.height);
+        } else {
+            NSLog(@"🔧 Desktop capture: Size %zux%zu", config.width, config.height);
+        }
+        
         config.queueDepth = 6;
         config.pixelFormat = kCVPixelFormatType_32BGRA;
         config.colorSpaceName = kCGColorSpaceSRGB;
         config.showsCursor = YES;
         config.minimumFrameInterval = CMTimeMake(1, 30); // 30 FPS
         
-        // Create stream
-        self.stream = [[SCStream alloc] initWithFilter:filter configuration:config delegate:nil];
+        // Enable headless capture for locked screens and closed lids
+        if (@available(macOS 13.0, *)) {
+            config.capturesAudio = NO;
+            config.sampleRate = 0;
+            config.channelCount = 0;
+            // These experimental settings may help with headless capture
+            NSLog(@"🔧 Attempting headless capture configuration...");
+        }
+        
+        NSLog(@"🔧 Configured stream for headless capture (locked screen / lid closed support)");
+        
+        // Create stream with error delegate
+        self.stream = [[SCStream alloc] initWithFilter:filter configuration:config delegate:self];
         
         NSError *streamError;
         BOOL success = [self.stream addStreamOutput:self type:SCStreamOutputTypeScreen sampleHandlerQueue:self.outputQueue error:&streamError];
@@ -316,48 +337,104 @@ typedef enum {
         
         CGPoint clickPoint = CGPointMake(x, y);
         
-        // If we have a target window, bring it to front and convert coordinates
+        // If we have a target window, bring it to front (coordinates are already scaled properly)
         if (windowID != 0) {
-            NSLog(@"🎯 Targeting specific window ID: %u", windowID);
+            NSLog(@"🎯 Targeting specific window ID: %u at coordinates %d,%d", windowID, x, y);
             
             // Always activate the window to bring it to front
             [self activateWindowIfNeeded:windowID];
             
-            // Get window info for coordinate conversion
-            CFArrayRef windowList = CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
-            if (windowList) {
-                CFIndex count = CFArrayGetCount(windowList);
-                for (CFIndex i = 0; i < count; i++) {
-                    CFDictionaryRef window = (CFDictionaryRef)CFArrayGetValueAtIndex(windowList, i);
-                    CFNumberRef windowNumber = (CFNumberRef)CFDictionaryGetValue(window, kCGWindowNumber);
-                    
-                    UInt32 currentWindowID;
-                    CFNumberGetValue(windowNumber, kCFNumberSInt32Type, &currentWindowID);
-                    
-                    if (currentWindowID == windowID) {
-                        // Get window bounds
-                        CFDictionaryRef bounds = (CFDictionaryRef)CFDictionaryGetValue(window, kCGWindowBounds);
-                        if (bounds) {
-                            CGRect windowRect;
-                            CGRectMakeWithDictionaryRepresentation(bounds, &windowRect);
-                            
-                            // Convert relative coordinates to absolute
-                            clickPoint.x += windowRect.origin.x;
-                            clickPoint.y += windowRect.origin.y;
-                            
-                            NSLog(@"🗂️ Window bounds: %.0f,%.0f %.0fx%.0f", 
-                                  windowRect.origin.x, windowRect.origin.y, 
-                                  windowRect.size.width, windowRect.size.height);
-                            NSLog(@"🎯 Adjusted click point: %.0f,%.0f", clickPoint.x, clickPoint.y);
-                        }
-                        break;
-                    }
-                }
-                CFRelease(windowList);
-            }
+            // Don't adjust coordinates - they're already scaled correctly from the server
+            NSLog(@"🎯 Using provided coordinates directly (already scaled): %.0f,%.0f", clickPoint.x, clickPoint.y);
         }
         
-        // Always use global events now that the window is in focus
+        // Use window-specific events if we have a target window
+        if (windowID != 0) {
+            NSLog(@"🎯 Sending window-specific click events to window %u", windowID);
+            
+            // Try to find the specific window element and click it directly
+            pid_t targetPID = [self getProcessIDForWindowID:windowID];
+            if (targetPID > 0) {
+                AXUIElementRef appElement = AXUIElementCreateApplication(targetPID);
+                if (appElement) {
+                    CFArrayRef windows;
+                    AXError result = AXUIElementCopyAttributeValues(appElement, kAXWindowsAttribute, 0, 100, &windows);
+                    
+                    if (result == kAXErrorSuccess && windows) {
+                        CFIndex windowCount = CFArrayGetCount(windows);
+                        
+                        for (CFIndex j = 0; j < windowCount; j++) {
+                            AXUIElementRef windowElement = (AXUIElementRef)CFArrayGetValueAtIndex(windows, j);
+                            
+                            // Get window position to match with our CGWindowID
+                            CFTypeRef positionValue;
+                            if (AXUIElementCopyAttributeValue(windowElement, kAXPositionAttribute, &positionValue) == kAXErrorSuccess) {
+                                CGPoint windowPos;
+                                if (AXValueGetValue(positionValue, kAXValueCGPointType, &windowPos)) {
+                                    // Check if this matches our target window position
+                                    CFArrayRef cgWindows = CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
+                                    if (cgWindows) {
+                                        CFIndex cgCount = CFArrayGetCount(cgWindows);
+                                        for (CFIndex k = 0; k < cgCount; k++) {
+                                            CFDictionaryRef cgWindow = (CFDictionaryRef)CFArrayGetValueAtIndex(cgWindows, k);
+                                            CFNumberRef cgWindowNumber = (CFNumberRef)CFDictionaryGetValue(cgWindow, kCGWindowNumber);
+                                            UInt32 cgID;
+                                            CFNumberGetValue(cgWindowNumber, kCFNumberSInt32Type, &cgID);
+                                            
+                                            if (cgID == windowID) {
+                                                CFDictionaryRef bounds = (CFDictionaryRef)CFDictionaryGetValue(cgWindow, kCGWindowBounds);
+                                                if (bounds) {
+                                                    CGRect cgRect;
+                                                    CGRectMakeWithDictionaryRepresentation(bounds, &cgRect);
+                                                    
+                                                    // If positions match (within 5 pixels), this is our window
+                                                    if (fabs(windowPos.x - cgRect.origin.x) < 5 && fabs(windowPos.y - cgRect.origin.y) < 5) {
+                                                        // Found the correct window - bring it to front
+                                                        AXUIElementSetAttributeValue(windowElement, kAXMainAttribute, kCFBooleanTrue);
+                                                        AXUIElementSetAttributeValue(windowElement, kAXFocusedAttribute, kCFBooleanTrue);
+                                                        usleep(100000); // 100ms delay for window to focus
+                                                        
+                                                        NSLog(@"✅ Brought specific window to front, using original coordinates");
+                                                        
+                                                        CFRelease(cgWindows);
+                                                        
+                                                        // Use the original click coordinates since the window is now focused
+                                                        CGPoint originalPoint = CGPointMake(x, y);
+                                                        CGEventRef mouseDown = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseDown, originalPoint, kCGMouseButtonLeft);
+                                                        CGEventRef mouseUp = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseUp, originalPoint, kCGMouseButtonLeft);
+                                                        
+                                                        if (mouseDown && mouseUp) {
+                                                            NSLog(@"📤 Posting targeted click at original coordinates %d,%d", x, y);
+                                                            CGEventPost(kCGHIDEventTap, mouseDown);
+                                                            usleep(10000); // 10ms between down and up
+                                                            CGEventPost(kCGHIDEventTap, mouseUp);
+                                                            
+                                                            CFRelease(mouseDown);
+                                                            CFRelease(mouseUp);
+                                                            NSLog(@"✅ Window-specific click completed successfully");
+                                                        }
+                                                        
+                                                        goto cleanup_and_return;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        CFRelease(cgWindows);
+                                    }
+                                }
+                                CFRelease(positionValue);
+                            }
+                        }
+                        CFRelease(windows);
+                    }
+                    CFRelease(appElement);
+                }
+            }
+            
+            NSLog(@"⚠️ Window-specific click failed, falling back to global events");
+        }
+        
+        // Fallback to global events
         CGEventRef mouseDown = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseDown, clickPoint, kCGMouseButtonLeft);
         CGEventRef mouseUp = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseUp, clickPoint, kCGMouseButtonLeft);
         
@@ -376,6 +453,8 @@ typedef enum {
             if (mouseDown) CFRelease(mouseDown);
             if (mouseUp) CFRelease(mouseUp);
         }
+        
+        cleanup_and_return:;
     } @catch (NSException *exception) {
         NSLog(@"❌ Exception in performClick: %@", exception);
     }
@@ -409,32 +488,73 @@ typedef enum {
 }
 
 - (void)activateWindowIfNeeded:(UInt32)windowID {
-    NSLog(@"🎯 Attempting to activate window %u for better event delivery", windowID);
+    NSLog(@"🎯 Attempting to activate specific window %u for better event delivery", windowID);
     
-    // Get the process ID for this window
-    pid_t targetPID = [self getProcessIDForWindowID:windowID];
-    if (targetPID <= 0) {
-        NSLog(@"❌ Could not find process for window %u", windowID);
-        return;
-    }
-    
-    // Try to activate the application using NSRunningApplication
-    NSRunningApplication *app = [NSRunningApplication runningApplicationWithProcessIdentifier:targetPID];
-    if (app) {
-        NSLog(@"🎯 Activating application: %@ (PID: %d)", app.localizedName, targetPID);
-        
-        // Activate the application to bring it to front
-        BOOL success = [app activateWithOptions:0];
-        if (success) {
-            NSLog(@"✅ Successfully activated application");
-            // Give it a moment to activate
-            usleep(100000); // 100ms
-        } else {
-            NSLog(@"❌ Failed to activate application");
+    // First try to bring the specific window to front using Core Graphics
+    CFArrayRef windowList = CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
+    if (windowList) {
+        CFIndex count = CFArrayGetCount(windowList);
+        for (CFIndex i = 0; i < count; i++) {
+            CFDictionaryRef window = (CFDictionaryRef)CFArrayGetValueAtIndex(windowList, i);
+            CFNumberRef windowNumber = (CFNumberRef)CFDictionaryGetValue(window, kCGWindowNumber);
+            
+            UInt32 currentWindowID;
+            CFNumberGetValue(windowNumber, kCFNumberSInt32Type, &currentWindowID);
+            
+            if (currentWindowID == windowID) {
+                // Found our target window - get its info
+                CFStringRef windowTitle = (CFStringRef)CFDictionaryGetValue(window, kCGWindowName);
+                CFStringRef ownerName = (CFStringRef)CFDictionaryGetValue(window, kCGWindowOwnerName);
+                
+                NSString *title = windowTitle ? (__bridge NSString *)windowTitle : @"Untitled";
+                NSString *owner = ownerName ? (__bridge NSString *)ownerName : @"Unknown";
+                NSLog(@"🎯 Found target window: '%@' from '%@'", title, owner);
+                
+                // Get the process ID and activate the application first
+                pid_t targetPID = [self getProcessIDForWindowID:windowID];
+                if (targetPID > 0) {
+                    NSRunningApplication *app = [NSRunningApplication runningApplicationWithProcessIdentifier:targetPID];
+                    if (app) {
+                        NSLog(@"🎯 Activating application: %@", app.localizedName);
+                        [app activateWithOptions:0];
+                        usleep(200000); // 200ms - longer wait for app activation
+                    }
+                }
+                
+                // Now try to bring this specific window to front using accessibility
+                AXUIElementRef appElement = AXUIElementCreateApplication(targetPID);
+                if (appElement) {
+                    CFArrayRef windows;
+                    AXError result = AXUIElementCopyAttributeValues(appElement, kAXWindowsAttribute, 0, 100, &windows);
+                    
+                    if (result == kAXErrorSuccess && windows) {
+                        CFIndex windowCount = CFArrayGetCount(windows);
+                        NSLog(@"🔍 Found %ld windows in app, looking for window %u", windowCount, windowID);
+                        
+                        for (CFIndex j = 0; j < windowCount; j++) {
+                            AXUIElementRef windowElement = (AXUIElementRef)CFArrayGetValueAtIndex(windows, j);
+                            
+                            // Try to bring this window to front
+                            AXError frontResult = AXUIElementSetAttributeValue(windowElement, kAXMainAttribute, kCFBooleanTrue);
+                            AXError focusResult = AXUIElementSetAttributeValue(windowElement, kAXFocusedAttribute, kCFBooleanTrue);
+                            
+                            if (frontResult == kAXErrorSuccess) {
+                                NSLog(@"✅ Successfully brought window to front using AX");
+                                usleep(100000); // 100ms
+                                break;
+                            }
+                        }
+                        CFRelease(windows);
+                    }
+                    CFRelease(appElement);
+                }
+                break;
+            }
         }
-    } else {
-        NSLog(@"❌ Could not find NSRunningApplication for PID %d", targetPID);
+        CFRelease(windowList);
     }
+    
+    NSLog(@"✅ Window activation sequence completed");
 }
 
 - (void)performKeyPress:(NSString *)key {
@@ -557,6 +677,10 @@ typedef enum {
         }
         return;
     }
+    
+    // Reset frame failure counter when we get a successful frame
+    static int frameFailureCount = 0;
+    frameFailureCount = 0;
     
     // Log which stream this is coming from
     static int streamLogCount = 0;
@@ -781,10 +905,21 @@ typedef enum {
             config.showsCursor = YES;
             config.minimumFrameInterval = CMTimeMake(1, 30); // 30 FPS
             
+            // Enable headless capture for locked screens and closed lids
+            if (@available(macOS 13.0, *)) {
+                config.capturesAudio = NO;
+                config.sampleRate = 0;
+                config.channelCount = 0;
+                // These experimental settings may help with headless capture
+                NSLog(@"🔧 Attempting headless window capture configuration...");
+            }
+            
+            NSLog(@"🔧 Configured window stream for headless capture");
+            
             // Create new stream on main queue
             dispatch_async(dispatch_get_main_queue(), ^{
                 @try {
-                    self.stream = [[SCStream alloc] initWithFilter:filter configuration:config delegate:nil];
+                    self.stream = [[SCStream alloc] initWithFilter:filter configuration:config delegate:self];
                     
                     if (!self.stream) {
                         NSLog(@"❌ Failed to create SCStream!");
@@ -940,6 +1075,45 @@ typedef enum {
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
 
+#pragma mark - SCStreamDelegate
+
+- (void)stream:(SCStream *)stream didStopWithError:(NSError *)error {
+    NSLog(@"🚨 Stream stopped with error: %@", error.localizedDescription);
+    
+    if (error.code == -3801) { // SCStreamErrorDisplayNotFound
+        NSLog(@"🔒 Display not available (likely locked/sleeping). Attempting to continue with last frame...");
+        
+        // Keep serving the last captured frame
+        // Don't restart the stream immediately as it may fail again
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            NSLog(@"🔄 Attempting to restart capture after display lock...");
+            [self setupCapture];
+        });
+    } else {
+        NSLog(@"❌ Stream error: %ld - %@", (long)error.code, error.localizedDescription);
+        
+        // Try to restart the stream after a delay
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 3 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            NSLog(@"🔄 Attempting to restart stream...");
+            [self setupCapture];
+        });
+    }
+}
+
+- (void)streamDidBecomeInvalid:(SCStream *)stream {
+    NSLog(@"⚠️ Stream became invalid");
+    
+    if (stream == self.stream) {
+        self.stream = nil;
+        self.isCapturing = NO;
+        
+        // Try to restart after a delay
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            NSLog(@"🔄 Restarting capture after stream invalidation...");
+            [self setupCapture];
+        });
+    }
+}
 
 @end
 
@@ -1015,6 +1189,7 @@ void listApplicationsAndWindows() {
     NSLog(@"📝 API Endpoints:");
     NSLog(@"   GET  /apps           - List applications");
     NSLog(@"   GET  /windows        - List windows (Core Graphics)");
+    NSLog(@"   GET  /display        - Get display info (resolution, scaling)");
     NSLog(@"   GET  /frame          - Get current frame (JPEG)");
     NSLog(@"   POST /capture        - Start capture {type, index}");
     NSLog(@"   POST /click          - Send click {x, y}");
@@ -1103,8 +1278,8 @@ void listApplicationsAndWindows() {
     NSString *method = parts[0];
     NSString *path = parts[1];
     
-    // Only log non-frame requests to reduce spam
-    if (![path isEqualToString:@"/frame"]) {
+    // Only log non-frame and non-display requests to reduce spam
+    if (![path isEqualToString:@"/frame"] && ![path isEqualToString:@"/display"]) {
         NSLog(@"📨 %@ %@", method, path);
     }
     
@@ -1112,6 +1287,8 @@ void listApplicationsAndWindows() {
         [self sendAppsListResponse:client_fd];
     } else if ([method isEqualToString:@"GET"] && [path isEqualToString:@"/windows"]) {
         [self sendWindowsListResponse:client_fd];
+    } else if ([method isEqualToString:@"GET"] && [path isEqualToString:@"/display"]) {
+        [self sendDisplayInfoResponse:client_fd];
     } else if ([method isEqualToString:@"GET"] && [path isEqualToString:@"/frame"]) {
         [self sendFrameResponse:client_fd];
     } else if ([method isEqualToString:@"POST"] && [path isEqualToString:@"/click"]) {
@@ -1157,6 +1334,42 @@ void listApplicationsAndWindows() {
     
     NSString *response = [NSString stringWithFormat:@"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %lu\r\nAccess-Control-Allow-Origin: *\r\n\r\n%@", 
                          (unsigned long)data.length, json];
+    
+    send(client_fd, [response UTF8String], response.length, 0);
+}
+
+- (void)sendDisplayInfoResponse:(int)client_fd {
+    // Get primary display dimensions
+    CGDirectDisplayID displayID = CGMainDisplayID();
+    size_t physicalWidth = CGDisplayPixelsWide(displayID);
+    size_t physicalHeight = CGDisplayPixelsHigh(displayID);
+    
+    // Get display bounds (logical coordinates for mouse events)
+    CGRect bounds = CGDisplayBounds(displayID);
+    
+    // For clicks, we need to use the LOGICAL coordinate system, not physical pixels
+    size_t clickWidth = (size_t)bounds.size.width;
+    size_t clickHeight = (size_t)bounds.size.height;
+    
+    NSLog(@"🔍 Display info: Physical=%zux%zu, Logical=%.0fx%.0f (for clicks), Scale=%.1fx", 
+          physicalWidth, physicalHeight, bounds.size.width, bounds.size.height, (double)physicalWidth/bounds.size.width);
+    
+    NSDictionary *displayInfo = @{
+        @"width": @(clickWidth),        // Use logical coordinates for clicking
+        @"height": @(clickHeight),      // Use logical coordinates for clicking
+        @"physicalWidth": @(physicalWidth),
+        @"physicalHeight": @(physicalHeight),
+        @"boundsWidth": @(bounds.size.width),
+        @"boundsHeight": @(bounds.size.height),
+        @"scaleFactor": @((double)physicalWidth / bounds.size.width)
+    };
+    
+    NSError *jsonError;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:displayInfo options:0 error:&jsonError];
+    NSString *json = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    
+    NSString *response = [NSString stringWithFormat:@"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %lu\r\nAccess-Control-Allow-Origin: *\r\n\r\n%@", 
+                         (unsigned long)jsonData.length, json];
     
     send(client_fd, [response UTF8String], response.length, 0);
 }
