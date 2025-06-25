@@ -22,87 +22,34 @@
 
 - (void)setupEncoder {
     OSStatus status;
-    CMVideoCodecType codecType;
+    CMVideoCodecType codecType = kCMVideoCodecType_H264; // Start with most reliable
     
-    // Check macOS version and try codecs in order of preference
-    if (@available(macOS 13.0, *)) {
-        // Try VP9 first
-        codecType = kCMVideoCodecType_VP9;
-        status = VTCompressionSessionCreate(
-            kCFAllocatorDefault,
-            self.width,
-            self.height,
-            codecType,
-            NULL, NULL, NULL,
-            compressionOutputCallback,
-            (__bridge void *)self,
-            &_compressionSession
-        );
-        
-        if (status == noErr) {
-            NSLog(@"✅ VP9 encoder initialized successfully");
-        } else {
-            NSLog(@"⚠️ VP9 not available (status: %d), trying HEVC...", status);
-            codecType = 0; // Reset for fallback
-        }
-    } else {
-        NSLog(@"⚠️ macOS < 13.0, VP9 not available");
-        codecType = 0;
-    }
+    NSLog(@"🎥 Setting up hardware encoder...");
     
-    // Fallback to HEVC if VP9 failed or unavailable
-    if (codecType == 0 || _compressionSession == NULL) {
-        codecType = kCMVideoCodecType_HEVC;
-        status = VTCompressionSessionCreate(
-            kCFAllocatorDefault,
-            self.width,
-            self.height,
-            codecType,
-            NULL, NULL, NULL,
-            compressionOutputCallback,
-            (__bridge void *)self,
-            &_compressionSession
-        );
-        
-        if (status == noErr) {
-            NSLog(@"✅ HEVC encoder initialized successfully");
-        } else {
-            // Final fallback to H.264
-            NSLog(@"⚠️ HEVC not available (status: %d), trying H.264...", status);
-            codecType = kCMVideoCodecType_H264;
-            status = VTCompressionSessionCreate(
-                kCFAllocatorDefault,
-                self.width,
-                self.height,
-                codecType,
-                NULL, NULL, NULL,
-                compressionOutputCallback,
-                (__bridge void *)self,
-                &_compressionSession
-            );
-            
-            if (status != noErr) {
-                NSLog(@"❌ Failed to create any compression session! H.264 status: %d", status);
-                return;
-            }
-            NSLog(@"✅ H.264 encoder initialized successfully");
-        }
-    }
+    // Just use H.264 for now to avoid crashes
+    status = VTCompressionSessionCreate(
+        kCFAllocatorDefault,
+        self.width,
+        self.height,
+        codecType,
+        NULL, // encoder specification
+        NULL, // source image buffer attributes  
+        NULL, // compressed data allocator
+        compressionOutputCallback,
+        (__bridge void *)self,
+        &_compressionSession
+    );
     
-    // Configure encoder properties only if session was created
-    if (_compressionSession == NULL) {
-        NSLog(@"❌ No compression session available!");
+    if (status != noErr) {
+        NSLog(@"❌ Failed to create H.264 compression session: %d", status);
         return;
     }
     
-    VTSessionSetProperty(_compressionSession, kVTCompressionPropertyKey_RealTime, kCFBooleanTrue);
+    NSLog(@"✅ H.264 encoder initialized successfully (%dx%d)", self.width, self.height);
     
-    // Set profile based on codec type
-    if (codecType == kCMVideoCodecType_HEVC) {
-        VTSessionSetProperty(_compressionSession, kVTCompressionPropertyKey_ProfileLevel, kVTProfileLevel_HEVC_Main_AutoLevel);
-    } else if (codecType == kCMVideoCodecType_H264) {
-        VTSessionSetProperty(_compressionSession, kVTCompressionPropertyKey_ProfileLevel, kVTProfileLevel_H264_High_AutoLevel);
-    }
+    // Configure basic encoder properties
+    VTSessionSetProperty(_compressionSession, kVTCompressionPropertyKey_RealTime, kCFBooleanTrue);
+    VTSessionSetProperty(_compressionSession, kVTCompressionPropertyKey_ProfileLevel, kVTProfileLevel_H264_High_AutoLevel);
     
     // Set bitrate
     int bitrateBps = self.bitrate;
@@ -144,10 +91,15 @@ static void compressionOutputCallback(
     }
     
     VP9Encoder *encoder = (__bridge VP9Encoder *)outputCallbackRefCon;
+    if (!encoder) {
+        NSLog(@"❌ Encoder callback: encoder is nil");
+        return;
+    }
     
     // Get the encoded data
     CMBlockBufferRef blockBuffer = CMSampleBufferGetDataBuffer(sampleBuffer);
     if (!blockBuffer) {
+        NSLog(@"❌ Encoder callback: no block buffer");
         return;
     }
     

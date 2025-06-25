@@ -257,24 +257,9 @@ typedef enum {
         
         NSLog(@"🔧 Configured stream for headless capture (locked screen / lid closed support)");
         
-        // Initialize VP9 encoder for hardware acceleration
+        // VP9/High Quality mode - use better JPEG settings
         if (self.useVP9Mode) {
-            self.vp9Encoder = [[VP9Encoder alloc] 
-                initWithWidth:config.width 
-                       height:config.height 
-                      bitrate:8000000  // 8 Mbps for VP9 (more efficient)
-                    framerate:30];
-            
-            // Set up callback to store encoded frames
-            // Using __block instead of __weak for manual reference counting
-            __block ScreenCapture *blockSelf = self;
-            [self.vp9Encoder setFrameCallback:^(NSData *encodedFrame) {
-                @synchronized(blockSelf.currentEncodedFrame) {
-                    blockSelf.currentEncodedFrame = [encodedFrame mutableCopy];
-                }
-            }];
-            
-            NSLog(@"🚀 VP9 hardware encoder initialized: %zux%zu", config.width, config.height);
+            NSLog(@"🚀 High Quality mode enabled: %zux%zu", config.width, config.height);
         }
         
         // Create stream with error delegate
@@ -786,10 +771,13 @@ typedef enum {
                                                                                  1, NULL);
             
             if (destination) {
-                // Set JPEG quality
+                // Set JPEG quality - higher for VP9/High Quality mode
+                float quality = self.useVP9Mode ? 0.95 : 0.75;
+                int maxSize = self.useVP9Mode ? 3840 : 1920; // Full resolution in HQ mode
+                
                 NSDictionary *options = @{
-                    (__bridge NSString*)kCGImageDestinationLossyCompressionQuality: @(0.75),
-                    (__bridge NSString*)kCGImageDestinationImageMaxPixelSize: @(1920) // Max dimension
+                    (__bridge NSString*)kCGImageDestinationLossyCompressionQuality: @(quality),
+                    (__bridge NSString*)kCGImageDestinationImageMaxPixelSize: @(maxSize)
                 };
                 
                 CGImageDestinationAddImage(destination, cgImage, (__bridge CFDictionaryRef)options);
@@ -801,11 +789,7 @@ typedef enum {
                     [self.currentFrame setData:jpegData];
                 }
                 
-                // If VP9 mode is enabled, also encode with hardware accelerated encoder
-                if (self.useVP9Mode && self.vp9Encoder) {
-                    [self.vp9Encoder encodeFrame:imageBuffer];
-                    // The encoded frame will be stored via the callback
-                }
+                // VP9/High Quality mode provides better JPEG quality and full resolution
                 
                 // Log progress occasionally (disabled to reduce spam)
                 static int frameCount = 0;
@@ -855,7 +839,7 @@ typedef enum {
     self.useVP9Mode = useVP9;
     
     if (useVP9) {
-        NSLog(@"🚀 Starting capture with VP9 hardware acceleration enabled");
+        NSLog(@"🚀 Starting capture with High Quality mode enabled");
     } else {
         NSLog(@"📸 Starting capture with standard MJPEG mode");
     }
@@ -876,7 +860,7 @@ typedef enum {
     self.useVP9Mode = useVP9;
     
     if (useVP9) {
-        NSLog(@"🚀 Window capture with VP9 hardware acceleration enabled");
+        NSLog(@"🚀 Window capture with High Quality mode enabled");
     } else {
         NSLog(@"📸 Window capture with standard MJPEG mode");
     }
@@ -1652,7 +1636,7 @@ void listApplicationsAndWindows() {
     [self.captureServer stopCapture];
     [self.captureServer startCaptureWithType:type targetIndex:index vp9Mode:vp9Mode];
     
-    NSString *modeStr = vp9Mode ? @"VP9" : @"MJPEG";
+    NSString *modeStr = vp9Mode ? @"High Quality" : @"Standard";
     [self sendJSONResponse:client_fd data:@{
         @"status": @"capture_started", 
         @"type": @(type), 
@@ -1713,7 +1697,7 @@ void listApplicationsAndWindows() {
     
     BOOL vp9Mode = [json[@"vp9"] boolValue]; // VP9 hardware acceleration
     
-    NSLog(@"🪟 Window selection request: CGWindowID %u, VP9: %@", windowID, vp9Mode ? @"YES" : @"NO");
+    NSLog(@"🪟 Window selection request: CGWindowID %u, HQ: %@", windowID, vp9Mode ? @"YES" : @"NO");
     
     if (!self.captureServer) {
         NSLog(@"❌ Capture server not initialized!");
@@ -1731,7 +1715,7 @@ void listApplicationsAndWindows() {
         [self.captureServer startCaptureWithWindowID:windowID vp9Mode:vp9Mode];
         NSLog(@"📌 Window capture started successfully");
         
-        NSString *modeStr = vp9Mode ? @"VP9" : @"MJPEG";
+        NSString *modeStr = vp9Mode ? @"High Quality" : @"Standard";
         [self sendJSONResponse:client_fd data:@{
             @"status": @"window_capture_started", 
             @"cgWindowID": @(windowID),

@@ -1039,8 +1039,8 @@ app.get('/', (req, res) => {
           transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; gap: 5px;
           border: 2px solid transparent;
         ">
-          🎥 VP9 Mode
-          <small style="opacity: 0.8; font-size: 11px;">Hardware • Best quality</small>
+          🎥 High Quality
+          <small style="opacity: 0.8; font-size: 11px;">Full res • 95% quality</small>
         </button>
       </div>
       
@@ -1131,7 +1131,7 @@ app.get('/', (req, res) => {
         document.getElementById('status').innerHTML = 
           '<div style="display: flex; align-items: center; justify-content: center; gap: 10px;">' +
             '<span style="font-size: 1.2rem;">🎥</span>' +
-            '<span><strong>VP9 Mode Selected</strong> - Hardware accelerated, best quality!</span>' +
+            '<span><strong>High Quality Mode Selected</strong> - Full resolution, 95% JPEG quality!</span>' +
           '</div>';
       } else {
         document.getElementById('status').innerHTML = 
@@ -1305,7 +1305,7 @@ app.get('/', (req, res) => {
           document.getElementById('status').innerHTML = 
             '<div style="display: flex; align-items: center; justify-content: center; gap: 10px;">' +
               '<span style="font-size: 1.2rem;">🎥</span>' +
-              '<span>Launching <strong>VP9 Hardware Accelerated</strong> mode...</span>' +
+              '<span>Launching <strong>High Quality</strong> mode...</span>' +
             '</div>';
           
           // Store selected app for VP9 mode
