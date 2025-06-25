@@ -1030,12 +1030,12 @@ typedef enum {
 }
 
 - (NSString *)getWindowsList {
-    // Return cached windows list immediately - no blocking!
-    return self.cachedWindowsList ?: @"[]";
+    // Generate fresh windows list each time to avoid caching issues
+    NSString *freshList = [self generateWindowsList];
+    return freshList ?: @"[]";
 }
 
 - (NSString *)generateWindowsList {
-    // Use Core Graphics to get window list (inspired by Swift script, but in Objective-C)
     CFArrayRef windowList = CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly | kCGWindowListExcludeDesktopElements, kCGNullWindowID);
     
     if (!windowList) {
@@ -1049,7 +1049,6 @@ typedef enum {
     for (CFIndex i = 0; i < windowCount; i++) {
         CFDictionaryRef windowDict = CFArrayGetValueAtIndex(windowList, i);
         
-        // Extract window information
         CFStringRef ownerName = CFDictionaryGetValue(windowDict, kCGWindowOwnerName);
         CFStringRef windowName = CFDictionaryGetValue(windowDict, kCGWindowName);
         CFDictionaryRef boundsDict = CFDictionaryGetValue(windowDict, kCGWindowBounds);
@@ -1063,11 +1062,6 @@ typedef enum {
         // Skip windows without names or from system processes
         if (windowStr.length == 0 || ownerStr.length == 0) continue;
         
-        // Skip certain system windows
-        if ([ownerStr isEqualToString:@"WindowServer"] || 
-            [ownerStr isEqualToString:@"Dock"] || 
-            [ownerStr isEqualToString:@"SystemUIServer"]) continue;
-        
         // Extract bounds
         CGRect bounds;
         if (!CGRectMakeWithDictionaryRepresentation(boundsDict, &bounds)) continue;
@@ -1075,41 +1069,60 @@ typedef enum {
         // Skip windows that are too small
         if (bounds.size.width < 50 || bounds.size.height < 50) continue;
         
-        // Get CGWindowID
-        UInt32 cgWindowID;
-        CFNumberGetValue(cgWindowIDRef, kCFNumberSInt32Type, &cgWindowID);
+        // Skip certain system windows
+        if ([ownerStr isEqualToString:@"WindowServer"] || 
+            [ownerStr isEqualToString:@"Dock"] || 
+            [ownerStr isEqualToString:@"SystemUIServer"]) continue;
         
-        // Create window info dictionary
-        NSDictionary *windowInfo = @{
-            @"id": @(windowIdCounter),
-            @"cgWindowID": @(cgWindowID),
-            @"title": windowStr,
-            @"app": ownerStr,
-            @"position": @{
-                @"x": @((int)bounds.origin.x),
-                @"y": @((int)bounds.origin.y)
-            },
-            @"size": @{
-                @"width": @((int)bounds.size.width),
-                @"height": @((int)bounds.size.height)
-            }
-        };
+        // Get CGWindowID safely
+        UInt32 cgWindowID = 0;
+        if (cgWindowIDRef) {
+            CFNumberGetValue(cgWindowIDRef, kCFNumberSInt32Type, &cgWindowID);
+        }
         
-        [windows addObject:windowInfo];
-        windowIdCounter++;
+        // Limit to 30 windows to avoid browser hanging
+        if (windowIdCounter > 30) break;
+        
+        // Create window info dictionary with safer NSNumber creation
+        @try {
+            NSDictionary *windowInfo = @{
+                @"id": [NSNumber numberWithInt:windowIdCounter],
+                @"cgWindowID": [NSNumber numberWithUnsignedInt:cgWindowID],
+                @"title": windowStr ?: @"",
+                @"app": ownerStr ?: @"",
+                @"position": @{
+                    @"x": [NSNumber numberWithInt:(int)bounds.origin.x],
+                    @"y": [NSNumber numberWithInt:(int)bounds.origin.y]
+                },
+                @"size": @{
+                    @"width": [NSNumber numberWithInt:(int)bounds.size.width],
+                    @"height": [NSNumber numberWithInt:(int)bounds.size.height]
+                }
+            };
+            
+            [windows addObject:windowInfo];
+            windowIdCounter++;
+        } @catch (NSException *exception) {
+            // Skip this window if there's an error creating the dictionary
+            continue;
+        }
     }
     
     CFRelease(windowList);
     
-    // Convert to JSON
-    NSError *jsonError;
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:windows options:0 error:&jsonError];
-    
-    if (jsonError) {
+    // Convert to JSON safely
+    @try {
+        NSError *jsonError = nil;
+        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:windows options:0 error:&jsonError];
+        
+        if (jsonError || !jsonData) {
+            return @"[]";
+        }
+        
+        return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    } @catch (NSException *exception) {
         return @"[]";
     }
-    
-    return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
 
 #pragma mark - SCStreamDelegate
@@ -1313,14 +1326,19 @@ void listApplicationsAndWindows() {
     }
     
     NSString *method = parts[0];
-    NSString *path = parts[1];
+    NSString *fullPath = parts[1];
+    
+    // Strip query string from path (e.g., "/frame?123" -> "/frame")
+    NSString *path = [fullPath componentsSeparatedByString:@"?"][0];
     
     // Only log non-frame and non-display requests to reduce spam
     if (![path isEqualToString:@"/frame"] && ![path isEqualToString:@"/display"]) {
-        NSLog(@"📨 %@ %@", method, path);
+        NSLog(@"📨 %@ %@", method, fullPath);
     }
     
-    if ([method isEqualToString:@"GET"] && [path isEqualToString:@"/apps"]) {
+    if ([method isEqualToString:@"GET"] && ([path isEqualToString:@"/"] || [path isEqualToString:@"/index.html"])) {
+        [self sendWebUIResponse:client_fd];
+    } else if ([method isEqualToString:@"GET"] && [path isEqualToString:@"/apps"]) {
         [self sendAppsListResponse:client_fd];
     } else if ([method isEqualToString:@"GET"] && [path isEqualToString:@"/windows"]) {
         [self sendWindowsListResponse:client_fd];
@@ -1357,23 +1375,25 @@ void listApplicationsAndWindows() {
 
 - (void)sendAppsListResponse:(int)client_fd {
     NSString *json = [self.captureServer getApplicationsList];
-    NSData *data = [json dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *jsonData = [json dataUsingEncoding:NSUTF8StringEncoding];
     
-    NSString *response = [NSString stringWithFormat:@"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %lu\r\nAccess-Control-Allow-Origin: *\r\n\r\n%@", 
-                         (unsigned long)data.length, json];
+    NSString *headers = [NSString stringWithFormat:@"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %lu\r\nAccess-Control-Allow-Origin: *\r\n\r\n", 
+                        (unsigned long)jsonData.length];
     
-    send(client_fd, [response UTF8String], response.length, 0);
+    send(client_fd, [headers UTF8String], headers.length, 0);
+    send(client_fd, jsonData.bytes, jsonData.length, 0);
 }
 
 - (void)sendWindowsListResponse:(int)client_fd {
-    // Return cached data immediately - no blocking or async needed!
     NSString *json = [self.captureServer getWindowsList];
-    NSData *data = [json dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *jsonData = [json dataUsingEncoding:NSUTF8StringEncoding];
     
-    NSString *response = [NSString stringWithFormat:@"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %lu\r\nAccess-Control-Allow-Origin: *\r\n\r\n%@", 
-                         (unsigned long)data.length, json];
+    NSString *headers = [NSString stringWithFormat:@"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %lu\r\nAccess-Control-Allow-Origin: *\r\n\r\n", 
+                        (unsigned long)jsonData.length];
     
-    send(client_fd, [response UTF8String], response.length, 0);
+    // Send headers and body separately to ensure correct Content-Length
+    send(client_fd, [headers UTF8String], headers.length, 0);
+    send(client_fd, jsonData.bytes, jsonData.length, 0);
 }
 
 - (void)sendDisplayInfoResponse:(int)client_fd {
@@ -1415,7 +1435,11 @@ void listApplicationsAndWindows() {
 - (void)sendFrameResponse:(int)client_fd {
     NSData *frameData = [self.captureServer getCurrentFrame];
     
+    NSLog(@"🖼️ Frame request: frameData.length = %lu, isCapturing = %@", 
+          frameData.length, self.captureServer.isCapturing ? @"YES" : @"NO");
+    
     if (frameData.length == 0) {
+        NSLog(@"❌ No frame data available - sending 404");
         [self send404Response:client_fd];
         return;
     }
@@ -1760,12 +1784,12 @@ void listApplicationsAndWindows() {
 - (void)sendJSONResponse:(int)client_fd data:(NSDictionary *)data {
     NSError *error = nil;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:data options:0 error:&error];
-    NSString *json = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     
-    NSString *response = [NSString stringWithFormat:@"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %lu\r\nAccess-Control-Allow-Origin: *\r\n\r\n%@", 
-                         (unsigned long)jsonData.length, json];
+    NSString *headers = [NSString stringWithFormat:@"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %lu\r\nAccess-Control-Allow-Origin: *\r\n\r\n", 
+                        (unsigned long)jsonData.length];
     
-    send(client_fd, [response UTF8String], response.length, 0);
+    send(client_fd, [headers UTF8String], headers.length, 0);
+    send(client_fd, jsonData.bytes, jsonData.length, 0);
 }
 
 - (void)send404Response:(int)client_fd {
@@ -1790,6 +1814,254 @@ void listApplicationsAndWindows() {
                          @"Access-Control-Allow-Headers: Content-Type\r\n"
                          @"Content-Length: 0\r\n\r\n";
     send(client_fd, [response UTF8String], response.length, 0);
+}
+
+- (void)sendWebUIResponse:(int)client_fd {
+    NSString *html = @"<!DOCTYPE html>\n"
+                     @"<html>\n"
+                     @"<head>\n"
+                     @"    <title>Remote Desktop</title>\n"
+                     @"    <meta charset=\"utf-8\">\n"
+                     @"    <style>\n"
+                     @"        body { margin: 0; padding: 20px; font-family: Arial, sans-serif; background: #1a1a1a; color: white; }\n"
+                     @"        .controls { margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }\n"
+                     @"        button { padding: 8px 16px; background: #333; color: white; border: 1px solid #555; border-radius: 4px; cursor: pointer; }\n"
+                     @"        button:hover { background: #444; }\n"
+                     @"        button.active { background: #0066cc; }\n"
+                     @"        select { padding: 8px; background: #333; color: white; border: 1px solid #555; border-radius: 4px; }\n"
+                     @"        .status { padding: 10px; background: #333; border-radius: 4px; margin-bottom: 10px; }\n"
+                     @"        .screen-container { position: relative; border: 1px solid #555; background: #000; }\n"
+                     @"        .screen { max-width: 100%; height: auto; display: block; cursor: crosshair; }\n"
+                     @"        .loading { text-align: center; padding: 50px; color: #888; }\n"
+                     @"    </style>\n"
+                     @"</head>\n"
+                     @"<body>\n"
+                     @"    <h1>Remote Desktop Control</h1>\n"
+                     @"    \n"
+                     @"    <div class=\"controls\">\n"
+                     @"        <button id=\"start-btn\" onclick=\"startCapture()\">Start Desktop Capture</button>\n"
+                     @"        <label>Quality:</label>\n"
+                     @"        <button id=\"standard-btn\" class=\"active\" onclick=\"setQuality(false)\">Standard</button>\n"
+                     @"        <button id=\"hq-btn\" onclick=\"setQuality(true)\">High Quality</button>\n"
+                     @"        <select id=\"window-select\" onchange=\"switchToWindow()\">\n"
+                     @"            <option value=\"0\">Full Desktop</option>\n"
+                     @"        </select>\n"
+                     @"        <button onclick=\"refreshWindows()\">Refresh Windows</button>\n"
+                     @"    </div>\n"
+                     @"    \n"
+                     @"    <div class=\"status\" id=\"status\">Ready to start capture</div>\n"
+                     @"    \n"
+                     @"    <div class=\"screen-container\">\n"
+                     @"        <img id=\"screen\" class=\"screen\" onclick=\"handleClick(event)\" onload=\"onFrameLoad()\" style=\"display: none;\">\n"
+                     @"        <div id=\"loading\" class=\"loading\">Click 'Start Desktop Capture' to begin</div>\n"
+                     @"    </div>\n"
+                     @"    \n"
+                     @"    <script>\n"
+                     @"        let isCapturing = false;\n"
+                     @"        let pollInterval = null;\n"
+                     @"        let isHQMode = false;\n"
+                     @"        let currentWindowId = 0;\n"
+                     @"        let windows = [];\n"
+                     @"        \n"
+                     @"        function setStatus(msg) {\n"
+                     @"            document.getElementById('status').textContent = msg;\n"
+                     @"        }\n"
+                     @"        \n"
+                     @"        function setQuality(hq) {\n"
+                     @"            isHQMode = hq;\n"
+                     @"            document.getElementById('standard-btn').className = hq ? '' : 'active';\n"
+                     @"            document.getElementById('hq-btn').className = hq ? 'active' : '';\n"
+                     @"            if (isCapturing) {\n"
+                     @"                startCapture();\n"
+                     @"            }\n"
+                     @"        }\n"
+                     @"        \n"
+                     @"        async function startCapture() {\n"
+                     @"            try {\n"
+                     @"                setStatus('Starting capture...');\n"
+                     @"                \n"
+                     @"                let response;\n"
+                     @"                if (currentWindowId === 0) {\n"
+                     @"                    // Desktop capture\n"
+                     @"                    response = await fetch('/capture', {\n"
+                     @"                        method: 'POST',\n"
+                     @"                        headers: { 'Content-Type': 'application/json' },\n"
+                     @"                        body: JSON.stringify({\n"
+                     @"                            type: 0,\n"
+                     @"                            index: 0,\n"
+                     @"                            vp9: isHQMode\n"
+                     @"                        })\n"
+                     @"                    });\n"
+                     @"                } else {\n"
+                     @"                    // Window capture\n"
+                     @"                    response = await fetch('/capture-window', {\n"
+                     @"                        method: 'POST',\n"
+                     @"                        headers: { 'Content-Type': 'application/json' },\n"
+                     @"                        body: JSON.stringify({\n"
+                     @"                            cgWindowID: getCGWindowID(currentWindowId),\n"
+                     @"                            vp9: isHQMode\n"
+                     @"                        })\n"
+                     @"                    });\n"
+                     @"                }\n"
+                     @"                \n"
+                     @"                if (response.ok) {\n"
+                     @"                    isCapturing = true;\n"
+                     @"                    document.getElementById('start-btn').textContent = 'Stop Capture';\n"
+                     @"                    document.getElementById('start-btn').onclick = stopCapture;\n"
+                     @"                    document.getElementById('loading').style.display = 'none';\n"
+                     @"                    document.getElementById('screen').style.display = 'block';\n"
+                     @"                    startPolling();\n"
+                     @"                    setStatus('Capture active - ' + (isHQMode ? 'High Quality' : 'Standard') + ' mode');\n"
+                     @"                } else {\n"
+                     @"                    setStatus('Failed to start capture');\n"
+                     @"                }\n"
+                     @"            } catch (e) {\n"
+                     @"                setStatus('Error: ' + e.message);\n"
+                     @"            }\n"
+                     @"        }\n"
+                     @"        \n"
+                     @"        function stopCapture() {\n"
+                     @"            isCapturing = false;\n"
+                     @"            if (pollInterval) {\n"
+                     @"                clearInterval(pollInterval);\n"
+                     @"                pollInterval = null;\n"
+                     @"            }\n"
+                     @"            document.getElementById('start-btn').textContent = 'Start Desktop Capture';\n"
+                     @"            document.getElementById('start-btn').onclick = startCapture;\n"
+                     @"            document.getElementById('screen').style.display = 'none';\n"
+                     @"            document.getElementById('loading').style.display = 'block';\n"
+                     @"            setStatus('Capture stopped');\n"
+                     @"        }\n"
+                     @"        \n"
+                     @"        function startPolling() {\n"
+                     @"            if (pollInterval) clearInterval(pollInterval);\n"
+                     @"            \n"
+                     @"            pollInterval = setInterval(async () => {\n"
+                     @"                if (!isCapturing) return;\n"
+                     @"                \n"
+                     @"                try {\n"
+                     @"                    const response = await fetch('/frame?' + Date.now());\n"
+                     @"                    if (response.ok) {\n"
+                     @"                        const frameBlob = await response.blob();\n"
+                     @"                        const imageUrl = URL.createObjectURL(frameBlob);\n"
+                     @"                        const oldUrl = document.getElementById('screen').src;\n"
+                     @"                        document.getElementById('screen').src = imageUrl;\n"
+                     @"                        if (oldUrl && oldUrl.startsWith('blob:')) {\n"
+                     @"                            URL.revokeObjectURL(oldUrl);\n"
+                     @"                        }\n"
+                     @"                    }\n"
+                     @"                } catch (e) {\n"
+                     @"                    console.error('Frame fetch error:', e);\n"
+                     @"                    setStatus('Connection error - retrying...');\n"
+                     @"                }\n"
+                     @"            }, 200);\n"
+                     @"        }\n"
+                     @"        \n"
+                     @"        function onFrameLoad() {\n"
+                     @"            if (isCapturing) {\n"
+                     @"                setStatus('Capture active - ' + (isHQMode ? 'High Quality' : 'Standard') + ' mode');\n"
+                     @"            }\n"
+                     @"        }\n"
+                     @"        \n"
+                     @"        async function handleClick(event) {\n"
+                     @"            const rect = event.target.getBoundingClientRect();\n"
+                     @"            const scaleX = event.target.naturalWidth / rect.width;\n"
+                     @"            const scaleY = event.target.naturalHeight / rect.height;\n"
+                     @"            const x = Math.round((event.clientX - rect.left) * scaleX);\n"
+                     @"            const y = Math.round((event.clientY - rect.top) * scaleY);\n"
+                     @"            \n"
+                     @"            try {\n"
+                     @"                const endpoint = currentWindowId === 0 ? '/click' : '/click-window';\n"
+                     @"                const body = currentWindowId === 0 ? \n"
+                     @"                    { x: x, y: y } : \n"
+                     @"                    { x: x, y: y, cgWindowID: getCGWindowID(currentWindowId) };\n"
+                     @"                \n"
+                     @"                await fetch(endpoint, {\n"
+                     @"                    method: 'POST',\n"
+                     @"                    headers: { 'Content-Type': 'application/json' },\n"
+                     @"                    body: JSON.stringify(body)\n"
+                     @"                });\n"
+                     @"                \n"
+                     @"                setStatus('Clicked at (' + x + ', ' + y + ')');\n"
+                     @"            } catch (e) {\n"
+                     @"                setStatus('Click error: ' + e.message);\n"
+                     @"            }\n"
+                     @"        }\n"
+                     @"        \n"
+                     @"        document.addEventListener('keydown', async (event) => {\n"
+                     @"            if (event.target.tagName === 'INPUT' || event.target.tagName === 'SELECT') return;\n"
+                     @"            if (!isCapturing) return;\n"
+                     @"            \n"
+                     @"            event.preventDefault();\n"
+                     @"            \n"
+                     @"            try {\n"
+                     @"                const endpoint = currentWindowId === 0 ? '/key' : '/key-window';\n"
+                     @"                const body = currentWindowId === 0 ? \n"
+                     @"                    { key: event.key } : \n"
+                     @"                    { key: event.key, cgWindowID: getCGWindowID(currentWindowId) };\n"
+                     @"                \n"
+                     @"                await fetch(endpoint, {\n"
+                     @"                    method: 'POST',\n"
+                     @"                    headers: { 'Content-Type': 'application/json' },\n"
+                     @"                    body: JSON.stringify(body)\n"
+                     @"                });\n"
+                     @"            } catch (e) {\n"
+                     @"                console.error('Key error:', e);\n"
+                     @"            }\n"
+                     @"        });\n"
+                     @"        \n"
+                     @"        async function refreshWindows() {\n"
+                     @"            try {\n"
+                     @"                const response = await fetch('/windows');\n"
+                     @"                if (response.ok) {\n"
+                     @"                    windows = await response.json();\n"
+                     @"                    updateWindowSelect();\n"
+                     @"                    setStatus('Windows refreshed');\n"
+                     @"                }\n"
+                     @"            } catch (e) {\n"
+                     @"                setStatus('Error refreshing windows: ' + e.message);\n"
+                     @"            }\n"
+                     @"        }\n"
+                     @"        \n"
+                     @"        function updateWindowSelect() {\n"
+                     @"            const select = document.getElementById('window-select');\n"
+                     @"            select.innerHTML = '<option value=\"0\">Full Desktop</option>';\n"
+                     @"            \n"
+                     @"            windows.forEach(window => {\n"
+                     @"                const option = document.createElement('option');\n"
+                     @"                option.value = window.id;\n"
+                     @"                option.textContent = window.app + ' - ' + window.title;\n"
+                     @"                select.appendChild(option);\n"
+                     @"            });\n"
+                     @"        }\n"
+                     @"        \n"
+                     @"        function switchToWindow() {\n"
+                     @"            const select = document.getElementById('window-select');\n"
+                     @"            currentWindowId = parseInt(select.value);\n"
+                     @"            \n"
+                     @"            if (isCapturing) {\n"
+                     @"                startCapture();\n"
+                     @"            }\n"
+                     @"        }\n"
+                     @"        \n"
+                     @"        function getCGWindowID(windowId) {\n"
+                     @"            if (windowId === 0) return 0;\n"
+                     @"            const window = windows.find(w => w.id === windowId);\n"
+                     @"            return window ? window.cgWindowID : 0;\n"
+                     @"        }\n"
+                     @"        \n"
+                     @"        // Initialize\n"
+                     @"        refreshWindows();\n"
+                     @"    </script>\n"
+                     @"</body>\n"
+                     @"</html>";
+    
+    NSData *htmlData = [html dataUsingEncoding:NSUTF8StringEncoding];
+    NSString *headers = [NSString stringWithFormat:@"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: %lu\r\n\r\n", 
+                        (unsigned long)htmlData.length];
+    
+    send(client_fd, [headers UTF8String], headers.length, 0);
+    send(client_fd, htmlData.bytes, htmlData.length, 0);
 }
 
 @end
