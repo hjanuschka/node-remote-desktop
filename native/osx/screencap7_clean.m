@@ -33,6 +33,9 @@ typedef enum {
 @property (nonatomic, assign) int currentSegmentIndex;
 @property (nonatomic, assign) NSTimeInterval lastFrameTime;
 @property (nonatomic, assign) float currentServerFPS;
+@property (nonatomic, assign) VTCompressionSessionRef compressionSession;
+@property (nonatomic, strong) NSMutableData *h264Data;
+@property (nonatomic, strong) NSMutableData *mpegtsData;
 @property (nonatomic, assign) CGFloat coordinateScaleX;
 @property (nonatomic, assign) CGFloat coordinateScaleY;
 @property (nonatomic, assign) CGFloat coordinateOffsetX;
@@ -798,9 +801,9 @@ typedef enum {
                                                                                  1, NULL);
             
             if (destination) {
-                // Set JPEG quality - higher for VP9/High Quality mode
-                float quality = self.useVP9Mode ? 0.95 : 0.75;
-                int maxSize = self.useVP9Mode ? 3840 : 1920; // Full resolution in HQ mode
+                // Set JPEG quality - always high for smooth experience
+                float quality = 0.85; // Good balance of quality and size
+                int maxSize = 2560; // Higher resolution for sharper image
                 
                 NSDictionary *options = @{
                     (__bridge NSString*)kCGImageDestinationLossyCompressionQuality: @(quality),
@@ -1201,12 +1204,12 @@ typedef enum {
                       config.width, config.height);
             }
             
-            // Common configuration
-            config.queueDepth = 6;
+            // Common configuration - optimized for ultra-low latency MJPEG
+            config.queueDepth = 1; // Minimum queue for lowest latency
             config.pixelFormat = kCVPixelFormatType_32BGRA;
             config.colorSpaceName = kCGColorSpaceSRGB;
             config.showsCursor = YES;
-            config.minimumFrameInterval = CMTimeMake(1, 30); // 30 FPS
+            config.minimumFrameInterval = CMTimeMake(1, 30); // 30 FPS - good balance
             
             // Enable headless capture for locked screens and closed lids
             if (@available(macOS 13.0, *)) {
@@ -2596,14 +2599,14 @@ void listApplicationsAndWindows() {
                      @"                        // Update metrics\n"
                      @"                        networkLatency = endTime - startTime;\n"
                      @"                        document.getElementById('network-latency').textContent = networkLatency.toFixed(1);\n"
-                     @"                        document.getElementById('poll-rate').textContent = '200';\n"
+                     @"                        document.getElementById('poll-rate').textContent = '33';\n"
                      @"                        await updateClientFPS(frameBlob);\n"
                      @"                    }\n"
                      @"                } catch (e) {\n"
                      @"                    console.error('Frame fetch error:', e);\n"
                      @"                    setStatus('Connection error - retrying...');\n"
                      @"                }\n"
-                     @"            }, 200);\n"
+                     @"            }, 33);\n"
                      @"        }\n"
                      @"        \n"
                      @"        function onFrameLoad() {\n"
@@ -2613,13 +2616,7 @@ void listApplicationsAndWindows() {
                      @"        }\n"
                      @"        \n"
                      @"        function startVideoPolling() {\n"
-                     @"            // Try HLS streaming first if supported\n"
-                     @"            if (typeof Hls !== 'undefined' && Hls.isSupported()) {\n"
-                     @"                startHLSStream();\n"
-                     @"                return;\n"
-                     @"            }\n"
-                     @"            \n"
-                     @"            // Fallback to compressed frame polling\n"
+                     @"            // Use optimized MJPEG polling for low latency\n"
                      @"            if (pollInterval) clearInterval(pollInterval);\n"
                      @"            \n"
                      @"            pollInterval = setInterval(async () => {\n"
@@ -2642,14 +2639,14 @@ void listApplicationsAndWindows() {
                      @"                        // Update metrics\n"
                      @"                        networkLatency = endTime - startTime;\n"
                      @"                        document.getElementById('network-latency').textContent = networkLatency.toFixed(1);\n"
-                     @"                        document.getElementById('poll-rate').textContent = '100';\n"
+                     @"                        document.getElementById('poll-rate').textContent = '33';\n"
                      @"                        await updateClientFPS(frameBlob);\n"
                      @"                    }\n"
                      @"                } catch (e) {\n"
                      @"                    console.error('Video frame fetch error:', e);\n"
                      @"                    setStatus('Connection error - retrying...');\n"
                      @"                }\n"
-                     @"            }, 100); // Faster polling for video mode\n"
+                     @"            }, 33); // 30 FPS polling for smooth video\n"
                      @"        }\n"
                      @"        \n"
                      @"        function startHLSStream() {\n"
