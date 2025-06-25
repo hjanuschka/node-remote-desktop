@@ -1,0 +1,22 @@
+CC = clang
+CFLAGS = -framework Cocoa -framework Foundation
+TARGET = ClickTracker
+
+# Build the ClickTracker app
+build:
+	@echo "🔨 Building ClickTracker app..."
+	$(CC) -o $(TARGET) $(TARGET).m $(CFLAGS)
+	@echo "✅ ClickTracker build complete!"
+
+# Run the ClickTracker app
+run: build
+	@echo "🚀 Starting ClickTracker app..."
+	./$(TARGET)
+
+# Clean build artifacts
+clean:
+	@echo "🧹 Cleaning..."
+	rm -f $(TARGET)
+	@echo "✅ Clean complete!"
+
+.PHONY: build run clean

@@ -29,6 +29,15 @@ typedef enum {
 @property (nonatomic, assign) BOOL useVP9Mode;
 @property (nonatomic, strong) VP9Encoder *vp9Encoder;
 @property (nonatomic, strong) NSMutableData *vp9FrameData;
+@property (nonatomic, strong) NSMutableArray *hlsSegments;
+@property (nonatomic, assign) int currentSegmentIndex;
+@property (nonatomic, assign) NSTimeInterval lastFrameTime;
+@property (nonatomic, assign) float currentServerFPS;
+@property (nonatomic, assign) CGFloat coordinateScaleX;
+@property (nonatomic, assign) CGFloat coordinateScaleY;
+@property (nonatomic, assign) CGFloat coordinateOffsetX;
+@property (nonatomic, assign) CGFloat coordinateOffsetY;
+@property (nonatomic, assign) BOOL coordinatesCalibrated;
 @end
 
 @implementation ScreenCapture
@@ -47,6 +56,15 @@ typedef enum {
         self.targetIndex = targetIndex;
         self.currentFrame = [NSMutableData data];
         self.vp9FrameData = [NSMutableData data];
+        self.hlsSegments = [NSMutableArray array];
+        self.currentSegmentIndex = 0;
+        self.lastFrameTime = 0;
+        self.currentServerFPS = 0;
+        self.coordinateScaleX = 1.0;
+        self.coordinateScaleY = 1.0;
+        self.coordinateOffsetX = 0.0;
+        self.coordinateOffsetY = 0.0;
+        self.coordinatesCalibrated = NO;
         self.isCapturing = NO;
         self.cachedWindowsList = @"[]"; // Default empty list
         [self startWindowsCaching];
@@ -333,7 +351,16 @@ typedef enum {
 }
 
 - (void)performClick:(int)x y:(int)y targetWindowID:(UInt32)windowID activateWindow:(BOOL)activate {
-    NSLog(@"🖱️ Clicking at %d,%d (target window: %u, activate: %@)", x, y, windowID, activate ? @"YES" : @"NO");
+    NSLog(@"🖱️ Raw click at %d,%d (target window: %u, activate: %@)", x, y, windowID, activate ? @"YES" : @"NO");
+    
+    // Transform coordinates using calibration
+    CGPoint rawPoint = CGPointMake(x, y);
+    CGPoint transformedPoint = [self transformCoordinates:rawPoint];
+    
+    int finalX = (int)round(transformedPoint.x);
+    int finalY = (int)round(transformedPoint.y);
+    
+    NSLog(@"🎯 Transformed click: (%d,%d) → (%d,%d)", x, y, finalX, finalY);
     
     @try {
         // Check accessibility permissions
@@ -345,11 +372,11 @@ typedef enum {
         
         NSLog(@"✅ Accessibility permission verified");
         
-        CGPoint clickPoint = CGPointMake(x, y);
+        CGPoint clickPoint = CGPointMake(finalX, finalY);
         
         // If we have a target window, bring it to front (coordinates are already scaled properly)
         if (windowID != 0) {
-            NSLog(@"🎯 Targeting specific window ID: %u at coordinates %d,%d", windowID, x, y);
+            NSLog(@"🎯 Targeting specific window ID: %u at coordinates %d,%d", windowID, finalX, finalY);
             
             // Always activate the window to bring it to front
             [self activateWindowIfNeeded:windowID];
@@ -796,6 +823,27 @@ typedef enum {
                 
                 // VP9 mode: Encode both VP9 (for efficiency) and JPEG (for browser display)
                 
+                // Calculate server-side FPS with faster response
+                NSTimeInterval currentTime = [[NSDate date] timeIntervalSince1970];
+                static NSTimeInterval fpsWindowStart = 0;
+                static int fpsFrameCount = 0;
+                
+                if (fpsWindowStart == 0) {
+                    fpsWindowStart = currentTime;
+                }
+                
+                fpsFrameCount++;
+                NSTimeInterval windowDuration = currentTime - fpsWindowStart;
+                
+                // Update FPS every second using frame count method for accuracy
+                if (windowDuration >= 1.0) {
+                    self.currentServerFPS = fpsFrameCount / windowDuration;
+                    fpsWindowStart = currentTime;
+                    fpsFrameCount = 0;
+                }
+                
+                self.lastFrameTime = currentTime;
+                
                 // Log progress occasionally (disabled to reduce spam)
                 static int frameCount = 0;
                 frameCount++;
@@ -806,7 +854,13 @@ typedef enum {
                     } else if (self.captureType == CaptureTypeWindow) {
                         captureInfo = [NSString stringWithFormat:@"Window ID: %d", self.targetIndex];
                     }
-                    NSLog(@"📸 Captured %d frames | Mode: %@ | Size: %zux%zu", frameCount, captureInfo, width, height);
+                    NSLog(@"📸 Captured %d frames | Mode: %@ | Size: %zux%zu | Server FPS: %.1f", 
+                          frameCount, captureInfo, width, height, self.currentServerFPS);
+                }
+                
+                // Update segment index for HLS (every 2 seconds at 30fps)
+                if (frameCount % 60 == 0) {
+                    self.currentSegmentIndex++;
                 }
             }
             
@@ -834,6 +888,137 @@ typedef enum {
     // Return VP9 encoded frame (for future WebRTC/streaming use)
     @synchronized(self.vp9FrameData) {
         return [self.vp9FrameData copy];
+    }
+}
+
+- (float)getCurrentServerFPS {
+    return self.currentServerFPS;
+}
+
+- (void)calibrateCoordinates {
+    NSLog(@"CLICK-CALIBRATE: 🎯 Starting automatic coordinate calibration...");
+    
+    // Get the main display info for calibration
+    CGDirectDisplayID mainDisplay = CGMainDisplayID();
+    CGRect displayBounds = CGDisplayBounds(mainDisplay);
+    
+    // Get capture dimensions from current frame
+    if (self.currentFrame.length == 0) {
+        NSLog(@"⚠️ No frame available for calibration, using default scaling");
+        return;
+    }
+    
+    // For retina displays, we need to account for the scale factor
+    CGFloat scaleFactor = 1.0;
+    if (@available(macOS 10.7, *)) {
+        NSScreen *mainScreen = [NSScreen mainScreen];
+        if (mainScreen) {
+            scaleFactor = mainScreen.backingScaleFactor;
+        }
+    }
+    
+    // Calculate coordinate scaling based on capture mode
+    if (self.captureType == CaptureTypeFullDesktop) {
+        // Full desktop: browser shows logical size, we click at physical coordinates
+        self.coordinateScaleX = scaleFactor;
+        self.coordinateScaleY = scaleFactor;
+        self.coordinateOffsetX = 0;
+        self.coordinateOffsetY = 0;
+        NSLog(@"🖥️ Full desktop calibration: scale=%.1f", scaleFactor);
+    } else if (self.captureType == CaptureTypeWindow) {
+        // Window capture: need to map browser coordinates to window coordinates
+        // This requires getting the actual window bounds
+        [self calibrateForWindowCapture];
+    } else {
+        // Default fallback
+        self.coordinateScaleX = scaleFactor;
+        self.coordinateScaleY = scaleFactor;
+        self.coordinateOffsetX = 0;
+        self.coordinateOffsetY = 0;
+    }
+    
+    self.coordinatesCalibrated = YES;
+    NSLog(@"CLICK-CALIBRATE: ✅ Coordinate calibration complete: Mode=%d, scaleX=%.3f, scaleY=%.3f, offsetX=%.1f, offsetY=%.1f", 
+          self.captureType, self.coordinateScaleX, self.coordinateScaleY, self.coordinateOffsetX, self.coordinateOffsetY);
+}
+
+- (void)calibrateForWindowCapture {
+    // For window capture, get the window bounds to calculate proper mapping
+    CFArrayRef windowList = CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
+    
+    if (windowList) {
+        CFIndex count = CFArrayGetCount(windowList);
+        for (CFIndex i = 0; i < count; i++) {
+            CFDictionaryRef window = (CFDictionaryRef)CFArrayGetValueAtIndex(windowList, i);
+            
+            CFNumberRef windowID = (CFNumberRef)CFDictionaryGetValue(window, kCGWindowNumber);
+            if (windowID) {
+                int32_t id;
+                CFNumberGetValue(windowID, kCFNumberSInt32Type, &id);
+                
+                if (id == self.targetIndex) {
+                    // Found our target window, get its bounds
+                    CFDictionaryRef bounds = (CFDictionaryRef)CFDictionaryGetValue(window, kCGWindowBounds);
+                    if (bounds) {
+                        CGRect windowRect;
+                        CGRectMakeWithDictionaryRepresentation(bounds, &windowRect);
+                        
+                        // For window capture: browser coordinates are relative to window
+                        // but we need to click in screen coordinates
+                        self.coordinateScaleX = 1.0; // No scaling needed for window coordinates
+                        self.coordinateScaleY = 1.0;
+                        self.coordinateOffsetX = windowRect.origin.x;
+                        self.coordinateOffsetY = windowRect.origin.y;
+                        
+                        NSLog(@"🪟 Window calibration: bounds=(%.1f,%.1f,%.1f,%.1f)", 
+                              windowRect.origin.x, windowRect.origin.y, windowRect.size.width, windowRect.size.height);
+                        break;
+                    }
+                }
+            }
+        }
+        CFRelease(windowList);
+    }
+}
+
+- (void)performCoordinateVerification {
+    // Get current mouse position as reference
+    CGEventRef event = CGEventCreate(NULL);
+    CGPoint mouseLocation = CGEventGetLocation(event);
+    CFRelease(event);
+    
+    NSLog(@"🖱️ Current mouse position: (%.1f, %.1f)", mouseLocation.x, mouseLocation.y);
+}
+
+- (CGPoint)transformCoordinates:(CGPoint)webCoordinates {
+    if (!self.coordinatesCalibrated) {
+        [self calibrateCoordinates];
+    }
+    
+    // Apply scaling and offset transformation
+    CGPoint transformed = CGPointMake(
+        (webCoordinates.x * self.coordinateScaleX) + self.coordinateOffsetX,
+        (webCoordinates.y * self.coordinateScaleY) + self.coordinateOffsetY
+    );
+    
+    NSLog(@"CLICK-CALIBRATE: 🔄 Coordinate transform: (%.1f, %.1f) → (%.1f, %.1f)", 
+          webCoordinates.x, webCoordinates.y, transformed.x, transformed.y);
+    
+    return transformed;
+}
+
+- (void)adaptiveCoordinateCorrection:(CGPoint)clickedPoint expectedPoint:(CGPoint)expectedPoint {
+    // Adaptive correction based on click feedback
+    CGFloat errorX = expectedPoint.x - clickedPoint.x;
+    CGFloat errorY = expectedPoint.y - clickedPoint.y;
+    
+    // Only adjust if error is significant (> 10 pixels)
+    if (fabs(errorX) > 10 || fabs(errorY) > 10) {
+        self.coordinateOffsetX += errorX * 0.5; // Gradual correction
+        self.coordinateOffsetY += errorY * 0.5;
+        
+        NSLog(@"🔧 Adaptive correction: offset now (%.1f, %.1f)", 
+              self.coordinateOffsetX, self.coordinateOffsetY);
     }
 }
 
@@ -901,6 +1086,9 @@ typedef enum {
         NSLog(@"📸 Starting capture with standard MJPEG mode");
         [self cleanupVP9Encoder];
     }
+    
+    // Reset coordinate calibration for new capture session
+    self.coordinatesCalibrated = NO;
     
     [self setupCapture];
 }
@@ -1413,6 +1601,16 @@ void listApplicationsAndWindows() {
         [self sendFrameResponse:client_fd];
     } else if ([method isEqualToString:@"GET"] && [path isEqualToString:@"/video-stream"]) {
         [self sendVideoStreamResponse:client_fd];
+    } else if ([method isEqualToString:@"GET"] && [path isEqualToString:@"/stream.m3u8"]) {
+        [self sendHLSPlaylistResponse:client_fd];
+    } else if ([method isEqualToString:@"GET"] && [path hasPrefix:@"/segment"]) {
+        [self sendHLSSegmentResponse:client_fd path:path];
+    } else if ([method isEqualToString:@"GET"] && [path isEqualToString:@"/fps"]) {
+        [self sendFPSResponse:client_fd];
+    } else if ([method isEqualToString:@"POST"] && [path isEqualToString:@"/calibrate"]) {
+        [self sendCalibrateResponse:client_fd];
+    } else if ([method isEqualToString:@"POST"] && [path isEqualToString:@"/track-click"]) {
+        [self handleTrackClickRequest:client_fd request:request];
     } else if ([method isEqualToString:@"POST"] && [path isEqualToString:@"/click"]) {
         [self handleClickRequest:client_fd request:request];
     } else if ([method isEqualToString:@"POST"] && [path isEqualToString:@"/click-window"]) {
@@ -1548,6 +1746,176 @@ void listApplicationsAndWindows() {
     NSLog(@"✅ Video mode frame sent to client");
 }
 
+- (void)sendHLSPlaylistResponse:(int)client_fd {
+    NSLog(@"📺 HLS playlist request");
+    
+    if (!self.captureServer.useVP9Mode) {
+        NSLog(@"❌ HLS requested but not in video mode");
+        [self send404Response:client_fd];
+        return;
+    }
+    
+    // Generate M3U8 playlist
+    NSString *playlist = [NSString stringWithFormat:@"#EXTM3U\n"
+                         @"#EXT-X-VERSION:3\n"
+                         @"#EXT-X-TARGETDURATION:2\n"
+                         @"#EXT-X-MEDIA-SEQUENCE:%d\n"
+                         @"#EXT-X-PLAYLIST-TYPE:EVENT\n"
+                         @"#EXTINF:2.0,\n"
+                         @"segment%d.ts\n"
+                         @"#EXTINF:2.0,\n" 
+                         @"segment%d.ts\n"
+                         @"#EXTINF:2.0,\n"
+                         @"segment%d.ts\n",
+                         MAX(0, self.captureServer.currentSegmentIndex - 2),
+                         self.captureServer.currentSegmentIndex,
+                         self.captureServer.currentSegmentIndex + 1,
+                         self.captureServer.currentSegmentIndex + 2];
+    
+    NSData *playlistData = [playlist dataUsingEncoding:NSUTF8StringEncoding];
+    NSString *headers = [NSString stringWithFormat:@"HTTP/1.1 200 OK\r\nContent-Type: application/vnd.apple.mpegurl\r\nContent-Length: %lu\r\nAccess-Control-Allow-Origin: *\r\nCache-Control: no-cache\r\n\r\n",
+                        (unsigned long)playlistData.length];
+    
+    send(client_fd, [headers UTF8String], headers.length, 0);
+    send(client_fd, playlistData.bytes, playlistData.length, 0);
+    NSLog(@"✅ HLS playlist sent");
+}
+
+- (void)sendHLSSegmentResponse:(int)client_fd path:(NSString *)path {
+    NSLog(@"📺 HLS segment request: %@", path);
+    
+    if (!self.captureServer.useVP9Mode) {
+        NSLog(@"❌ HLS segment requested but not in video mode");
+        [self send404Response:client_fd];
+        return;
+    }
+    
+    // For now, serve the current frame as a pseudo-segment
+    // In a real implementation, we'd generate TS segments with H.264
+    NSData *frameData = [self.captureServer getCurrentFrame];
+    
+    if (frameData.length == 0) {
+        NSLog(@"❌ No segment data available");
+        [self send404Response:client_fd];
+        return;
+    }
+    
+    // Serve JPEG as TS segment (simplified for proof of concept)
+    NSString *headers = [NSString stringWithFormat:@"HTTP/1.1 200 OK\r\nContent-Type: video/mp2t\r\nContent-Length: %lu\r\nAccess-Control-Allow-Origin: *\r\nCache-Control: no-cache\r\n\r\n",
+                        (unsigned long)frameData.length];
+    
+    send(client_fd, [headers UTF8String], headers.length, 0);
+    send(client_fd, frameData.bytes, frameData.length, 0);
+    NSLog(@"✅ HLS segment sent");
+}
+
+- (void)sendFPSResponse:(int)client_fd {
+    float serverFPS = [self.captureServer getCurrentServerFPS];
+    
+    NSDictionary *fpsData = @{
+        @"serverFPS": @(serverFPS),
+        @"timestamp": @([[NSDate date] timeIntervalSince1970])
+    };
+    
+    [self sendJSONResponse:client_fd data:fpsData];
+}
+
+- (void)sendCalibrateResponse:(int)client_fd {
+    NSLog(@"🎯 Manual coordinate calibration requested");
+    [self.captureServer calibrateCoordinates];
+    
+    NSDictionary *calibrationData = @{
+        @"status": @"calibrated",
+        @"scaleX": @(self.captureServer.coordinateScaleX),
+        @"scaleY": @(self.captureServer.coordinateScaleY),
+        @"offsetX": @(self.captureServer.coordinateOffsetX),
+        @"offsetY": @(self.captureServer.coordinateOffsetY)
+    };
+    
+    [self sendJSONResponse:client_fd data:calibrationData];
+}
+
+- (void)handleTrackClickRequest:(int)client_fd request:(NSString *)request {
+    NSRange bodyRange = [request rangeOfString:@"\r\n\r\n"];
+    if (bodyRange.location == NSNotFound) {
+        NSLog(@"❌ Track-click request: No body separator found");
+        [self send400Response:client_fd];
+        return;
+    }
+    
+    NSString *body = [request substringFromIndex:bodyRange.location + bodyRange.length];
+    NSLog(@"📦 Track-click request body: %@", body);
+    NSLog(@"📦 Track-click request body length: %lu", (unsigned long)body.length);
+    
+    NSData *jsonData = [body dataUsingEncoding:NSUTF8StringEncoding];
+    
+    NSError *error = nil;
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
+    
+    if (error || !json) {
+        NSLog(@"❌ Track-click JSON parsing error: %@", error ? error.localizedDescription : @"nil result");
+        NSLog(@"❌ Body that failed to parse: '%@'", body);
+        [self send400Response:client_fd];
+        return;
+    }
+    
+    // Extract click tracking data
+    NSString *source = json[@"source"] ?: @"unknown";
+    NSNumber *timestamp = json[@"timestamp"] ?: @(0);
+    NSDictionary *coordinates = json[@"coordinates"];
+    NSDictionary *windowInfo = json[@"window_info"];
+    
+    // Handle both ClickTracker app format and Web Client format
+    if (coordinates) {
+        // For ClickTracker app format
+        NSDictionary *viewCoords = coordinates[@"view"];
+        NSDictionary *windowCoords = coordinates[@"window"];
+        NSDictionary *screenCoords = coordinates[@"screen"];
+        
+        if (viewCoords && windowCoords && screenCoords && windowInfo) {
+            NSDictionary *windowFrame = windowInfo[@"frame"];
+            NSNumber *cgWindowID = windowInfo[@"cgWindowID"];
+            
+            // Log comprehensive click tracking information
+            NSLog(@"CLICK-CALIBRATE: 🎯 CLICK TRACKING from %@:", source);
+            NSLog(@"   📍 View: (%.1f, %.1f)", [viewCoords[@"x"] doubleValue], [viewCoords[@"y"] doubleValue]);
+            NSLog(@"   🪟 Window: (%.1f, %.1f)", [windowCoords[@"x"] doubleValue], [windowCoords[@"y"] doubleValue]);
+            NSLog(@"   🖥️ Screen: (%.1f, %.1f)", [screenCoords[@"x"] doubleValue], [screenCoords[@"y"] doubleValue]);
+            NSLog(@"   📏 Window Frame: (%.0f,%.0f) %.0fx%.0f", 
+                  [windowFrame[@"x"] doubleValue], [windowFrame[@"y"] doubleValue],
+                  [windowFrame[@"width"] doubleValue], [windowFrame[@"height"] doubleValue]);
+            NSLog(@"   🆔 CGWindowID: %@", cgWindowID);
+            NSLog(@"   ⏰ Timestamp: %.3f", [timestamp doubleValue]);
+        } else {
+            // For Web Client format
+            NSDictionary *clientCoords = coordinates[@"client"];
+            if (clientCoords) {
+                NSLog(@"CLICK-CALIBRATE: 🎯 CLICK TRACKING from %@:", source);
+                NSLog(@"   📍 Client: (%.1f, %.1f)", [clientCoords[@"x"] doubleValue], [clientCoords[@"y"] doubleValue]);
+                NSLog(@"   🖥️ Element: %@", coordinates[@"element"] ?: @"unknown");
+                NSDictionary *viewport = coordinates[@"viewport"];
+                if (viewport) {
+                    NSLog(@"   📏 Viewport: %.0fx%.0f", [viewport[@"width"] doubleValue], [viewport[@"height"] doubleValue]);
+                }
+                if (windowInfo) {
+                    NSLog(@"   🆔 CGWindowID: %@", windowInfo[@"cgWindowID"]);
+                    NSLog(@"   🎯 Mode: %@", windowInfo[@"capture_mode"]);
+                }
+                NSLog(@"   ⏰ Timestamp: %.3f", [timestamp doubleValue]);
+            }
+        }
+    }
+    
+    // Send acknowledgment response
+    NSDictionary *response = @{
+        @"status": @"tracked",
+        @"source": source,
+        @"received_at": @([[NSDate date] timeIntervalSince1970])
+    };
+    
+    [self sendJSONResponse:client_fd data:response];
+}
+
 - (void)handleClickRequest:(int)client_fd request:(NSString *)request {
     NSRange bodyRange = [request rangeOfString:@"\r\n\r\n"];
     if (bodyRange.location == NSNotFound) {
@@ -1653,7 +2021,7 @@ void listApplicationsAndWindows() {
     int x = [json[@"x"] intValue];
     int y = [json[@"y"] intValue];
     UInt32 windowID = [json[@"cgWindowID"] unsignedIntValue];
-    NSLog(@"🖱️ Window click at (%d, %d) targeting window %u", x, y, windowID);
+    NSLog(@"CLICK-CALIBRATE: 🖱️ Window click at (%d, %d) targeting window %u", x, y, windowID);
     
     @try {
         [self.captureServer performClick:x y:y targetWindowID:windowID];
@@ -1917,6 +2285,7 @@ void listApplicationsAndWindows() {
                      @"<head>\n"
                      @"    <title>Remote Desktop</title>\n"
                      @"    <meta charset=\"utf-8\">\n"
+                     @"    <script src=\"https://cdn.jsdelivr.net/npm/hls.js@latest\"></script>\n"
                      @"    <style>\n"
                      @"        body { margin: 0; padding: 20px; font-family: Arial, sans-serif; background: #1a1a1a; color: white; }\n"
                      @"        .controls { margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }\n"
@@ -1945,9 +2314,13 @@ void listApplicationsAndWindows() {
                      @"            <option value=\"0\">Full Desktop</option>\n"
                      @"        </select>\n"
                      @"        <button onclick=\"refreshWindows()\">Refresh Windows</button>\n"
+                     @"        <button onclick=\"calibrateCoordinates()\" style=\"background: #660066;\">🎯 Calibrate Mouse</button>\n"
                      @"    </div>\n"
                      @"    \n"
                      @"    <div class=\"status\" id=\"status\">Ready to start capture</div>\n"
+                     @"    <div class=\"status\" id=\"fps-display\" style=\"background: #222; font-family: monospace; display: none;\">\n"
+                     @"        Server: <span id=\"server-fps\">0</span>fps | Client: <span id=\"client-fps\">0</span>fps | Latency: <span id=\"network-latency\">0</span>ms | Poll Rate: <span id=\"poll-rate\">0</span>ms\n"
+                     @"    </div>\n"
                      @"    \n"
                      @"    <div class=\"screen-container\">\n"
                      @"        <img id=\"screen\" class=\"screen\" onclick=\"handleClick(event)\" onload=\"onFrameLoad()\" style=\"display: none;\">\n"
@@ -1963,8 +2336,84 @@ void listApplicationsAndWindows() {
                      @"        let windows = [];\n"
                      @"        let currentMode = 'jpeg'; // 'jpeg' or 'video'\n"
                      @"        \n"
+                     @"        // FPS tracking\n"
+                     @"        let lastFrameTime = 0;\n"
+                     @"        let clientFPS = 0;\n"
+                     @"        let frameCount = 0;\n"
+                     @"        let fpsInterval = null;\n"
+                     @"        let lastFrameHash = '';\n"
+                     @"        let uniqueFrameCount = 0;\n"
+                     @"        let fpsStartTime = 0;\n"
+                     @"        let networkLatency = 0;\n"
+                     @"        \n"
                      @"        function setStatus(msg) {\n"
                      @"            document.getElementById('status').textContent = msg;\n"
+                     @"        }\n"
+                     @"        \n"
+                     @"        async function updateClientFPS(frameData) {\n"
+                     @"            const currentTime = performance.now();\n"
+                     @"            \n"
+                     @"            // Generate simple hash of frame data to detect unique frames\n"
+                     @"            let frameHash = '';\n"
+                     @"            if (frameData && frameData.size) {\n"
+                     @"                frameHash = frameData.size + '_' + frameData.type;\n"
+                     @"            } else {\n"
+                     @"                // For video or other sources, use timestamp\n"
+                     @"                frameHash = Math.floor(currentTime / 100) + ''; // 100ms precision\n"
+                     @"            }\n"
+                     @"            \n"
+                     @"            // Only count unique frames\n"
+                     @"            if (frameHash !== lastFrameHash) {\n"
+                     @"                lastFrameHash = frameHash;\n"
+                     @"                uniqueFrameCount++;\n"
+                     @"                \n"
+                     @"                // Initialize timing\n"
+                     @"                if (fpsStartTime === 0) {\n"
+                     @"                    fpsStartTime = currentTime;\n"
+                     @"                }\n"
+                     @"                \n"
+                     @"                // Calculate FPS over 1 second window\n"
+                     @"                const windowDuration = currentTime - fpsStartTime;\n"
+                     @"                if (windowDuration >= 1000) { // 1 second\n"
+                     @"                    clientFPS = (uniqueFrameCount * 1000) / windowDuration;\n"
+                     @"                    document.getElementById('client-fps').textContent = clientFPS.toFixed(1);\n"
+                     @"                    \n"
+                     @"                    // Reset counters\n"
+                     @"                    fpsStartTime = currentTime;\n"
+                     @"                    uniqueFrameCount = 0;\n"
+                     @"                }\n"
+                     @"            }\n"
+                     @"        }\n"
+                     @"        \n"
+                     @"        function startFPSMonitoring() {\n"
+                     @"            document.getElementById('fps-display').style.display = 'block';\n"
+                     @"            \n"
+                     @"            // Reset FPS counters\n"
+                     @"            lastFrameHash = '';\n"
+                     @"            uniqueFrameCount = 0;\n"
+                     @"            fpsStartTime = 0;\n"
+                     @"            clientFPS = 0;\n"
+                     @"            \n"
+                     @"            // Update server FPS every second\n"
+                     @"            fpsInterval = setInterval(async () => {\n"
+                     @"                try {\n"
+                     @"                    const response = await fetch('/fps');\n"
+                     @"                    if (response.ok) {\n"
+                     @"                        const data = await response.json();\n"
+                     @"                        document.getElementById('server-fps').textContent = data.serverFPS.toFixed(1);\n"
+                     @"                    }\n"
+                     @"                } catch (e) {\n"
+                     @"                    console.error('FPS fetch error:', e);\n"
+                     @"                }\n"
+                     @"            }, 1000);\n"
+                     @"        }\n"
+                     @"        \n"
+                     @"        function stopFPSMonitoring() {\n"
+                     @"            document.getElementById('fps-display').style.display = 'none';\n"
+                     @"            if (fpsInterval) {\n"
+                     @"                clearInterval(fpsInterval);\n"
+                     @"                fpsInterval = null;\n"
+                     @"            }\n"
                      @"        }\n"
                      @"        \n"
                      @"        function setQuality(hq) {\n"
@@ -2040,6 +2489,7 @@ void listApplicationsAndWindows() {
                      @"                    }\n"
                      @"                    \n"
                      @"                    setStatus('Capture active - ' + currentMode.toUpperCase() + ' mode');\n"
+                     @"                    startFPSMonitoring();\n"
                      @"                } else {\n"
                      @"                    setStatus('Failed to start capture');\n"
                      @"                }\n"
@@ -2059,6 +2509,7 @@ void listApplicationsAndWindows() {
                      @"            document.getElementById('screen').style.display = 'none';\n"
                      @"            document.getElementById('video').style.display = 'none';\n"
                      @"            document.getElementById('loading').style.display = 'block';\n"
+                     @"            stopFPSMonitoring();\n"
                      @"            setStatus('Capture stopped');\n"
                      @"        }\n"
                      @"        \n"
@@ -2069,7 +2520,10 @@ void listApplicationsAndWindows() {
                      @"                if (!isCapturing) return;\n"
                      @"                \n"
                      @"                try {\n"
+                     @"                    const startTime = performance.now();\n"
                      @"                    const response = await fetch('/frame?' + Date.now());\n"
+                     @"                    const endTime = performance.now();\n"
+                     @"                    \n"
                      @"                    if (response.ok) {\n"
                      @"                        const frameBlob = await response.blob();\n"
                      @"                        const imageUrl = URL.createObjectURL(frameBlob);\n"
@@ -2078,6 +2532,12 @@ void listApplicationsAndWindows() {
                      @"                        if (oldUrl && oldUrl.startsWith('blob:')) {\n"
                      @"                            URL.revokeObjectURL(oldUrl);\n"
                      @"                        }\n"
+                     @"                        \n"
+                     @"                        // Update metrics\n"
+                     @"                        networkLatency = endTime - startTime;\n"
+                     @"                        document.getElementById('network-latency').textContent = networkLatency.toFixed(1);\n"
+                     @"                        document.getElementById('poll-rate').textContent = '200';\n"
+                     @"                        await updateClientFPS(frameBlob);\n"
                      @"                    }\n"
                      @"                } catch (e) {\n"
                      @"                    console.error('Frame fetch error:', e);\n"
@@ -2093,14 +2553,23 @@ void listApplicationsAndWindows() {
                      @"        }\n"
                      @"        \n"
                      @"        function startVideoPolling() {\n"
+                     @"            // Try HLS streaming first if supported\n"
+                     @"            if (typeof Hls !== 'undefined' && Hls.isSupported()) {\n"
+                     @"                startHLSStream();\n"
+                     @"                return;\n"
+                     @"            }\n"
+                     @"            \n"
+                     @"            // Fallback to compressed frame polling\n"
                      @"            if (pollInterval) clearInterval(pollInterval);\n"
                      @"            \n"
                      @"            pollInterval = setInterval(async () => {\n"
                      @"                if (!isCapturing) return;\n"
                      @"                \n"
                      @"                try {\n"
-                     @"                    // Use video-stream endpoint for compressed frames\n"
+                     @"                    const startTime = performance.now();\n"
                      @"                    const response = await fetch('/video-stream?' + Date.now());\n"
+                     @"                    const endTime = performance.now();\n"
+                     @"                    \n"
                      @"                    if (response.ok) {\n"
                      @"                        const frameBlob = await response.blob();\n"
                      @"                        const imageUrl = URL.createObjectURL(frameBlob);\n"
@@ -2109,12 +2578,55 @@ void listApplicationsAndWindows() {
                      @"                        if (oldUrl && oldUrl.startsWith('blob:')) {\n"
                      @"                            URL.revokeObjectURL(oldUrl);\n"
                      @"                        }\n"
+                     @"                        \n"
+                     @"                        // Update metrics\n"
+                     @"                        networkLatency = endTime - startTime;\n"
+                     @"                        document.getElementById('network-latency').textContent = networkLatency.toFixed(1);\n"
+                     @"                        document.getElementById('poll-rate').textContent = '100';\n"
+                     @"                        await updateClientFPS(frameBlob);\n"
                      @"                    }\n"
                      @"                } catch (e) {\n"
                      @"                    console.error('Video frame fetch error:', e);\n"
                      @"                    setStatus('Connection error - retrying...');\n"
                      @"                }\n"
                      @"            }, 100); // Faster polling for video mode\n"
+                     @"        }\n"
+                     @"        \n"
+                     @"        function startHLSStream() {\n"
+                     @"            const video = document.getElementById('video');\n"
+                     @"            document.getElementById('screen').style.display = 'none';\n"
+                     @"            document.getElementById('video').style.display = 'block';\n"
+                     @"            \n"
+                     @"            if (window.hls) {\n"
+                     @"                window.hls.destroy();\n"
+                     @"            }\n"
+                     @"            \n"
+                     @"            window.hls = new Hls({\n"
+                     @"                debug: false,\n"
+                     @"                enableWorker: false,\n"
+                     @"                lowLatencyMode: true\n"
+                     @"            });\n"
+                     @"            \n"
+                     @"            window.hls.loadSource('/stream.m3u8');\n"
+                     @"            window.hls.attachMedia(video);\n"
+                     @"            \n"
+                     @"            window.hls.on(Hls.Events.MANIFEST_PARSED, () => {\n"
+                     @"                setStatus('HLS stream started - VP9 mode');\n"
+                     @"                video.play();\n"
+                     @"            });\n"
+                     @"            \n"
+                     @"            video.addEventListener('timeupdate', () => {\n"
+                     @"                document.getElementById('poll-rate').textContent = 'HLS';\n"
+                     @"                updateClientFPS();\n"
+                     @"            });\n"
+                     @"            \n"
+                     @"            window.hls.on(Hls.Events.ERROR, (event, data) => {\n"
+                     @"                console.error('HLS error:', data);\n"
+                     @"                setStatus('HLS error - falling back to polling');\n"
+                     @"                document.getElementById('video').style.display = 'none';\n"
+                     @"                document.getElementById('screen').style.display = 'block';\n"
+                     @"                startPolling();\n"
+                     @"            });\n"
                      @"        }\n"
                      @"        \n"
                      @"        async function handleClick(event) {\n"
@@ -2134,6 +2646,26 @@ void listApplicationsAndWindows() {
                      @"                    method: 'POST',\n"
                      @"                    headers: { 'Content-Type': 'application/json' },\n"
                      @"                    body: JSON.stringify(body)\n"
+                     @"                });\n"
+                     @"                \n"
+                     @"                // Send click tracking data\n"
+                     @"                await fetch('/track-click', {\n"
+                     @"                    method: 'POST',\n"
+                     @"                    headers: { 'Content-Type': 'application/json' },\n"
+                     @"                    body: JSON.stringify({\n"
+                     @"                        event: 'click_tracking',\n"
+                     @"                        source: 'Web_Client',\n"
+                     @"                        timestamp: Date.now() / 1000,\n"
+                     @"                        coordinates: {\n"
+                     @"                            client: { x: x, y: y },\n"
+                     @"                            element: event.target.tagName,\n"
+                     @"                            viewport: { width: window.innerWidth, height: window.innerHeight }\n"
+                     @"                        },\n"
+                     @"                        window_info: {\n"
+                     @"                            cgWindowID: currentWindowId === 0 ? 0 : getCGWindowID(currentWindowId),\n"
+                     @"                            capture_mode: currentWindowId === 0 ? 'fullscreen' : 'window'\n"
+                     @"                        }\n"
+                     @"                    })\n"
                      @"                });\n"
                      @"                \n"
                      @"                setStatus('Clicked at (' + x + ', ' + y + ')');\n"
@@ -2202,6 +2734,21 @@ void listApplicationsAndWindows() {
                      @"            if (windowId === 0) return 0;\n"
                      @"            const window = windows.find(w => w.id === windowId);\n"
                      @"            return window ? window.cgWindowID : 0;\n"
+                     @"        }\n"
+                     @"        \n"
+                     @"        async function calibrateCoordinates() {\n"
+                     @"            try {\n"
+                     @"                setStatus('🎯 Calibrating mouse coordinates...');\n"
+                     @"                const response = await fetch('/calibrate', { method: 'POST' });\n"
+                     @"                if (response.ok) {\n"
+                     @"                    const data = await response.json();\n"
+                     @"                    setStatus(`✅ Calibrated! Scale: ${data.scaleX.toFixed(3)}x${data.scaleY.toFixed(3)}, Offset: ${data.offsetX.toFixed(1)},${data.offsetY.toFixed(1)}`);\n"
+                     @"                } else {\n"
+                     @"                    setStatus('❌ Calibration failed');\n"
+                     @"                }\n"
+                     @"            } catch (e) {\n"
+                     @"                setStatus('❌ Calibration error: ' + e.message);\n"
+                     @"            }\n"
                      @"        }\n"
                      @"        \n"
                      @"        // Initialize\n"
