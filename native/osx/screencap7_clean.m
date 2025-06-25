@@ -351,16 +351,11 @@ typedef enum {
 }
 
 - (void)performClick:(int)x y:(int)y targetWindowID:(UInt32)windowID activateWindow:(BOOL)activate {
-    NSLog(@"🖱️ Raw click at %d,%d (target window: %u, activate: %@)", x, y, windowID, activate ? @"YES" : @"NO");
+    NSLog(@"🖱️ Final click at %d,%d (target window: %u, activate: %@)", x, y, windowID, activate ? @"YES" : @"NO");
     
-    // Transform coordinates using calibration
-    CGPoint rawPoint = CGPointMake(x, y);
-    CGPoint transformedPoint = [self transformCoordinates:rawPoint];
-    
-    int finalX = (int)round(transformedPoint.x);
-    int finalY = (int)round(transformedPoint.y);
-    
-    NSLog(@"🎯 Transformed click: (%d,%d) → (%d,%d)", x, y, finalX, finalY);
+    // Coordinates are already transformed in handleClickRequest - use directly
+    int finalX = x;
+    int finalY = y;
     
     @try {
         // Check accessibility permissions
@@ -1953,9 +1948,33 @@ void listApplicationsAndWindows() {
         return;
     }
     
-    int x = [json[@"x"] intValue];
-    int y = [json[@"y"] intValue];
-    NSLog(@"🖱️ Click at (%d, %d)", x, y);
+    // Handle relative coordinates from browser (0-1000 range representing 0.0-1.0)
+    float relativeX = [json[@"x"] floatValue] / 1000.0;  // Convert to 0.0-1.0
+    float relativeY = [json[@"y"] floatValue] / 1000.0;  // Convert to 0.0-1.0
+    
+    // Get actual screen dimensions
+    CGDirectDisplayID displayID = CGMainDisplayID();
+    CGRect bounds = CGDisplayBounds(displayID);
+    
+    int x, y;
+    
+    // For fullscreen desktop capture, map to entire screen including menu bar
+    if (self.captureServer.captureType == CaptureTypeFullDesktop) {
+        x = (int)(relativeX * bounds.size.width);
+        y = (int)(relativeY * bounds.size.height);
+        NSLog(@"🖱️ FULLSCREEN Click: relative(%.3f, %.3f) → screen(%d, %d) [full screen: %.0fx%.0f]", 
+              relativeX, relativeY, x, y, bounds.size.width, bounds.size.height);
+    } else {
+        // For window/app capture, exclude menu bar area
+        NSScreen *mainScreen = [NSScreen mainScreen];
+        CGFloat menuBarHeight = mainScreen.frame.size.height - mainScreen.visibleFrame.size.height;
+        CGFloat availableHeight = bounds.size.height - menuBarHeight;
+        
+        x = (int)(relativeX * bounds.size.width);
+        y = (int)(menuBarHeight + (relativeY * availableHeight));
+        NSLog(@"🖱️ WINDOW Click: relative(%.3f, %.3f) → screen(%d, %d) [menuBar:%.0f, available:%.0fx%.0f]", 
+              relativeX, relativeY, x, y, menuBarHeight, bounds.size.width, availableHeight);
+    }
     
     [self.captureServer performClick:x y:y];
     [self sendJSONResponse:client_fd data:@{@"status": @"clicked", @"x": @(x), @"y": @(y)}];
@@ -2639,19 +2658,51 @@ void listApplicationsAndWindows() {
                      @"            });\n"
                      @"        }\n"
                      @"        \n"
+                     @"        let realScreenWidth = 3840;\n"
+                     @"        let realScreenHeight = 1620;\n"
+                     @"        \n"
+                     @"        // Fetch actual screen dimensions from server\n"
+                     @"        async function fetchRealDimensions() {\n"
+                     @"            try {\n"
+                     @"                const response = await fetch('/display');\n"
+                     @"                const data = await response.json();\n"
+                     @"                realScreenWidth = data.width;\n"
+                     @"                realScreenHeight = data.height;\n"
+                     @"                console.log('📐 Real screen dimensions:', realScreenWidth, 'x', realScreenHeight);\n"
+                     @"            } catch (e) {\n"
+                     @"                console.warn('⚠️ Could not fetch screen dimensions, using defaults');\n"
+                     @"            }\n"
+                     @"        }\n"
+                     @"        \n"
                      @"        async function handleClick(event) {\n"
+                     @"            // Get the image/video element bounds\n"
                      @"            const rect = event.target.getBoundingClientRect();\n"
-                     @"            const scaleX = event.target.naturalWidth / rect.width;\n"
-                     @"            const scaleY = event.target.naturalHeight / rect.height;\n"
-                     @"            console.log('🔍 COORDINATE DEBUG:');\n"
-                     @"            console.log('  naturalWidth:', event.target.naturalWidth, 'naturalHeight:', event.target.naturalHeight);\n"
-                     @"            console.log('  rect.width:', rect.width, 'rect.height:', rect.height);\n"
-                     @"            console.log('  scaleX:', scaleX, 'scaleY:', scaleY);\n"
-                     @"            console.log('  clientX:', event.clientX, 'clientY:', event.clientY);\n"
-                     @"            console.log('  rect.left:', rect.left, 'rect.top:', rect.top);\n"
-                     @"            const x = Math.round((event.clientX - rect.left) * scaleX);\n"
-                     @"            const y = Math.round((event.clientY - rect.top) * scaleY);\n"
-                     @"            console.log('  final x:', x, 'y:', y);\n"
+                     @"            \n"
+                     @"            // Calculate click position relative to the image element's top-left corner\n"
+                     @"            // This gives us the exact pixel position within the image bounds\n"
+                     @"            const imageClickX = event.clientX - rect.left;\n"
+                     @"            const imageClickY = event.clientY - rect.top;\n"
+                     @"            \n"
+                     @"            // Ensure coordinates are within image bounds (clamp to prevent out-of-bounds)\n"
+                     @"            const clampedX = Math.max(0, Math.min(imageClickX, rect.width));\n"
+                     @"            const clampedY = Math.max(0, Math.min(imageClickY, rect.height));\n"
+                     @"            \n"
+                     @"            // Convert to normalized coordinates (0.0 to 1.0) within the image\n"
+                     @"            const relativeX = clampedX / rect.width;\n"
+                     @"            const relativeY = clampedY / rect.height;\n"
+                     @"            \n"
+                     @"            // NEW APPROACH: Send relative coordinates (0.0-1.0) and let server handle transformation\n"
+                     @"            // This eliminates all client-side coordinate system assumptions\n"
+                     @"            const x = Math.round(relativeX * 1000); // Convert to 0-1000 range for precision\n"
+                     @"            const y = Math.round(relativeY * 1000);\n"
+                     @"            \n"
+                     @"            console.log('🔍 COORDINATE MAPPING:');\n"
+                     @"            console.log('  Browser click: (', event.clientX, ',', event.clientY, ')');\n"
+                     @"            console.log('  Image rect: ', rect.width, 'x', rect.height, ' at (', rect.left, ',', rect.top, ')');\n"
+                     @"            console.log('  NEW RELATIVE APPROACH: sending 0-1000 range to server');\n"
+                     @"            console.log('  Image-relative click: (', imageClickX.toFixed(1), ',', imageClickY.toFixed(1), ')');\n"
+                     @"            console.log('  Normalized (0-1): (', relativeX.toFixed(3), ',', relativeY.toFixed(3), ')');\n"
+                     @"            console.log('  Final coords (0-1000): (', x, ',', y, ')');\n"
                      @"            \n"
                      @"            try {\n"
                      @"                const endpoint = currentWindowId === 0 ? '/click' : '/click-window';\n"
@@ -2770,6 +2821,7 @@ void listApplicationsAndWindows() {
                      @"        \n"
                      @"        // Initialize\n"
                      @"        refreshWindows();\n"
+                     @"        fetchRealDimensions();\n"
                      @"    </script>\n"
                      @"</body>\n"
                      @"</html>";
