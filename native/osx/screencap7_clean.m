@@ -1174,13 +1174,17 @@ typedef enum {
             } else {
                 NSLog(@"✅ Found window: %@ (ID: %u)", targetWindow.title, windowID);
                 
-                // Create filter for specific window
-                filter = [[SCContentFilter alloc] initWithDesktopIndependentWindow:targetWindow];
+                // Create filter for full desktop to include menu bar and context
+                // Window mode now shows full desktop (like fullscreen) but targets specific window
+                SCDisplay *display = content.displays.firstObject;
+                filter = [[SCContentFilter alloc] initWithDisplay:display excludingWindows:@[]];
                 
-                // Configure stream for window
-                CGRect frame = targetWindow.frame;
-                config.width = (int)CGRectGetWidth(frame);
-                config.height = (int)CGRectGetHeight(frame);
+                // Configure stream for full desktop to include menu bar
+                config.width = (int)display.width;
+                config.height = (int)display.height;
+                
+                NSLog(@"🖥️ Window capture with desktop context: %dx%d (includes menu bar)", 
+                      config.width, config.height);
             }
             
             // Common configuration
@@ -2047,10 +2051,22 @@ void listApplicationsAndWindows() {
         return;
     }
     
-    int x = [json[@"x"] intValue];
-    int y = [json[@"y"] intValue];
+    // Handle relative coordinates from browser (0-1000 range representing 0.0-1.0)
+    float relativeX = [json[@"x"] floatValue] / 1000.0;  // Convert to 0.0-1.0
+    float relativeY = [json[@"y"] floatValue] / 1000.0;  // Convert to 0.0-1.0
     UInt32 windowID = [json[@"cgWindowID"] unsignedIntValue];
-    NSLog(@"CLICK-CALIBRATE: 🖱️ Window click at (%d, %d) targeting window %u", x, y, windowID);
+    
+    // Get actual screen dimensions - since window capture now includes full desktop
+    CGDirectDisplayID displayID = CGMainDisplayID();
+    CGRect bounds = CGDisplayBounds(displayID);
+    
+    // Convert relative coordinates to absolute screen coordinates
+    // Window capture now shows full screen including menu bar, so use same mapping as fullscreen
+    int x = (int)(relativeX * bounds.size.width);
+    int y = (int)(relativeY * bounds.size.height);
+    
+    NSLog(@"🖱️ WINDOW Click: relative(%.3f, %.3f) → screen(%d, %d) targeting window %u [full desktop: %.0fx%.0f]", 
+          relativeX, relativeY, x, y, windowID, bounds.size.width, bounds.size.height);
     
     @try {
         [self.captureServer performClick:x y:y targetWindowID:windowID];
