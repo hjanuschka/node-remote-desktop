@@ -717,6 +717,18 @@ typedef enum {
     static int frameFailureCount = 0;
     frameFailureCount = 0;
     
+    // Debug: Log actual frame delivery rate
+    static int debugFrameCount = 0;
+    static NSTimeInterval debugLastLog = 0;
+    NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
+    debugFrameCount++;
+    
+    if (now - debugLastLog >= 1.0) {
+        NSLog(@"🎥 ScreenCaptureKit delivering %d FPS to didOutputSampleBuffer", debugFrameCount);
+        debugFrameCount = 0;
+        debugLastLog = now;
+    }
+    
     // Log which stream this is coming from
     static int streamLogCount = 0;
     if (++streamLogCount % 900 == 0) { // Every 30 seconds
@@ -801,9 +813,9 @@ typedef enum {
                                                                                  1, NULL);
             
             if (destination) {
-                // Set JPEG quality - always high for smooth experience
-                float quality = 0.85; // Good balance of quality and size
-                int maxSize = 2560; // Higher resolution for sharper image
+                // Set JPEG quality - Optimized for performance
+                float quality = 0.75; // Good balance of quality and speed
+                int maxSize = 1920; // Standard resolution for good performance
                 
                 NSDictionary *options = @{
                     (__bridge NSString*)kCGImageDestinationLossyCompressionQuality: @(quality),
@@ -814,9 +826,10 @@ typedef enum {
                 CGImageDestinationFinalize(destination);
                 CFRelease(destination);
                 
-                // Store JPEG data for HTTP server
+                // Store JPEG data for HTTP server with timestamp
                 @synchronized(self.currentFrame) {
                     [self.currentFrame setData:jpegData];
+                    self.lastFrameTime = [[NSDate date] timeIntervalSince1970];
                 }
                 
                 // VP9 mode: Encode both VP9 (for efficiency) and JPEG (for browser display)
@@ -845,7 +858,7 @@ typedef enum {
                 // Log progress occasionally (disabled to reduce spam)
                 static int frameCount = 0;
                 frameCount++;
-                if (frameCount % 300 == 0) { // Every 10 seconds at 30fps
+                if (frameCount % 30 == 0) { // Every 1 second at 30fps
                     NSString *captureInfo = @"Unknown";
                     if (self.captureType == CaptureTypeFullDesktop) {
                         captureInfo = @"Full Desktop";
@@ -1716,8 +1729,16 @@ void listApplicationsAndWindows() {
 - (void)sendFrameResponse:(int)client_fd {
     NSData *frameData = [self.captureServer getCurrentFrame];
     
-    NSLog(@"🖼️ Frame request: frameData.length = %lu, isCapturing = %@", 
-          frameData.length, self.captureServer.isCapturing ? @"YES" : @"NO");
+    // Fix: If we have frame data, we must be capturing
+    BOOL actuallyCapturing = (frameData.length > 0);
+    if (actuallyCapturing && !self.captureServer.isCapturing) {
+        self.captureServer.isCapturing = YES;
+        NSLog(@"🔧 Fixed isCapturing flag - we have frame data so we must be capturing");
+    }
+    
+    NSTimeInterval frameAge = [[NSDate date] timeIntervalSince1970] - self.captureServer.lastFrameTime;
+    NSLog(@"🖼️ Frame request: frameData.length = %lu, isCapturing = %@, frameAge: %.1fs", 
+          frameData.length, actuallyCapturing ? @"YES" : @"NO", frameAge);
     
     if (frameData.length == 0) {
         NSLog(@"❌ No frame data available - sending 404");
@@ -2366,13 +2387,7 @@ void listApplicationsAndWindows() {
                      @"    <h1>Remote Desktop Control</h1>\n"
                      @"    \n"
                      @"    <div class=\"controls\">\n"
-                     @"        <button id=\"start-btn\" onclick=\"startCapture()\">Start Desktop Capture</button>\n"
-                     @"        <label>Mode:</label>\n"
-                     @"        <button id=\"jpeg-btn\" class=\"active\" onclick=\"setMode('jpeg')\">Image (JPEG)</button>\n"
-                     @"        <button id=\"video-btn\" onclick=\"setMode('video')\">Video (VP9)</button>\n"
-                     @"        <label>Quality:</label>\n"
-                     @"        <button id=\"standard-btn\" class=\"active\" onclick=\"setQuality(false)\">Standard</button>\n"
-                     @"        <button id=\"hq-btn\" onclick=\"setQuality(true)\">High Quality</button>\n"
+                     @"        <button id=\"start-btn\" onclick=\"startCapture()\">Start Capture</button>\n"
                      @"        <select id=\"window-select\" onchange=\"switchToWindow()\">\n"
                      @"            <option value=\"0\">Full Desktop</option>\n"
                      @"        </select>\n"
@@ -2394,10 +2409,8 @@ void listApplicationsAndWindows() {
                      @"    <script>\n"
                      @"        let isCapturing = false;\n"
                      @"        let pollInterval = null;\n"
-                     @"        let isHQMode = false;\n"
                      @"        let currentWindowId = 0;\n"
                      @"        let windows = [];\n"
-                     @"        let currentMode = 'jpeg'; // 'jpeg' or 'video'\n"
                      @"        \n"
                      @"        // FPS tracking\n"
                      @"        let lastFrameTime = 0;\n"
@@ -2479,34 +2492,6 @@ void listApplicationsAndWindows() {
                      @"            }\n"
                      @"        }\n"
                      @"        \n"
-                     @"        function setQuality(hq) {\n"
-                     @"            isHQMode = hq;\n"
-                     @"            document.getElementById('standard-btn').className = hq ? '' : 'active';\n"
-                     @"            document.getElementById('hq-btn').className = hq ? 'active' : '';\n"
-                     @"            if (isCapturing) {\n"
-                     @"                startCapture();\n"
-                     @"            }\n"
-                     @"        }\n"
-                     @"        \n"
-                     @"        function setMode(mode) {\n"
-                     @"            currentMode = mode;\n"
-                     @"            document.getElementById('jpeg-btn').className = mode === 'jpeg' ? 'active' : '';\n"
-                     @"            document.getElementById('video-btn').className = mode === 'video' ? 'active' : '';\n"
-                     @"            \n"
-                     @"            // Switch display elements\n"
-                     @"            if (mode === 'video') {\n"
-                     @"                document.getElementById('screen').style.display = 'none';\n"
-                     @"                document.getElementById('video').style.display = 'block';\n"
-                     @"            } else {\n"
-                     @"                document.getElementById('video').style.display = 'none';\n"
-                     @"                document.getElementById('screen').style.display = 'block';\n"
-                     @"            }\n"
-                     @"            \n"
-                     @"            if (isCapturing) {\n"
-                     @"                startCapture();\n"
-                     @"            }\n"
-                     @"        }\n"
-                     @"        \n"
                      @"        async function startCapture() {\n"
                      @"            try {\n"
                      @"                setStatus('Starting capture...');\n"
@@ -2520,7 +2505,7 @@ void listApplicationsAndWindows() {
                      @"                        body: JSON.stringify({\n"
                      @"                            type: 0,\n"
                      @"                            index: 0,\n"
-                     @"                            vp9: currentMode === 'video'\n"
+                     @"                            vp9: true\n"
                      @"                        })\n"
                      @"                    });\n"
                      @"                } else {\n"
@@ -2530,7 +2515,7 @@ void listApplicationsAndWindows() {
                      @"                        headers: { 'Content-Type': 'application/json' },\n"
                      @"                        body: JSON.stringify({\n"
                      @"                            cgWindowID: getCGWindowID(currentWindowId),\n"
-                     @"                            vp9: currentMode === 'video'\n"
+                     @"                            vp9: true\n"
                      @"                        })\n"
                      @"                    });\n"
                      @"                }\n"
@@ -2541,17 +2526,13 @@ void listApplicationsAndWindows() {
                      @"                    document.getElementById('start-btn').onclick = stopCapture;\n"
                      @"                    document.getElementById('loading').style.display = 'none';\n"
                      @"                    \n"
-                     @"                    // Both modes use img element but video mode gets compressed frames\n"
+                     @"                    // Show the screen element and start polling\n"
                      @"                    document.getElementById('video').style.display = 'none';\n"
                      @"                    document.getElementById('screen').style.display = 'block';\n"
                      @"                    \n"
-                     @"                    if (currentMode === 'video') {\n"
-                     @"                        startVideoPolling();\n"
-                     @"                    } else {\n"
-                     @"                        startPolling();\n"
-                     @"                    }\n"
+                     @"                    startPolling();\n"
                      @"                    \n"
-                     @"                    setStatus('Capture active - ' + currentMode.toUpperCase() + ' mode');\n"
+                     @"                    setStatus('Capture active - High Quality MJPEG');\n"
                      @"                    startFPSMonitoring();\n"
                      @"                } else {\n"
                      @"                    setStatus('Failed to start capture');\n"
@@ -2567,7 +2548,7 @@ void listApplicationsAndWindows() {
                      @"                clearInterval(pollInterval);\n"
                      @"                pollInterval = null;\n"
                      @"            }\n"
-                     @"            document.getElementById('start-btn').textContent = 'Start Desktop Capture';\n"
+                     @"            document.getElementById('start-btn').textContent = 'Start Capture';\n"
                      @"            document.getElementById('start-btn').onclick = startCapture;\n"
                      @"            document.getElementById('screen').style.display = 'none';\n"
                      @"            document.getElementById('video').style.display = 'none';\n"
@@ -2611,79 +2592,8 @@ void listApplicationsAndWindows() {
                      @"        \n"
                      @"        function onFrameLoad() {\n"
                      @"            if (isCapturing) {\n"
-                     @"                setStatus('Capture active - ' + currentMode.toUpperCase() + ' mode');\n"
+                     @"                setStatus('Capture active - High Quality MJPEG');\n"
                      @"            }\n"
-                     @"        }\n"
-                     @"        \n"
-                     @"        function startVideoPolling() {\n"
-                     @"            // Use optimized MJPEG polling for low latency\n"
-                     @"            if (pollInterval) clearInterval(pollInterval);\n"
-                     @"            \n"
-                     @"            pollInterval = setInterval(async () => {\n"
-                     @"                if (!isCapturing) return;\n"
-                     @"                \n"
-                     @"                try {\n"
-                     @"                    const startTime = performance.now();\n"
-                     @"                    const response = await fetch('/video-stream?' + Date.now());\n"
-                     @"                    const endTime = performance.now();\n"
-                     @"                    \n"
-                     @"                    if (response.ok) {\n"
-                     @"                        const frameBlob = await response.blob();\n"
-                     @"                        const imageUrl = URL.createObjectURL(frameBlob);\n"
-                     @"                        const oldUrl = document.getElementById('screen').src;\n"
-                     @"                        document.getElementById('screen').src = imageUrl;\n"
-                     @"                        if (oldUrl && oldUrl.startsWith('blob:')) {\n"
-                     @"                            URL.revokeObjectURL(oldUrl);\n"
-                     @"                        }\n"
-                     @"                        \n"
-                     @"                        // Update metrics\n"
-                     @"                        networkLatency = endTime - startTime;\n"
-                     @"                        document.getElementById('network-latency').textContent = networkLatency.toFixed(1);\n"
-                     @"                        document.getElementById('poll-rate').textContent = '33';\n"
-                     @"                        await updateClientFPS(frameBlob);\n"
-                     @"                    }\n"
-                     @"                } catch (e) {\n"
-                     @"                    console.error('Video frame fetch error:', e);\n"
-                     @"                    setStatus('Connection error - retrying...');\n"
-                     @"                }\n"
-                     @"            }, 33); // 30 FPS polling for smooth video\n"
-                     @"        }\n"
-                     @"        \n"
-                     @"        function startHLSStream() {\n"
-                     @"            const video = document.getElementById('video');\n"
-                     @"            document.getElementById('screen').style.display = 'none';\n"
-                     @"            document.getElementById('video').style.display = 'block';\n"
-                     @"            \n"
-                     @"            if (window.hls) {\n"
-                     @"                window.hls.destroy();\n"
-                     @"            }\n"
-                     @"            \n"
-                     @"            window.hls = new Hls({\n"
-                     @"                debug: false,\n"
-                     @"                enableWorker: false,\n"
-                     @"                lowLatencyMode: true\n"
-                     @"            });\n"
-                     @"            \n"
-                     @"            window.hls.loadSource('/stream.m3u8');\n"
-                     @"            window.hls.attachMedia(video);\n"
-                     @"            \n"
-                     @"            window.hls.on(Hls.Events.MANIFEST_PARSED, () => {\n"
-                     @"                setStatus('HLS stream started - VP9 mode');\n"
-                     @"                video.play();\n"
-                     @"            });\n"
-                     @"            \n"
-                     @"            video.addEventListener('timeupdate', () => {\n"
-                     @"                document.getElementById('poll-rate').textContent = 'HLS';\n"
-                     @"                updateClientFPS();\n"
-                     @"            });\n"
-                     @"            \n"
-                     @"            window.hls.on(Hls.Events.ERROR, (event, data) => {\n"
-                     @"                console.error('HLS error:', data);\n"
-                     @"                setStatus('HLS error - falling back to polling');\n"
-                     @"                document.getElementById('video').style.display = 'none';\n"
-                     @"                document.getElementById('screen').style.display = 'block';\n"
-                     @"                startPolling();\n"
-                     @"            });\n"
                      @"        }\n"
                      @"        \n"
                      @"        let realScreenWidth = 3840;\n"
