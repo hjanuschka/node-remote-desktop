@@ -1790,23 +1790,33 @@ void listApplicationsAndWindows() {
         return;
     }
     
-    // For now, serve the current frame as a pseudo-segment
-    // In a real implementation, we'd generate TS segments with H.264
-    NSData *frameData = [self.captureServer getCurrentFrame];
+    // Get H.264 encoded video data instead of JPEG
+    NSData *videoData = [self.captureServer getCurrentVP9Frame];
     
-    if (frameData.length == 0) {
-        NSLog(@"❌ No segment data available");
-        [self send404Response:client_fd];
+    if (videoData.length == 0) {
+        NSLog(@"❌ No H.264/VP9 video data available, falling back to MJPEG");
+        // Fallback to MJPEG for now
+        NSData *frameData = [self.captureServer getCurrentFrame];
+        if (frameData.length == 0) {
+            [self send404Response:client_fd];
+            return;
+        }
+        // Serve as MJPEG stream instead of broken TS
+        NSString *headers = [NSString stringWithFormat:@"HTTP/1.1 200 OK\r\nContent-Type: image/jpeg\r\nContent-Length: %lu\r\nAccess-Control-Allow-Origin: *\r\nCache-Control: no-cache\r\n\r\n",
+                            (unsigned long)frameData.length];
+        send(client_fd, [headers UTF8String], headers.length, 0);
+        send(client_fd, frameData.bytes, frameData.length, 0);
+        NSLog(@"⚠️ HLS segment sent as MJPEG fallback");
         return;
     }
     
-    // Serve JPEG as TS segment (simplified for proof of concept)
+    // Serve actual H.264 video data as TS segment
     NSString *headers = [NSString stringWithFormat:@"HTTP/1.1 200 OK\r\nContent-Type: video/mp2t\r\nContent-Length: %lu\r\nAccess-Control-Allow-Origin: *\r\nCache-Control: no-cache\r\n\r\n",
-                        (unsigned long)frameData.length];
+                        (unsigned long)videoData.length];
     
     send(client_fd, [headers UTF8String], headers.length, 0);
-    send(client_fd, frameData.bytes, frameData.length, 0);
-    NSLog(@"✅ HLS segment sent");
+    send(client_fd, videoData.bytes, videoData.length, 0);
+    NSLog(@"✅ HLS segment sent (H.264 video data)");
 }
 
 - (void)sendFPSResponse:(int)client_fd {
