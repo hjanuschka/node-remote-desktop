@@ -1,5 +1,9 @@
 #import <Cocoa/Cocoa.h>
 #import <Foundation/Foundation.h>
+#import <sys/socket.h>
+#import <netinet/in.h>
+#import <arpa/inet.h>
+#import <unistd.h>
 
 @protocol ClickableViewDelegate <NSObject>
 - (void)clickableView:(NSView *)view didClickAtPoint:(NSPoint)point;
@@ -235,17 +239,25 @@
     
     // Create payload with comprehensive coordinate data
     NSLog(@"CLICK-CALIBRATE: 📝 Creating JSON payload...");
+    
+    // Convert native coordinates to web client compatible format
+    // Use the same logical coordinate system as web client
+    CGFloat logicalX = viewCoords.x;
+    CGFloat logicalY = viewCoords.y;
+    
+    // Convert to web client format to match coordinate system
     NSDictionary *payload = @{
         @"event": @"click_tracking",
         @"source": @"ClickTracker_App",
         @"timestamp": @([[NSDate date] timeIntervalSince1970]),
         @"coordinates": @{
-            @"view": @{@"x": @(viewCoords.x), @"y": @(viewCoords.y)},
-            @"window": @{@"x": @(windowCoords.x), @"y": @(windowCoords.y)},
-            @"screen": @{@"x": @(screenCoords.x), @"y": @(screenCoords.y)}
+            @"client": @{@"x": @(logicalX), @"y": @(logicalY)},
+            @"element": @"ClickTracker_Native",
+            @"viewport": @{@"width": @(windowFrame.size.width), @"height": @(windowFrame.size.height)}
         },
         @"window_info": @{
             @"cgWindowID": @(windowID),
+            @"capture_mode": @"fullscreen",
             @"frame": @{
                 @"x": @(windowFrame.origin.x),
                 @"y": @(windowFrame.origin.y),
@@ -255,23 +267,6 @@
         }
     };
     
-    // Send via HTTP POST
-    NSString *urlString = [NSString stringWithFormat:@"%@/track-click", self.serverURL];
-    NSURL *url = [NSURL URLWithString:urlString];
-    if (!url) {
-        NSLog(@"❌ Invalid URL: %@", urlString);
-        return;
-    }
-    
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-    if (!request) {
-        NSLog(@"❌ Failed to create URL request");
-        return;
-    }
-    
-    [request setHTTPMethod:@"POST"];
-    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-    
     NSError *error = nil;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:payload options:0 error:&error];
     if (error || !jsonData) {
@@ -279,41 +274,63 @@
         return;
     }
     
-    NSLog(@"CLICK-CALIBRATE: ✅ JSON created successfully, length: %lu bytes", (unsigned long)jsonData.length);
+    NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    NSLog(@"CLICK-CALIBRATE: 📄 JSON payload (%lu bytes): %@", (unsigned long)jsonData.length, jsonString);
     
-    [request setHTTPBody:jsonData];
+    // Use raw socket connection instead of NSURLSession
+    [self sendRawHTTPRequest:jsonString];
+}
+
+- (void)sendRawHTTPRequest:(NSString *)jsonPayload {
+    NSLog(@"CLICK-CALIBRATE: 🔌 Creating raw socket connection to localhost:3030");
     
-    NSURLSession *session = [NSURLSession sharedSession];
-    if (!session) {
-        NSLog(@"❌ Failed to get URL session");
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0) {
+        NSLog(@"CLICK-CALIBRATE: ❌ Failed to create socket");
         return;
     }
     
-    NSURLSessionDataTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *taskError) {
-        if (taskError) {
-            NSLog(@"❌ Failed to send click to server: %@", taskError.localizedDescription);
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (self && self.statusLabel) {
-                    self.isConnected = NO;
-                    [self.statusLabel setStringValue:@"❌ Server connection lost"];
-                }
-            });
-        } else {
-            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-            if (httpResponse && httpResponse.statusCode == 200) {
-                NSLog(@"CLICK-CALIBRATE: ✅ Native click data sent to server successfully");
-            } else {
-                NSLog(@"CLICK-CALIBRATE: ⚠️ Server responded with status: %ld", httpResponse ? (long)httpResponse.statusCode : -1);
-            }
-        }
-    }];
+    struct sockaddr_in server_addr;
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(3030);
+    server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
     
-    if (task) {
-        NSLog(@"CLICK-CALIBRATE: 🚀 Sending HTTP request to server...");
-        [task resume];
-    } else {
-        NSLog(@"CLICK-CALIBRATE: ❌ Failed to create data task");
+    if (connect(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+        NSLog(@"CLICK-CALIBRATE: ❌ Failed to connect to server");
+        close(sockfd);
+        return;
     }
+    
+    // Build HTTP request manually
+    NSString *httpRequest = [NSString stringWithFormat:
+        @"POST /track-click HTTP/1.1\r\n"
+        @"Host: localhost:3030\r\n"
+        @"Content-Type: application/json\r\n"
+        @"Content-Length: %lu\r\n"
+        @"\r\n"
+        @"%@",
+        (unsigned long)[jsonPayload lengthOfBytesUsingEncoding:NSUTF8StringEncoding],
+        jsonPayload
+    ];
+    
+    NSLog(@"CLICK-CALIBRATE: 📤 Sending raw HTTP request:\n%@", httpRequest);
+    
+    const char *requestCString = [httpRequest UTF8String];
+    ssize_t bytesSent = send(sockfd, requestCString, strlen(requestCString), 0);
+    
+    NSLog(@"CLICK-CALIBRATE: 📊 Sent %zd bytes to server", bytesSent);
+    
+    // Read response
+    char response[1024];
+    ssize_t bytesReceived = recv(sockfd, response, sizeof(response) - 1, 0);
+    if (bytesReceived > 0) {
+        response[bytesReceived] = '\0';
+        NSLog(@"CLICK-CALIBRATE: 📥 Server response: %s", response);
+    }
+    
+    close(sockfd);
+    NSLog(@"CLICK-CALIBRATE: ✅ Raw socket connection closed");
 }
 
 - (void)testServerConnection {
