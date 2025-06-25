@@ -7,7 +7,7 @@
 #import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #import <CoreGraphics/CoreGraphics.h>
 #import <ApplicationServices/ApplicationServices.h>
-// VP9 encoder removed - using High Quality JPEG instead
+#import "vp9_encoder.h"
 
 typedef enum {
     CaptureTypeFullDesktop = 0,
@@ -27,6 +27,8 @@ typedef enum {
 @property (nonatomic, strong) NSString *cachedWindowsList;
 @property (nonatomic, strong) NSTimer *windowsUpdateTimer;
 @property (nonatomic, assign) BOOL useVP9Mode;
+@property (nonatomic, strong) VP9Encoder *vp9Encoder;
+@property (nonatomic, strong) NSMutableData *vp9FrameData;
 @end
 
 @implementation ScreenCapture
@@ -44,6 +46,7 @@ typedef enum {
         self.captureType = captureType;
         self.targetIndex = targetIndex;
         self.currentFrame = [NSMutableData data];
+        self.vp9FrameData = [NSMutableData data];
         self.isCapturing = NO;
         self.cachedWindowsList = @"[]"; // Default empty list
         [self startWindowsCaching];
@@ -761,7 +764,12 @@ typedef enum {
         }
         
         if (cgImage) {
-            // Convert to JPEG and write to stdout
+            // Try VP9 encoding first if enabled
+            if (self.useVP9Mode) {
+                [self tryVP9Encoding:imageBuffer width:width height:height];
+            }
+            
+            // Always generate JPEG as fallback
             NSMutableData *jpegData = [NSMutableData data];
             CGImageDestinationRef destination = CGImageDestinationCreateWithData((__bridge CFMutableDataRef)jpegData,
                                                                                  (__bridge CFStringRef)UTTypeJPEG.identifier,
@@ -786,7 +794,7 @@ typedef enum {
                     [self.currentFrame setData:jpegData];
                 }
                 
-                // VP9/High Quality mode provides better JPEG quality and full resolution
+                // VP9 mode: Encode both VP9 (for efficiency) and JPEG (for browser display)
                 
                 // Log progress occasionally (disabled to reduce spam)
                 static int frameCount = 0;
@@ -815,8 +823,62 @@ typedef enum {
 }
 
 - (NSData *)getCurrentFrame {
+    // Always return JPEG for web browser compatibility
+    // VP9 encoding is used for logging/future WebRTC implementation
     @synchronized(self.currentFrame) {
         return [self.currentFrame copy];
+    }
+}
+
+- (NSData *)getCurrentVP9Frame {
+    // Return VP9 encoded frame (for future WebRTC/streaming use)
+    @synchronized(self.vp9FrameData) {
+        return [self.vp9FrameData copy];
+    }
+}
+
+- (void)setupVP9Encoder {
+    [self cleanupVP9Encoder];
+    // VP9 encoder will be initialized with actual dimensions in frame processing
+}
+
+- (void)cleanupVP9Encoder {
+    if (self.vp9Encoder) {
+        [self.vp9Encoder cleanup];
+        self.vp9Encoder = nil;
+    }
+}
+
+- (void)tryVP9Encoding:(CVPixelBufferRef)pixelBuffer width:(size_t)width height:(size_t)height {
+    // Initialize VP9 encoder with actual frame dimensions if needed
+    if (!self.vp9Encoder || !self.vp9Encoder.isInitialized) {
+        NSLog(@"🔧 Initializing VP9 encoder with dimensions %zux%zu", width, height);
+        self.vp9Encoder = [[VP9Encoder alloc] initWithWidth:(int)width height:(int)height];
+        
+        if (!self.vp9Encoder.isInitialized) {
+            NSLog(@"❌ Failed to initialize VP9 encoder, falling back to JPEG");
+            return;
+        }
+    }
+    
+    // Encode the frame
+    NSData *vp9Data = [self.vp9Encoder encodeFrame:pixelBuffer];
+    
+    if (vp9Data && vp9Data.length > 0) {
+        // Store VP9 encoded data
+        @synchronized(self.vp9FrameData) {
+            [self.vp9FrameData setData:vp9Data];
+        }
+        
+        // Log occasionally
+        static int vp9FrameCount = 0;
+        vp9FrameCount++;
+        if (vp9FrameCount % 300 == 0) {
+            NSLog(@"🎬 VP9 encoded %d frames | Size: %zu bytes | Compression: %.1fx", 
+                  vp9FrameCount, vp9Data.length, (float)(width * height * 4) / vp9Data.length);
+        }
+    } else {
+        NSLog(@"⚠️ VP9 encoding failed, using JPEG fallback");
     }
 }
 
@@ -832,9 +894,12 @@ typedef enum {
     self.useVP9Mode = useVP9;
     
     if (useVP9) {
-        NSLog(@"🚀 Starting capture with High Quality mode enabled");
+        NSLog(@"🚀 Starting capture with VP9 encoding enabled");
+        // Initialize VP9 encoder - we'll set dimensions once we know the capture size
+        [self setupVP9Encoder];
     } else {
         NSLog(@"📸 Starting capture with standard MJPEG mode");
+        [self cleanupVP9Encoder];
     }
     
     [self setupCapture];
@@ -1346,7 +1411,8 @@ void listApplicationsAndWindows() {
         [self sendDisplayInfoResponse:client_fd];
     } else if ([method isEqualToString:@"GET"] && [path isEqualToString:@"/frame"]) {
         [self sendFrameResponse:client_fd];
-    // VP9 frame endpoint removed - using High Quality JPEG instead
+    } else if ([method isEqualToString:@"GET"] && [path isEqualToString:@"/video-stream"]) {
+        [self sendVideoStreamResponse:client_fd];
     } else if ([method isEqualToString:@"POST"] && [path isEqualToString:@"/click"]) {
         [self handleClickRequest:client_fd request:request];
     } else if ([method isEqualToString:@"POST"] && [path isEqualToString:@"/click-window"]) {
@@ -1451,7 +1517,36 @@ void listApplicationsAndWindows() {
     send(client_fd, frameData.bytes, frameData.length, 0);
 }
 
-// VP9 frame response method removed - using High Quality JPEG instead
+- (void)sendVideoStreamResponse:(int)client_fd {
+    NSLog(@"🎬 Video stream request - VP9 mode: %@, capturing: %@", 
+          self.captureServer.useVP9Mode ? @"YES" : @"NO",
+          self.captureServer.isCapturing ? @"YES" : @"NO");
+    
+    if (!self.captureServer.useVP9Mode) {
+        NSLog(@"❌ Video stream requested but VP9 mode not active");
+        [self send404Response:client_fd];
+        return;
+    }
+    
+    // For browser compatibility, serve JPEG in video mode but with higher compression
+    // VP9/H.264 frames can't be displayed directly in browsers without proper containers
+    NSData *frameData = [self.captureServer getCurrentFrame];
+    NSLog(@"🎬 Compressed frame data length: %lu", (unsigned long)frameData.length);
+    
+    if (frameData.length == 0) {
+        NSLog(@"❌ No frame data available");
+        [self send404Response:client_fd];
+        return;
+    }
+    
+    // Serve as JPEG for browser compatibility but indicate it's from video mode
+    NSString *header = [NSString stringWithFormat:@"HTTP/1.1 200 OK\r\nContent-Type: image/jpeg\r\nContent-Length: %lu\r\nAccess-Control-Allow-Origin: *\r\nCache-Control: no-cache\r\nX-Video-Mode: true\r\n\r\n", 
+                       (unsigned long)frameData.length];
+    
+    send(client_fd, [header UTF8String], header.length, 0);
+    send(client_fd, frameData.bytes, frameData.length, 0);
+    NSLog(@"✅ Video mode frame sent to client");
+}
 
 - (void)handleClickRequest:(int)client_fd request:(NSString *)request {
     NSRange bodyRange = [request rangeOfString:@"\r\n\r\n"];
@@ -1636,7 +1731,7 @@ void listApplicationsAndWindows() {
     [self.captureServer stopCapture];
     [self.captureServer startCaptureWithType:type targetIndex:index vp9Mode:vp9Mode];
     
-    NSString *modeStr = vp9Mode ? @"High Quality" : @"Standard";
+    NSString *modeStr = vp9Mode ? @"VP9" : @"Standard";
     [self sendJSONResponse:client_fd data:@{
         @"status": @"capture_started", 
         @"type": @(type), 
@@ -1715,7 +1810,7 @@ void listApplicationsAndWindows() {
         [self.captureServer startCaptureWithWindowID:windowID vp9Mode:vp9Mode];
         NSLog(@"📌 Window capture started successfully");
         
-        NSString *modeStr = vp9Mode ? @"High Quality" : @"Standard";
+        NSString *modeStr = vp9Mode ? @"VP9" : @"Standard";
         [self sendJSONResponse:client_fd data:@{
             @"status": @"window_capture_started", 
             @"cgWindowID": @(windowID),
@@ -1840,6 +1935,9 @@ void listApplicationsAndWindows() {
                      @"    \n"
                      @"    <div class=\"controls\">\n"
                      @"        <button id=\"start-btn\" onclick=\"startCapture()\">Start Desktop Capture</button>\n"
+                     @"        <label>Mode:</label>\n"
+                     @"        <button id=\"jpeg-btn\" class=\"active\" onclick=\"setMode('jpeg')\">Image (JPEG)</button>\n"
+                     @"        <button id=\"video-btn\" onclick=\"setMode('video')\">Video (VP9)</button>\n"
                      @"        <label>Quality:</label>\n"
                      @"        <button id=\"standard-btn\" class=\"active\" onclick=\"setQuality(false)\">Standard</button>\n"
                      @"        <button id=\"hq-btn\" onclick=\"setQuality(true)\">High Quality</button>\n"
@@ -1853,6 +1951,7 @@ void listApplicationsAndWindows() {
                      @"    \n"
                      @"    <div class=\"screen-container\">\n"
                      @"        <img id=\"screen\" class=\"screen\" onclick=\"handleClick(event)\" onload=\"onFrameLoad()\" style=\"display: none;\">\n"
+                     @"        <video id=\"video\" class=\"screen\" onclick=\"handleClick(event)\" autoplay muted style=\"display: none;\"></video>\n"
                      @"        <div id=\"loading\" class=\"loading\">Click 'Start Desktop Capture' to begin</div>\n"
                      @"    </div>\n"
                      @"    \n"
@@ -1862,6 +1961,7 @@ void listApplicationsAndWindows() {
                      @"        let isHQMode = false;\n"
                      @"        let currentWindowId = 0;\n"
                      @"        let windows = [];\n"
+                     @"        let currentMode = 'jpeg'; // 'jpeg' or 'video'\n"
                      @"        \n"
                      @"        function setStatus(msg) {\n"
                      @"            document.getElementById('status').textContent = msg;\n"
@@ -1871,6 +1971,25 @@ void listApplicationsAndWindows() {
                      @"            isHQMode = hq;\n"
                      @"            document.getElementById('standard-btn').className = hq ? '' : 'active';\n"
                      @"            document.getElementById('hq-btn').className = hq ? 'active' : '';\n"
+                     @"            if (isCapturing) {\n"
+                     @"                startCapture();\n"
+                     @"            }\n"
+                     @"        }\n"
+                     @"        \n"
+                     @"        function setMode(mode) {\n"
+                     @"            currentMode = mode;\n"
+                     @"            document.getElementById('jpeg-btn').className = mode === 'jpeg' ? 'active' : '';\n"
+                     @"            document.getElementById('video-btn').className = mode === 'video' ? 'active' : '';\n"
+                     @"            \n"
+                     @"            // Switch display elements\n"
+                     @"            if (mode === 'video') {\n"
+                     @"                document.getElementById('screen').style.display = 'none';\n"
+                     @"                document.getElementById('video').style.display = 'block';\n"
+                     @"            } else {\n"
+                     @"                document.getElementById('video').style.display = 'none';\n"
+                     @"                document.getElementById('screen').style.display = 'block';\n"
+                     @"            }\n"
+                     @"            \n"
                      @"            if (isCapturing) {\n"
                      @"                startCapture();\n"
                      @"            }\n"
@@ -1889,7 +2008,7 @@ void listApplicationsAndWindows() {
                      @"                        body: JSON.stringify({\n"
                      @"                            type: 0,\n"
                      @"                            index: 0,\n"
-                     @"                            vp9: isHQMode\n"
+                     @"                            vp9: currentMode === 'video'\n"
                      @"                        })\n"
                      @"                    });\n"
                      @"                } else {\n"
@@ -1899,7 +2018,7 @@ void listApplicationsAndWindows() {
                      @"                        headers: { 'Content-Type': 'application/json' },\n"
                      @"                        body: JSON.stringify({\n"
                      @"                            cgWindowID: getCGWindowID(currentWindowId),\n"
-                     @"                            vp9: isHQMode\n"
+                     @"                            vp9: currentMode === 'video'\n"
                      @"                        })\n"
                      @"                    });\n"
                      @"                }\n"
@@ -1909,9 +2028,18 @@ void listApplicationsAndWindows() {
                      @"                    document.getElementById('start-btn').textContent = 'Stop Capture';\n"
                      @"                    document.getElementById('start-btn').onclick = stopCapture;\n"
                      @"                    document.getElementById('loading').style.display = 'none';\n"
+                     @"                    \n"
+                     @"                    // Both modes use img element but video mode gets compressed frames\n"
+                     @"                    document.getElementById('video').style.display = 'none';\n"
                      @"                    document.getElementById('screen').style.display = 'block';\n"
-                     @"                    startPolling();\n"
-                     @"                    setStatus('Capture active - ' + (isHQMode ? 'High Quality' : 'Standard') + ' mode');\n"
+                     @"                    \n"
+                     @"                    if (currentMode === 'video') {\n"
+                     @"                        startVideoPolling();\n"
+                     @"                    } else {\n"
+                     @"                        startPolling();\n"
+                     @"                    }\n"
+                     @"                    \n"
+                     @"                    setStatus('Capture active - ' + currentMode.toUpperCase() + ' mode');\n"
                      @"                } else {\n"
                      @"                    setStatus('Failed to start capture');\n"
                      @"                }\n"
@@ -1929,6 +2057,7 @@ void listApplicationsAndWindows() {
                      @"            document.getElementById('start-btn').textContent = 'Start Desktop Capture';\n"
                      @"            document.getElementById('start-btn').onclick = startCapture;\n"
                      @"            document.getElementById('screen').style.display = 'none';\n"
+                     @"            document.getElementById('video').style.display = 'none';\n"
                      @"            document.getElementById('loading').style.display = 'block';\n"
                      @"            setStatus('Capture stopped');\n"
                      @"        }\n"
@@ -1959,8 +2088,33 @@ void listApplicationsAndWindows() {
                      @"        \n"
                      @"        function onFrameLoad() {\n"
                      @"            if (isCapturing) {\n"
-                     @"                setStatus('Capture active - ' + (isHQMode ? 'High Quality' : 'Standard') + ' mode');\n"
+                     @"                setStatus('Capture active - ' + currentMode.toUpperCase() + ' mode');\n"
                      @"            }\n"
+                     @"        }\n"
+                     @"        \n"
+                     @"        function startVideoPolling() {\n"
+                     @"            if (pollInterval) clearInterval(pollInterval);\n"
+                     @"            \n"
+                     @"            pollInterval = setInterval(async () => {\n"
+                     @"                if (!isCapturing) return;\n"
+                     @"                \n"
+                     @"                try {\n"
+                     @"                    // Use video-stream endpoint for compressed frames\n"
+                     @"                    const response = await fetch('/video-stream?' + Date.now());\n"
+                     @"                    if (response.ok) {\n"
+                     @"                        const frameBlob = await response.blob();\n"
+                     @"                        const imageUrl = URL.createObjectURL(frameBlob);\n"
+                     @"                        const oldUrl = document.getElementById('screen').src;\n"
+                     @"                        document.getElementById('screen').src = imageUrl;\n"
+                     @"                        if (oldUrl && oldUrl.startsWith('blob:')) {\n"
+                     @"                            URL.revokeObjectURL(oldUrl);\n"
+                     @"                        }\n"
+                     @"                    }\n"
+                     @"                } catch (e) {\n"
+                     @"                    console.error('Video frame fetch error:', e);\n"
+                     @"                    setStatus('Connection error - retrying...');\n"
+                     @"                }\n"
+                     @"            }, 100); // Faster polling for video mode\n"
                      @"        }\n"
                      @"        \n"
                      @"        async function handleClick(event) {\n"

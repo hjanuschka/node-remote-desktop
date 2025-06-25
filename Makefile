@@ -1,13 +1,13 @@
 CC = clang
-CFLAGS = -framework Foundation -framework ScreenCaptureKit -framework CoreMedia -framework CoreVideo -framework ImageIO -framework UniformTypeIdentifiers -framework CoreGraphics -framework AppKit
+CFLAGS = -framework Foundation -framework ScreenCaptureKit -framework CoreMedia -framework CoreVideo -framework ImageIO -framework UniformTypeIdentifiers -framework CoreGraphics -framework AppKit -framework VideoToolbox
 SRCDIR = native/osx
 TARGET = screencap7
 PORT = 3030
 
 # Build the binary
 build:
-	@echo "🔨 Building screencap7..."
-	cd $(SRCDIR) && $(CC) -o $(TARGET) screencap7_clean.m $(CFLAGS)
+	@echo "🔨 Building screencap7 with VP9 support..."
+	cd $(SRCDIR) && $(CC) -o $(TARGET) screencap7_clean.m vp9_encoder.m $(CFLAGS)
 	@echo "✅ Build complete!"
 
 # Run the server
