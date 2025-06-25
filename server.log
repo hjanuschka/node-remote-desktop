@@ -14635,3 +14635,1516 @@ ScreenCap: 2025-06-25 10:41:17.786 screencap7[3144:97079364] 🔍 Display info: 
 
 ScreenCap: 2025-06-25 10:41:18.098 screencap7[3144:97079364] 📸 Captured 2700 frames | Mode: Full Desktop | Size: 3840x1620
 
+ScreenCap: 2025-06-25 10:41:29.655 screencap7[3144:97079364] 📸 Captured 3000 frames | Mode: Full Desktop | Size: 3840x1620
+
+ScreenCap: 2025-06-25 10:41:41.527 screencap7[3144:97079364] 📸 Captured 3300 frames | Mode: Full Desktop | Size: 3840x1620
+
+ScreenCap: 2025-06-25 10:41:45.233 screencap7[3144:97079364] 🎬 Frame from current stream 0x130007530 | Mode: 0 | Target: 0
+
+ScreenCap: 2025-06-25 10:41:52.304 screencap7[3144:97079364] 📸 Captured 3600 frames | Mode: Full Desktop | Size: 3840x1620
+
+ScreenCap: 2025-06-25 10:42:02.613 screencap7[3144:97086477] 📸 Captured 3900 frames | Mode: Full Desktop | Size: 3840x1620
+
+ScreenCap: 2025-06-25 10:42:14.578 screencap7[3144:97086477] 📸 Captured 4200 frames | Mode: Full Desktop | Size: 3840x1620
+
+ScreenCap: 2025-06-25 10:42:18.087 screencap7[3144:97086477] 🎬 Frame from current stream 0x130007530 | Mode: 0 | Target: 0
+
+ScreenCap: 2025-06-25 10:42:25.813 screencap7[3144:97097262] 📸 Captured 4500 frames | Mode: Full Desktop | Size: 3840x1620
+
+ScreenCap: 2025-06-25 10:42:27.906 screencap7[3144:97097262] 🚫 Ignoring frame from old stream 0x11f605040 (current: 0x130007530)
+
+ScreenCap: 2025-06-25 10:42:39.171 screencap7[3144:97097829] 🚫 Ignoring frame from old stream 0x11f605040 (current: 0x130007530)
+
+ScreenCap: 2025-06-25 10:42:40.084 screencap7[3144:97097829] 📸 Captured 4800 frames | Mode: Full Desktop | Size: 3840x1620
+
+ScreenCap: 2025-06-25 10:42:49.720 screencap7[3144:97102684] 🎬 Frame from current stream 0x130007530 | Mode: 0 | Target: 0
+
+ScreenCap: 2025-06-25 10:42:50.836 screencap7[3144:97102684] 📸 Captured 5100 frames | Mode: Full Desktop | Size: 3840x1620
+
+ScreenCap: 2025-06-25 10:43:02.675 screencap7[3144:97102684] 📸 Captured 5400 frames | Mode: Full Desktop | Size: 3840x1620
+
+ScreenCap: 2025-06-25 10:43:15.788 screencap7[3144:97102684] 📸 Captured 5700 frames | Mode: Full Desktop | Size: 3840x1620
+
+ScreenCap: 2025-06-25 10:43:26.714 screencap7[3144:97102684] 🎬 Frame from current stream 0x130007530 | Mode: 0 | Target: 0
+
+ScreenCap: 2025-06-25 10:43:27.950 screencap7[3144:97102684] 📸 Captured 6000 frames | Mode: Full Desktop | Size: 3840x1620
+
+ScreenCap: 2025-06-25 10:43:32.386 screencap7[3144:97102698] 🚫 Ignoring frame from old stream 0x11f605040 (current: 0x130007530)
+
+ScreenCap: 2025-06-25 10:43:38.357 screencap7[3144:97102684] 📸 Captured 6300 frames | Mode: Full Desktop | Size: 3840x1620
+
+ScreenCap: 2025-06-25 10:43:51.160 screencap7[3144:97112190] 🚫 Ignoring frame from old stream 0x11f605040 (current: 0x130007530)
+
+ScreenCap: 2025-06-25 10:43:51.810 screencap7[3144:97112190] 📸 Captured 6600 frames | Mode: Full Desktop | Size: 3840x1620
+
+ScreenCap: 2025-06-25 10:43:57.967 screencap7[3144:97102684] 🎬 Frame from current stream 0x130007530 | Mode: 0 | Target: 0
+
+ScreenCap: 2025-06-25 10:44:02.472 screencap7[3144:97102684] 🚫 Ignoring frame from old stream 0x11f605040 (current: 0x130007530)
+
+ScreenCap: 2025-06-25 10:44:12.917 screencap7[3144:97102698] 🚫 Ignoring frame from old stream 0x11f605040 (current: 0x130007530)
+
+ScreenCap: 2025-06-25 10:44:18.199 screencap7[3144:97102698] 📸 Captured 6900 frames | Mode: Full Desktop | Size: 3840x1620
+
+ScreenCap: 2025-06-25 10:44:29.544 screencap7[3144:97102684] 🎬 Frame from current stream 0x130007530 | Mode: 0 | Target: 0
+
+ScreenCap: 2025-06-25 10:44:29.609 screencap7[3144:97102684] 📸 Captured 7200 frames | Mode: Full Desktop | Size: 3840x1620
+
+ScreenCap: 2025-06-25 10:44:32.357 screencap7[3144:97102684] 🚫 Ignoring frame from old stream 0x11f605040 (current: 0x130007530)
+
+
+> node-remote-desktop@1.0.0 dev
+> nodemon server.js --watch native/osx/*.m --ext js,m
+
+[33m[nodemon] 3.1.10[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): native/osx/list_windows_cg.m[39m
+[33m[nodemon] watching extensions: js,m[39m
+[32m[nodemon] starting `node server.js native/osx/screencap7_clean.m native/osx/vp9_encoder.m`[39m
+🚀 Starting HTTP API screen capture server...
+🔨 Recompiling native binaries...
+
+╔════════════════════════════════════════╗
+║      Remote Desktop VNC v2 (HTTP)     ║
+╠════════════════════════════════════════╣
+║  URL: http://0.0.0.0:3030               ║
+║  Platform: darwin                    ║
+║  Method: ScreenCaptureKit HTTP API    ║
+║  Native API: http://0.0.0.0:8080       ║
+║  Display: default              ║
+╚════════════════════════════════════════╝
+  
+✅ list_windows_cg compiled successfully
+✅ screencap7 compiled successfully
+🔥 Starting native macOS ScreenCaptureKit HTTP server...
+✅ Native macOS HTTP server started on port 8080!
+ScreenCap: 2025-06-25 10:44:46.510 screencap7[23217:97123375] 🔥 ScreenCaptureKit HTTP Server v7 Starting...
+
+ScreenCap: 2025-06-25 10:44:46.543 screencap7[23217:97123375] 📋 Permission Status:
+2025-06-25 10:44:46.543 screencap7[23217:97123375]    Screen Recording: ✅ GRANTED
+2025-06-25 10:44:46.543 screencap7[23217:97123375]    Accessibility: ✅ GRANTED
+
+ScreenCap: 2025-06-25 10:44:46.543 screencap7[23217:97123375] 🚀 Setting up ScreenCaptureKit...
+
+ScreenCap: 2025-06-25 10:44:46.555 screencap7[23217:97123375] 🌐 Starting HTTP server on port 8080...
+2025-06-25 10:44:46.555 screencap7[23217:97123375] 📸 Starting capture with standard MJPEG mode
+2025-06-25 10:44:46.555 screencap7[23217:97123375] 🚀 Setting up ScreenCaptureKit...
+
+ScreenCap: 2025-06-25 10:44:46.569 screencap7[23217:97123375] 📝 API Endpoints:
+2025-06-25 10:44:46.569 screencap7[23217:97123375]    GET  /apps           - List applications
+2025-06-25 10:44:46.569 screencap7[23217:97123375]    GET  /windows        - List windows (Core Graphics)
+2025-06-25 10:44:46.569 screencap7[23217:97123375]    GET  /display        - Get display info (resolution, scaling)
+2025-06-25 10:44:46.569 screencap7[23217:97123375]    GET  /frame          - Get current frame (JPEG)
+2025-06-25 10:44:46.569 screencap7[23217:97123375]    GET  /vp9-frame      - Get current VP9 encoded frame
+2025-06-25 10:44:46.569 screencap7[23217:97123375]    POST /capture        - Start capture {type, index}
+2025-06-25 10:44:46.569 screencap7[23217:97123375]    POST /click          - Send click {x, y}
+2025-06-25 10:44:46.569 screencap7[23217:97123375]    POST /click-window   - Send click to window {x, y, cgWindowID}
+2025-06-25 10:44:46.569 screencap7[23217:97123375]    POST /click-background - Send click to background window {x, y, cgWindowID}
+2025-06-25 10:44:46.569 screencap7[23217:97123375]    POST /key            - Send key {key}
+
+ScreenCap: 2025-06-25 10:44:46.569 screencap7[23217:97123375]    POST /key-window     - Send key to window {key, cgWindowID}
+2025-06-25 10:44:46.569 screencap7[23217:97123375]    POST /key-background - Send key to background window {key, cgWindowID}
+2025-06-25 10:44:46.569 screencap7[23217:97123375]    POST /screenshot     - Get window screenshot {cgWindowID}
+2025-06-25 10:44:46.569 screencap7[23217:97123375]    POST /stop           - Stop capture
+2025-06-25 10:44:46.569 screencap7[23217:97123416] ✅ HTTP server listening on port 8080
+
+ScreenCap: 2025-06-25 10:44:46.698 screencap7[23217:97123422] ✅ Found display: 4 (3840 x 1620)
+
+ScreenCap: 2025-06-25 10:44:46.700 screencap7[23217:97123422] 🔧 Desktop capture: Size 3840x1620
+2025-06-25 10:44:46.700 screencap7[23217:97123422] 🔧 Attempting headless capture configuration...
+2025-06-25 10:44:46.700 screencap7[23217:97123422] 🔧 Configured stream for headless capture (locked screen / lid closed support)
+
+ScreenCap: 2025-06-25 10:44:46.906 screencap7[23217:97123422] ✅ Found display: 4 (3840 x 1620)
+
+ScreenCap: 2025-06-25 10:44:46.906 screencap7[23217:97123422] 🔧 Desktop capture: Size 3840x1620
+2025-06-25 10:44:46.906 screencap7[23217:97123422] 🔧 Attempting headless capture configuration...
+2025-06-25 10:44:46.906 screencap7[23217:97123422] 🔧 Configured stream for headless capture (locked screen / lid closed support)
+
+ScreenCap: 2025-06-25 10:44:46.907 screencap7[23217:97123405] ✅ full desktop capture started successfully at 30 FPS!
+
+ScreenCap: 2025-06-25 10:44:46.907 screencap7[23217:97123405] 📝 Send commands via stdin: 'click x y' or 'key character'
+
+ScreenCap: 2025-06-25 10:44:46.968 screencap7[23217:97123423] ✅ full desktop capture started successfully at 30 FPS!
+
+ScreenCap: 2025-06-25 10:44:46.968 screencap7[23217:97123423] 📝 Send commands via stdin: 'click x y' or 'key character'
+
+✅ HTTP API streaming started at 30 FPS
+ScreenCap: 2025-06-25 10:44:52.813 screencap7[23217:97123405] 📨 OPTIONS /capture
+
+ScreenCap: 2025-06-25 10:44:52.832 screencap7[23217:97123511] 📨 POST /capture
+2025-06-25 10:44:52.832 screencap7[23217:97123511] 🛑 Stopping current capture...
+
+ScreenCap: 2025-06-25 10:44:52.835 screencap7[23217:97123516] ✅ Capture stopped
+
+ScreenCap: 2025-06-25 10:44:52.934 screencap7[23217:97123511] 🚀 Starting capture with High Quality mode enabled
+2025-06-25 10:44:52.934 screencap7[23217:97123511] 🚀 Setting up ScreenCaptureKit...
+
+ScreenCap: 2025-06-25 10:44:52.985 screencap7[23217:97123511] 📨 GET /frame?1750841092984
+
+ScreenCap: 2025-06-25 10:44:53.017 screencap7[23217:97123405] 📨 GET /frame?1750841093015
+
+ScreenCap: 2025-06-25 10:44:53.050 screencap7[23217:97123514] 📨 GET /frame?1750841093048
+
+ScreenCap: 2025-06-25 10:44:53.083 screencap7[23217:97123514] 📨 GET /frame?1750841093081
+
+ScreenCap: 2025-06-25 10:44:53.094 screencap7[23217:97123511] ✅ Found display: 4 (3840 x 1620)
+
+ScreenCap: 2025-06-25 10:44:53.094 screencap7[23217:97123511] 🔧 Desktop capture: Size 3840x1620
+2025-06-25 10:44:53.094 screencap7[23217:97123511] 🔧 Attempting headless capture configuration...
+2025-06-25 10:44:53.094 screencap7[23217:97123511] 🔧 Configured stream for headless capture (locked screen / lid closed support)
+2025-06-25 10:44:53.094 screencap7[23217:97123511] 🚀 High Quality mode enabled: 3840x1620
+
+ScreenCap: 2025-06-25 10:44:53.116 screencap7[23217:97123511] 📨 GET /frame?1750841093115
+
+ScreenCap: 2025-06-25 10:44:53.150 screencap7[23217:97123511] 📨 GET /frame?1750841093148
+
+ScreenCap: 2025-06-25 10:44:53.174 screencap7[23217:97123514] ✅ full desktop capture started successfully at 30 FPS!
+2025-06-25 10:44:53.174 screencap7[23217:97123514] 📝 Send commands via stdin: 'click x y' or 'key character'
+
+ScreenCap: 2025-06-25 10:44:53.182 screencap7[23217:97123405] 📨 GET /frame?1750841093180
+
+ScreenCap: 2025-06-25 10:44:53.215 screencap7[23217:97123405] 📨 GET /frame?1750841093213
+
+ScreenCap: 2025-06-25 10:44:53.257 screencap7[23217:97123405] 📨 GET /frame?1750841093246
+
+ScreenCap: 2025-06-25 10:44:53.281 screencap7[23217:97123511] 📨 GET /frame?1750841093279
+
+ScreenCap: 2025-06-25 10:44:53.314 screencap7[23217:97123405] 📨 GET /frame?1750841093312
+
+ScreenCap: 2025-06-25 10:44:53.346 screencap7[23217:97123405] 📨 GET /frame?1750841093345
+
+ScreenCap: 2025-06-25 10:44:53.380 screencap7[23217:97123405] 📨 GET /frame?1750841093378
+
+ScreenCap: 2025-06-25 10:44:53.413 screencap7[23217:97123405] 📨 GET /frame?1750841093411
+
+ScreenCap: 2025-06-25 10:44:53.446 screencap7[23217:97123405] 📨 GET /frame?1750841093445
+
+ScreenCap: 2025-06-25 10:44:53.479 screencap7[23217:97123405] 📨 GET /frame?1750841093478
+
+ScreenCap: 2025-06-25 10:44:53.512 screencap7[23217:97123405] 📨 GET /frame?1750841093511
+
+ScreenCap: 2025-06-25 10:44:53.547 screencap7[23217:97123405] 📨 GET /frame?1750841093545
+
+ScreenCap: 2025-06-25 10:44:53.585 screencap7[23217:97123405] 📨 GET /frame?1750841093577
+
+ScreenCap: 2025-06-25 10:44:53.612 screencap7[23217:97123405] 📨 GET /frame?1750841093610
+
+ScreenCap: 2025-06-25 10:44:53.645 screencap7[23217:97123405] 📨 GET /frame?1750841093643
+
+ScreenCap: 2025-06-25 10:44:53.678 screencap7[23217:97123405] 📨 GET /frame?1750841093676
+
+ScreenCap: 2025-06-25 10:44:53.710 screencap7[23217:97123405] 📨 GET /frame?1750841093708
+
+ScreenCap: 2025-06-25 10:44:53.743 screencap7[23217:97123405] 📨 GET /frame?1750841093741
+
+ScreenCap: 2025-06-25 10:44:53.775 screencap7[23217:97123405] 📨 GET /frame?1750841093774
+
+ScreenCap: 2025-06-25 10:44:53.808 screencap7[23217:97123405] 📨 GET /frame?1750841093807
+
+ScreenCap: 2025-06-25 10:44:53.848 screencap7[23217:97123405] 📨 GET /frame?1750841093840
+
+ScreenCap: 2025-06-25 10:44:53.875 screencap7[23217:97123405] 📨 GET /frame?1750841093874
+
+ScreenCap: 2025-06-25 10:44:53.908 screencap7[23217:97123511] 📨 GET /frame?1750841093907
+
+ScreenCap: 2025-06-25 10:44:53.941 screencap7[23217:97123511] 📨 GET /frame?1750841093940
+
+ScreenCap: 2025-06-25 10:44:53.973 screencap7[23217:97123511] 📨 GET /frame?1750841093972
+
+ScreenCap: 2025-06-25 10:44:54.007 screencap7[23217:97123511] 📨 GET /frame?1750841094006
+
+ScreenCap: 2025-06-25 10:44:54.041 screencap7[23217:97123511] 📨 GET /frame?1750841094038
+
+ScreenCap: 2025-06-25 10:44:54.073 screencap7[23217:97123405] 📨 GET /frame?1750841094071
+
+ScreenCap: 2025-06-25 10:44:54.107 screencap7[23217:97123405] 📨 GET /frame?1750841094105
+
+ScreenCap: 2025-06-25 10:44:54.138 screencap7[23217:97123405] 📨 GET /frame?1750841094137
+
+ScreenCap: 2025-06-25 10:44:54.171 screencap7[23217:97123405] 📨 GET /frame?1750841094170
+
+ScreenCap: 2025-06-25 10:44:54.204 screencap7[23217:97123405] 📨 GET /frame?1750841094203
+
+ScreenCap: 2025-06-25 10:44:54.243 screencap7[23217:97123405] 📨 GET /frame?1750841094237
+
+ScreenCap: 2025-06-25 10:44:54.271 screencap7[23217:97123405] 📨 GET /frame?1750841094270
+
+ScreenCap: 2025-06-25 10:44:54.304 screencap7[23217:97123405] 📨 GET /frame?1750841094302
+
+ScreenCap: 2025-06-25 10:44:54.344 screencap7[23217:97123405] 📨 GET /frame?1750841094336
+
+ScreenCap: 2025-06-25 10:44:54.369 screencap7[23217:97123405] 📨 GET /frame?1750841094368
+
+ScreenCap: 2025-06-25 10:44:54.404 screencap7[23217:97123405] 📨 GET /frame?1750841094402
+
+ScreenCap: 2025-06-25 10:44:54.437 screencap7[23217:97123405] 📨 GET /frame?1750841094435
+
+ScreenCap: 2025-06-25 10:44:54.470 screencap7[23217:97123405] 📨 GET /frame?1750841094468
+
+ScreenCap: 2025-06-25 10:44:54.475 screencap7[23217:97123405] 📨 OPTIONS /key
+
+ScreenCap: 2025-06-25 10:44:54.476 screencap7[23217:97123405] 📨 POST /key
+2025-06-25 10:44:54.476 screencap7[23217:97123405] 📦 Key request body: {"key":"Meta"}
+
+ScreenCap: 2025-06-25 10:44:54.477 screencap7[23217:97123405] ⌨️ Key press: Meta
+2025-06-25 10:44:54.477 screencap7[23217:97123405] ⌨️ Key press: Meta (target window: 0)
+2025-06-25 10:44:54.477 screencap7[23217:97123405] 🔤 Processing character: 'M' (unicode: 77)
+2025-06-25 10:44:54.477 screencap7[23217:97123405] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:44:54.477 screencap7[23217:97123405] 📝 Created keyboard events: down=0x600003b2fc40, up=0x600003b28ba0
+2025-06-25 10:44:54.477 screencap7[23217:97123405] 📤 Posting global keyboard events...
+
+ScreenCap: 2025-06-25 10:44:54.490 screencap7[23217:97123405] ✅ Key press completed and events released
+2025-06-25 10:44:54.490 screencap7[23217:97123405] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.503 screencap7[23217:97123422] 📨 GET /frame?1750841094501
+
+ScreenCap: 2025-06-25 10:44:54.510 screencap7[23217:97123405] 📨 POST /key
+2025-06-25 10:44:54.510 screencap7[23217:97123405] 📦 Key request body: {"key":"m"}
+
+ScreenCap: 2025-06-25 10:44:54.510 screencap7[23217:97123405] ⌨️ Key press: m
+2025-06-25 10:44:54.510 screencap7[23217:97123405] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.510 screencap7[23217:97123405] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.510 screencap7[23217:97123405] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:44:54.510 screencap7[23217:97123405] 📝 Created keyboard events: down=0x600003b60160, up=0x600003b28a40
+2025-06-25 10:44:54.510 screencap7[23217:97123405] 📤 Posting global keyboard events...
+2025-06-25 10:44:54.510 screencap7[23217:97123405] ✅ Key press completed and events released
+
+ScreenCap: 2025-06-25 10:44:54.510 screencap7[23217:97123405] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.514 screencap7[23217:97123405] 📨 POST /key
+2025-06-25 10:44:54.514 screencap7[23217:97123405] 📦 Key request body: {"key":"m"}
+2025-06-25 10:44:54.514 screencap7[23217:97123405] ⌨️ Key press: m
+
+ScreenCap: 2025-06-25 10:44:54.514 screencap7[23217:97123405] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.514 screencap7[23217:97123405] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.514 screencap7[23217:97123405] 📤 Creating keyboard events for keyCode: 46
+2025-06-25 10:44:54.514 screencap7[23217:97123405] 📝 Created keyboard events: down=0x600003b314e0, up=0x600003b31980
+2025-06-25 10:44:54.514 screencap7[23217:97123405] 📤 Posting global keyboard events...
+2025-06-25 10:44:54.514 screencap7[23217:97123405] ✅ Key press completed and events released
+2025-06-25 10:44:54.514 screencap7[23217:97123405] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.516 screencap7[23217:97123405] 📨 POST /key
+2025-06-25 10:44:54.516 screencap7[23217:97123405] 📦 Key request body: {"key":"m"}
+2025-06-25 10:44:54.516 screencap7[23217:97123405] ⌨️ Key press: m
+2025-06-25 10:44:54.516 screencap7[23217:97123405] ⌨️ Key press: m (target window: 0)
+
+ScreenCap: 2025-06-25 10:44:54.516 screencap7[23217:97123405] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.516 screencap7[23217:97123405] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:44:54.516 screencap7[23217:97123405] 📝 Created keyboard events: down=0x600003b39000, up=0x600003b395a0
+2025-06-25 10:44:54.516 screencap7[23217:97123405] 📤 Posting global keyboard events...
+
+ScreenCap: 2025-06-25 10:44:54.516 screencap7[23217:97123405] ✅ Key press completed and events released
+2025-06-25 10:44:54.516 screencap7[23217:97123405] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.519 screencap7[23217:97123511] 📨 POST /key
+2025-06-25 10:44:54.519 screencap7[23217:97123511] 📦 Key request body: {"key":"m"}
+2025-06-25 10:44:54.519 screencap7[23217:97123511] ⌨️ Key press: m
+
+ScreenCap: 2025-06-25 10:44:54.519 screencap7[23217:97123511] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.519 screencap7[23217:97123511] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.519 screencap7[23217:97123511] 📤 Creating keyboard events for keyCode: 46
+2025-06-25 10:44:54.519 screencap7[23217:97123511] 📝 Created keyboard events: down=0x600003b24ce0, up=0x600003b25040
+2025-06-25 10:44:54.519 screencap7[23217:97123511] 📤 Posting global keyboard events...
+2025-06-25 10:44:54.519 screencap7[23217:97123511] ✅ Key press completed and events released
+
+ScreenCap: 2025-06-25 10:44:54.519 screencap7[23217:97123511] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.521 screencap7[23217:97123405] 📨 POST /key
+2025-06-25 10:44:54.521 screencap7[23217:97123405] 📦 Key request body: {"key":"m"}
+2025-06-25 10:44:54.521 screencap7[23217:97123405] ⌨️ Key press: m
+2025-06-25 10:44:54.522 screencap7[23217:97123405] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.522 screencap7[23217:97123405] 🔤 Processing character: 'm' (unicode: 109)
+
+ScreenCap: 2025-06-25 10:44:54.522 screencap7[23217:97123405] 📤 Creating keyboard events for keyCode: 46
+2025-06-25 10:44:54.522 screencap7[23217:97123405] 📝 Created keyboard events: down=0x600003b38bc0, up=0x600003b383e0
+2025-06-25 10:44:54.522 screencap7[23217:97123405] 📤 Posting global keyboard events...
+
+ScreenCap: 2025-06-25 10:44:54.522 screencap7[23217:97123405] ✅ Key press completed and events released
+2025-06-25 10:44:54.522 screencap7[23217:97123405] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.524 screencap7[23217:97123405] 📨 POST /key
+2025-06-25 10:44:54.524 screencap7[23217:97123405] 📦 Key request body: {"key":"m"}
+
+ScreenCap: 2025-06-25 10:44:54.524 screencap7[23217:97123405] ⌨️ Key press: m
+2025-06-25 10:44:54.524 screencap7[23217:97123405] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.524 screencap7[23217:97123405] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.524 screencap7[23217:97123405] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:44:54.524 screencap7[23217:97123405] 📝 Created keyboard events: down=0x600003b2d400, up=0x600003b2fc40
+2025-06-25 10:44:54.524 screencap7[23217:97123405] 📤 Posting global keyboard events...
+2025-06-25 10:44:54.524 screencap7[23217:97123405] ✅ Key press completed and events released
+
+ScreenCap: 2025-06-25 10:44:54.524 screencap7[23217:97123405] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.526 screencap7[23217:97123405] 📨 POST /key
+2025-06-25 10:44:54.526 screencap7[23217:97123405] 📦 Key request body: {"key":"m"}
+2025-06-25 10:44:54.526 screencap7[23217:97123405] ⌨️ Key press: m
+
+ScreenCap: 2025-06-25 10:44:54.526 screencap7[23217:97123405] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.526 screencap7[23217:97123405] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.526 screencap7[23217:97123405] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:44:54.526 screencap7[23217:97123405] 📝 Created keyboard events: down=0x600003b10180, up=0x600003b102e0
+2025-06-25 10:44:54.526 screencap7[23217:97123405] 📤 Posting global keyboard events...
+
+ScreenCap: 2025-06-25 10:44:54.527 screencap7[23217:97123405] ✅ Key press completed and events released
+
+ScreenCap: 2025-06-25 10:44:54.527 screencap7[23217:97123405] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.532 screencap7[23217:97123405] 📨 POST /key
+2025-06-25 10:44:54.532 screencap7[23217:97123405] 📦 Key request body: {"key":"m"}
+
+ScreenCap: 2025-06-25 10:44:54.532 screencap7[23217:97123405] ⌨️ Key press: m
+2025-06-25 10:44:54.532 screencap7[23217:97123405] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.532 screencap7[23217:97123405] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.532 screencap7[23217:97123405] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:44:54.532 screencap7[23217:97123405] 📝 Created keyboard events: down=0x600003b69740, up=0x600003b699e0
+2025-06-25 10:44:54.532 screencap7[23217:97123405] 📤 Posting global keyboard events...
+2025-06-25 10:44:54.532 screencap7[23217:97123405] ✅ Key press completed and events released
+
+ScreenCap: 2025-06-25 10:44:54.532 screencap7[23217:97123405] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.534 screencap7[23217:97123422] 📨 POST /key
+2025-06-25 10:44:54.534 screencap7[23217:97123422] 📦 Key request body: {"key":"m"}
+2025-06-25 10:44:54.534 screencap7[23217:97123422] ⌨️ Key press: m
+
+ScreenCap: 2025-06-25 10:44:54.534 screencap7[23217:97123422] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.534 screencap7[23217:97123422] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.535 screencap7[23217:97123422] 📤 Creating keyboard events for keyCode: 46
+2025-06-25 10:44:54.534 screencap7[23217:97123405] 📨 GET /frame?1750841094533
+
+ScreenCap: 2025-06-25 10:44:54.535 screencap7[23217:97123422] 📝 Created keyboard events: down=0x600003b04420, up=0x600003b31a00
+2025-06-25 10:44:54.535 screencap7[23217:97123422] 📤 Posting global keyboard events...
+2025-06-25 10:44:54.535 screencap7[23217:97123422] ✅ Key press completed and events released
+2025-06-25 10:44:54.535 screencap7[23217:97123422] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.537 screencap7[23217:97123422] 📨 POST /key
+2025-06-25 10:44:54.537 screencap7[23217:97123422] 📦 Key request body: {"key":"m"}
+2025-06-25 10:44:54.537 screencap7[23217:97123422] ⌨️ Key press: m
+2025-06-25 10:44:54.537 screencap7[23217:97123422] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.537 screencap7[23217:97123422] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.537 screencap7[23217:97123422] 📤 Creating keyboard events for keyCode: 46
+2025-06-25 10:44:54.537 screencap7[23217:97123422] 📝 Created keyboard events: down=0x600003b2f7c0, up=0x600003b2e060
+2025-06-25 10:44:54.537 screencap7[23217:97123422] 📤 Posting global keyboard events...
+2025-06-25 10:44:54.537 screencap7[23217:97123422] ✅ Key press completed and events released
+2025-06-25 10:44:54.537 screencap7[23217:97123422] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.539 screencap7[23217:97123422] 📨 POST /key
+2025-06-25 10:44:54.539 screencap7[23217:97123422] 📦 Key request body: {"key":"m"}
+2025-06-25 10:44:54.539 screencap7[23217:97123422] ⌨️ Key press: m
+2025-06-25 10:44:54.539 screencap7[23217:97123422] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.539 screencap7[23217:97123422] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.539 screencap7[23217:97123422] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:44:54.539 screencap7[23217:97123422] 📝 Created keyboard events: down=0x600003b68d80, up=0x600003b2ff20
+2025-06-25 10:44:54.540 screencap7[23217:97123422] 📤 Posting global keyboard events...
+2025-06-25 10:44:54.540 screencap7[23217:97123422] ✅ Key press completed and events released
+2025-06-25 10:44:54.540 screencap7[23217:97123422] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.542 screencap7[23217:97123422] 📨 POST /key
+
+ScreenCap: 2025-06-25 10:44:54.542 screencap7[23217:97123422] 📦 Key request body: {"key":"m"}
+2025-06-25 10:44:54.542 screencap7[23217:97123422] ⌨️ Key press: m
+2025-06-25 10:44:54.542 screencap7[23217:97123422] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.542 screencap7[23217:97123422] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.542 screencap7[23217:97123422] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:44:54.542 screencap7[23217:97123422] 📝 Created keyboard events: down=0x600003b395a0, up=0x600003b64dc0
+
+ScreenCap: 2025-06-25 10:44:54.542 screencap7[23217:97123422] 📤 Posting global keyboard events...
+2025-06-25 10:44:54.542 screencap7[23217:97123422] ✅ Key press completed and events released
+2025-06-25 10:44:54.542 screencap7[23217:97123422] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.544 screencap7[23217:97123422] 📨 POST /key
+2025-06-25 10:44:54.544 screencap7[23217:97123422] 📦 Key request body: {"key":"m"}
+2025-06-25 10:44:54.544 screencap7[23217:97123422] ⌨️ Key press: m
+2025-06-25 10:44:54.544 screencap7[23217:97123422] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.544 screencap7[23217:97123422] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.544 screencap7[23217:97123422] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:44:54.544 screencap7[23217:97123422] 📝 Created keyboard events: down=0x600003b39000, up=0x600003b395a0
+2025-06-25 10:44:54.544 screencap7[23217:97123422] 📤 Posting global keyboard events...
+2025-06-25 10:44:54.544 screencap7[23217:97123422] ✅ Key press completed and events released
+
+ScreenCap: 2025-06-25 10:44:54.544 screencap7[23217:97123422] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.548 screencap7[23217:97123422] 📨 POST /key
+2025-06-25 10:44:54.548 screencap7[23217:97123422] 📦 Key request body: {"key":"m"}
+
+ScreenCap: 2025-06-25 10:44:54.548 screencap7[23217:97123422] ⌨️ Key press: m
+2025-06-25 10:44:54.548 screencap7[23217:97123422] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.548 screencap7[23217:97123422] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.548 screencap7[23217:97123422] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:44:54.548 screencap7[23217:97123422] 📝 Created keyboard events: down=0x600003b2d400, up=0x600003b2ff20
+2025-06-25 10:44:54.548 screencap7[23217:97123422] 📤 Posting global keyboard events...
+
+ScreenCap: 2025-06-25 10:44:54.548 screencap7[23217:97123422] ✅ Key press completed and events released
+2025-06-25 10:44:54.548 screencap7[23217:97123422] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.551 screencap7[23217:97123422] 📨 POST /key
+2025-06-25 10:44:54.551 screencap7[23217:97123422] 📦 Key request body: {"key":"m"}
+2025-06-25 10:44:54.551 screencap7[23217:97123422] ⌨️ Key press: m
+2025-06-25 10:44:54.551 screencap7[23217:97123422] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.551 screencap7[23217:97123422] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.551 screencap7[23217:97123422] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:44:54.551 screencap7[23217:97123422] 📝 Created keyboard events: down=0x600003b291c0, up=0x600003b289a0
+2025-06-25 10:44:54.551 screencap7[23217:97123422] 📤 Posting global keyboard events...
+
+ScreenCap: 2025-06-25 10:44:54.551 screencap7[23217:97123422] ✅ Key press completed and events released
+2025-06-25 10:44:54.551 screencap7[23217:97123422] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.553 screencap7[23217:97123422] 📨 POST /key
+2025-06-25 10:44:54.553 screencap7[23217:97123422] 📦 Key request body: {"key":"m"}
+2025-06-25 10:44:54.553 screencap7[23217:97123422] ⌨️ Key press: m
+2025-06-25 10:44:54.553 screencap7[23217:97123422] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.553 screencap7[23217:97123422] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.553 screencap7[23217:97123422] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:44:54.553 screencap7[23217:97123422] 📝 Created keyboard events: down=0x600003b699e0, up=0x600003b10460
+2025-06-25 10:44:54.553 screencap7[23217:97123422] 📤 Posting global keyboard events...
+
+ScreenCap: 2025-06-25 10:44:54.553 screencap7[23217:97123422] ✅ Key press completed and events released
+2025-06-25 10:44:54.553 screencap7[23217:97123422] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.556 screencap7[23217:97123405] 📨 POST /key
+2025-06-25 10:44:54.556 screencap7[23217:97123405] 📦 Key request body: {"key":"m"}
+
+ScreenCap: 2025-06-25 10:44:54.556 screencap7[23217:97123405] ⌨️ Key press: m
+2025-06-25 10:44:54.556 screencap7[23217:97123405] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.556 screencap7[23217:97123405] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.556 screencap7[23217:97123405] 📤 Creating keyboard events for keyCode: 46
+2025-06-25 10:44:54.556 screencap7[23217:97123405] 📝 Created keyboard events: down=0x600003b316e0, up=0x600003b30280
+2025-06-25 10:44:54.556 screencap7[23217:97123405] 📤 Posting global keyboard events...
+
+ScreenCap: 2025-06-25 10:44:54.556 screencap7[23217:97123405] ✅ Key press completed and events released
+2025-06-25 10:44:54.556 screencap7[23217:97123405] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.558 screencap7[23217:97123405] 📨 POST /key
+2025-06-25 10:44:54.558 screencap7[23217:97123405] 📦 Key request body: {"key":"m"}
+
+ScreenCap: 2025-06-25 10:44:54.558 screencap7[23217:97123405] ⌨️ Key press: m
+2025-06-25 10:44:54.558 screencap7[23217:97123405] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.558 screencap7[23217:97123405] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.558 screencap7[23217:97123405] 📤 Creating keyboard events for keyCode: 46
+2025-06-25 10:44:54.558 screencap7[23217:97123405] 📝 Created keyboard events: down=0x600003b10860, up=0x600003b10a80
+2025-06-25 10:44:54.558 screencap7[23217:97123405] 📤 Posting global keyboard events...
+2025-06-25 10:44:54.558 screencap7[23217:97123405] ✅ Key press completed and events released
+2025-06-25 10:44:54.558 screencap7[23217:97123405] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.560 screencap7[23217:97123405] 📨 POST /key
+
+ScreenCap: 2025-06-25 10:44:54.560 screencap7[23217:97123405] 📦 Key request body: {"key":"m"}
+2025-06-25 10:44:54.560 screencap7[23217:97123405] ⌨️ Key press: m
+2025-06-25 10:44:54.560 screencap7[23217:97123405] ⌨️ Key press: m (target window: 0)
+
+ScreenCap: 2025-06-25 10:44:54.560 screencap7[23217:97123405] 🔤 Processing character: 'm' (unicode: 109)
+
+ScreenCap: 2025-06-25 10:44:54.560 screencap7[23217:97123405] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:44:54.560 screencap7[23217:97123405] 📝 Created keyboard events: down=0x600003b1c840, up=0x600003b28bc0
+2025-06-25 10:44:54.560 screencap7[23217:97123405] 📤 Posting global keyboard events...
+2025-06-25 10:44:54.560 screencap7[23217:97123405] ✅ Key press completed and events released
+
+ScreenCap: 2025-06-25 10:44:54.560 screencap7[23217:97123405] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.566 screencap7[23217:97123405] 📨 POST /key
+2025-06-25 10:44:54.566 screencap7[23217:97123405] 📦 Key request body: {"key":"m"}
+2025-06-25 10:44:54.566 screencap7[23217:97123405] ⌨️ Key press: m
+2025-06-25 10:44:54.566 screencap7[23217:97123405] ⌨️ Key press: m (target window: 0)
+
+ScreenCap: 2025-06-25 10:44:54.566 screencap7[23217:97123405] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.566 screencap7[23217:97123405] 📤 Creating keyboard events for keyCode: 46
+2025-06-25 10:44:54.566 screencap7[23217:97123405] 📝 Created keyboard events: down=0x600003b285c0, up=0x600003b28240
+2025-06-25 10:44:54.566 screencap7[23217:97123405] 📤 Posting global keyboard events...
+
+ScreenCap: 2025-06-25 10:44:54.566 screencap7[23217:97123405] ✅ Key press completed and events released
+2025-06-25 10:44:54.566 screencap7[23217:97123405] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.568 screencap7[23217:97123405] 📨 GET /frame?1750841094566
+2025-06-25 10:44:54.568 screencap7[23217:97123422] 📨 POST /key
+
+ScreenCap: 2025-06-25 10:44:54.568 screencap7[23217:97123422] 📦 Key request body: {"key":"m"}
+2025-06-25 10:44:54.568 screencap7[23217:97123422] ⌨️ Key press: m
+2025-06-25 10:44:54.568 screencap7[23217:97123422] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.568 screencap7[23217:97123422] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.568 screencap7[23217:97123422] 📤 Creating keyboard events for keyCode: 46
+2025-06-25 10:44:54.569 screencap7[23217:97123422] 📝 Created keyboard events: down=0x600003b109e0, up=0x600003b102e0
+2025-06-25 10:44:54.569 screencap7[23217:97123422] 📤 Posting global keyboard events...
+2025-06-25 10:44:54.569 screencap7[23217:97123422] ✅ Key press completed and events released
+2025-06-25 10:44:54.569 screencap7[23217:97123422] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.571 screencap7[23217:97123422] 📨 POST /key
+2025-06-25 10:44:54.571 screencap7[23217:97123422] 📦 Key request body: {"key":"m"}
+2025-06-25 10:44:54.571 screencap7[23217:97123422] ⌨️ Key press: m
+2025-06-25 10:44:54.571 screencap7[23217:97123422] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.571 screencap7[23217:97123422] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.571 screencap7[23217:97123422] 📤 Creating keyboard events for keyCode: 46
+2025-06-25 10:44:54.571 screencap7[23217:97123422] 📝 Created keyboard events: down=0x600003b64dc0, up=0x600003b39200
+2025-06-25 10:44:54.571 screencap7[23217:97123422] 📤 Posting global keyboard events...
+2025-06-25 10:44:54.571 screencap7[23217:97123422] ✅ Key press completed and events released
+2025-06-25 10:44:54.571 screencap7[23217:97123422] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.573 screencap7[23217:97123422] 📨 POST /key
+2025-06-25 10:44:54.573 screencap7[23217:97123422] 📦 Key request body: {"key":"m"}
+2025-06-25 10:44:54.573 screencap7[23217:97123422] ⌨️ Key press: m
+2025-06-25 10:44:54.573 screencap7[23217:97123422] ⌨️ Key press: m (target window: 0)
+
+ScreenCap: 2025-06-25 10:44:54.573 screencap7[23217:97123422] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.573 screencap7[23217:97123422] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:44:54.574 screencap7[23217:97123422] 📝 Created keyboard events: down=0x600003b69440, up=0x600003b00340
+2025-06-25 10:44:54.574 screencap7[23217:97123422] 📤 Posting global keyboard events...
+2025-06-25 10:44:54.574 screencap7[23217:97123422] ✅ Key press completed and events released
+2025-06-25 10:44:54.574 screencap7[23217:97123422] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.576 screencap7[23217:97123422] 📨 POST /key
+
+ScreenCap: 2025-06-25 10:44:54.576 screencap7[23217:97123422] 📦 Key request body: {"key":"m"}
+2025-06-25 10:44:54.576 screencap7[23217:97123422] ⌨️ Key press: m
+2025-06-25 10:44:54.576 screencap7[23217:97123422] ⌨️ Key press: m (target window: 0)
+
+ScreenCap: 2025-06-25 10:44:54.576 screencap7[23217:97123422] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.576 screencap7[23217:97123422] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:44:54.577 screencap7[23217:97123422] 📝 Created keyboard events: down=0x600003b65360, up=0x600003b64a00
+
+ScreenCap: 2025-06-25 10:44:54.577 screencap7[23217:97123422] 📤 Posting global keyboard events...
+2025-06-25 10:44:54.577 screencap7[23217:97123422] ✅ Key press completed and events released
+
+ScreenCap: 2025-06-25 10:44:54.577 screencap7[23217:97123422] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.582 screencap7[23217:97123422] 📨 POST /key
+2025-06-25 10:44:54.582 screencap7[23217:97123422] 📦 Key request body: {"key":"m"}
+
+ScreenCap: 2025-06-25 10:44:54.582 screencap7[23217:97123422] ⌨️ Key press: m
+2025-06-25 10:44:54.582 screencap7[23217:97123422] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.582 screencap7[23217:97123422] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.582 screencap7[23217:97123422] 📤 Creating keyboard events for keyCode: 46
+2025-06-25 10:44:54.582 screencap7[23217:97123422] 📝 Created keyboard events: down=0x600003b102e0, up=0x600003b109e0
+2025-06-25 10:44:54.582 screencap7[23217:97123422] 📤 Posting global keyboard events...
+2025-06-25 10:44:54.582 screencap7[23217:97123422] ✅ Key press completed and events released
+2025-06-25 10:44:54.582 screencap7[23217:97123422] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.584 screencap7[23217:97123422] 📨 POST /key
+2025-06-25 10:44:54.584 screencap7[23217:97123422] 📦 Key request body: {"key":"m"}
+
+ScreenCap: 2025-06-25 10:44:54.584 screencap7[23217:97123422] ⌨️ Key press: m
+2025-06-25 10:44:54.584 screencap7[23217:97123422] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.584 screencap7[23217:97123422] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.584 screencap7[23217:97123422] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:44:54.584 screencap7[23217:97123422] 📝 Created keyboard events: down=0x600003b383e0, up=0x600003b24b60
+2025-06-25 10:44:54.584 screencap7[23217:97123422] 📤 Posting global keyboard events...
+
+ScreenCap: 2025-06-25 10:44:54.584 screencap7[23217:97123422] ✅ Key press completed and events released
+2025-06-25 10:44:54.584 screencap7[23217:97123422] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.590 screencap7[23217:97123422] 📨 POST /key
+
+ScreenCap: 2025-06-25 10:44:54.590 screencap7[23217:97123422] 📦 Key request body: {"key":"m"}
+2025-06-25 10:44:54.590 screencap7[23217:97123422] ⌨️ Key press: m
+2025-06-25 10:44:54.590 screencap7[23217:97123422] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.590 screencap7[23217:97123422] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.590 screencap7[23217:97123422] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:44:54.590 screencap7[23217:97123422] 📝 Created keyboard events: down=0x600003b31e60, up=0x600003b31880
+2025-06-25 10:44:54.590 screencap7[23217:97123422] 📤 Posting global keyboard events...
+2025-06-25 10:44:54.590 screencap7[23217:97123422] ✅ Key press completed and events released
+
+ScreenCap: 2025-06-25 10:44:54.590 screencap7[23217:97123422] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.593 screencap7[23217:97123422] 📨 POST /key
+2025-06-25 10:44:54.593 screencap7[23217:97123422] 📦 Key request body: {"key":"m"}
+
+ScreenCap: 2025-06-25 10:44:54.593 screencap7[23217:97123422] ⌨️ Key press: m
+2025-06-25 10:44:54.593 screencap7[23217:97123422] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.593 screencap7[23217:97123422] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.593 screencap7[23217:97123422] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:44:54.593 screencap7[23217:97123422] 📝 Created keyboard events: down=0x600003b699e0, up=0x600003b2cf60
+2025-06-25 10:44:54.593 screencap7[23217:97123422] 📤 Posting global keyboard events...
+2025-06-25 10:44:54.593 screencap7[23217:97123422] ✅ Key press completed and events released
+
+ScreenCap: 2025-06-25 10:44:54.593 screencap7[23217:97123422] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.599 screencap7[23217:97123422] 📨 POST /key
+2025-06-25 10:44:54.599 screencap7[23217:97123422] 📦 Key request body: {"key":"m"}
+2025-06-25 10:44:54.599 screencap7[23217:97123422] ⌨️ Key press: m
+2025-06-25 10:44:54.599 screencap7[23217:97123422] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.599 screencap7[23217:97123422] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.599 screencap7[23217:97123422] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:44:54.600 screencap7[23217:97123405] 📨 GET /frame?1750841094599
+
+ScreenCap: 2025-06-25 10:44:54.600 screencap7[23217:97123422] 📝 Created keyboard events: down=0x600003b24ac0, up=0x600003b10460
+2025-06-25 10:44:54.600 screencap7[23217:97123422] 📤 Posting global keyboard events...
+
+ScreenCap: 2025-06-25 10:44:54.600 screencap7[23217:97123422] ✅ Key press completed and events released
+2025-06-25 10:44:54.600 screencap7[23217:97123422] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.602 screencap7[23217:97123422] 📨 POST /key
+2025-06-25 10:44:54.602 screencap7[23217:97123422] 📦 Key request body: {"key":"m"}
+2025-06-25 10:44:54.602 screencap7[23217:97123422] ⌨️ Key press: m
+2025-06-25 10:44:54.602 screencap7[23217:97123422] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.602 screencap7[23217:97123422] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.602 screencap7[23217:97123422] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:44:54.603 screencap7[23217:97123422] 📝 Created keyboard events: down=0x600003b65940, up=0x600003b39000
+2025-06-25 10:44:54.603 screencap7[23217:97123422] 📤 Posting global keyboard events...
+
+ScreenCap: 2025-06-25 10:44:54.603 screencap7[23217:97123422] ✅ Key press completed and events released
+2025-06-25 10:44:54.603 screencap7[23217:97123422] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.605 screencap7[23217:97123405] 📨 POST /key
+2025-06-25 10:44:54.605 screencap7[23217:97123405] 📦 Key request body: {"key":"m"}
+2025-06-25 10:44:54.605 screencap7[23217:97123405] ⌨️ Key press: m
+2025-06-25 10:44:54.605 screencap7[23217:97123405] ⌨️ Key press: m (target window: 0)
+
+ScreenCap: 2025-06-25 10:44:54.605 screencap7[23217:97123405] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.605 screencap7[23217:97123405] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:44:54.605 screencap7[23217:97123405] 📝 Created keyboard events: down=0x600003b65740, up=0x600003b28bc0
+2025-06-25 10:44:54.605 screencap7[23217:97123405] 📤 Posting global keyboard events...
+2025-06-25 10:44:54.606 screencap7[23217:97123405] ✅ Key press completed and events released
+
+ScreenCap: 2025-06-25 10:44:54.606 screencap7[23217:97123405] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.608 screencap7[23217:97123405] 📨 POST /key
+2025-06-25 10:44:54.608 screencap7[23217:97123405] 📦 Key request body: {"key":"m"}
+
+ScreenCap: 2025-06-25 10:44:54.608 screencap7[23217:97123405] ⌨️ Key press: m
+2025-06-25 10:44:54.608 screencap7[23217:97123405] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:44:54.608 screencap7[23217:97123405] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:44:54.608 screencap7[23217:97123405] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:44:54.608 screencap7[23217:97123405] 📝 Created keyboard events: down=0x600003b65360, up=0x600003b64a00
+2025-06-25 10:44:54.608 screencap7[23217:97123405] 📤 Posting global keyboard events...
+2025-06-25 10:44:54.608 screencap7[23217:97123405] ✅ Key press completed and events released
+2025-06-25 10:44:54.608 screencap7[23217:97123405] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:44:54.634 screencap7[23217:97123405] 📨 GET /frame?1750841094633
+
+ScreenCap: 2025-06-25 10:44:54.670 screencap7[23217:97123405] 📨 GET /frame?1750841094669
+
+ScreenCap: 2025-06-25 10:44:54.700 screencap7[23217:97123405] 📨 GET /frame?1750841094698
+
+ScreenCap: 2025-06-25 10:44:54.732 screencap7[23217:97123405] 📨 GET /frame?1750841094731
+
+ScreenCap: 2025-06-25 10:44:54.766 screencap7[23217:97123405] 📨 GET /frame?1750841094765
+
+ScreenCap: 2025-06-25 10:44:54.799 screencap7[23217:97123405] 📨 GET /frame?1750841094798
+
+ScreenCap: 2025-06-25 10:44:54.831 screencap7[23217:97123405] 📨 GET /frame?1750841094830
+
+ScreenCap: 2025-06-25 10:44:54.865 screencap7[23217:97123405] 📨 GET /frame?1750841094864
+
+ScreenCap: 2025-06-25 10:44:54.897 screencap7[23217:97123405] 📨 GET /frame?1750841094896
+
+ScreenCap: 2025-06-25 10:44:54.931 screencap7[23217:97123405] 📨 GET /frame?1750841094930
+
+ScreenCap: 2025-06-25 10:44:54.964 screencap7[23217:97123405] 📨 GET /frame?1750841094963
+
+ScreenCap: 2025-06-25 10:44:54.997 screencap7[23217:97123405] 📨 GET /frame?1750841094995
+
+ScreenCap: 2025-06-25 10:44:55.030 screencap7[23217:97123405] 📨 GET /frame?1750841095029
+
+ScreenCap: 2025-06-25 10:44:55.064 screencap7[23217:97123405] 📨 GET /frame?1750841095062
+
+ScreenCap: 2025-06-25 10:44:55.096 screencap7[23217:97123405] 📨 GET /frame?1750841095095
+
+ScreenCap: 2025-06-25 10:44:55.130 screencap7[23217:97123405] 📨 GET /frame?1750841095128
+
+ScreenCap: 2025-06-25 10:44:55.163 screencap7[23217:97123405] 📨 GET /frame?1750841095161
+
+ScreenCap: 2025-06-25 10:44:55.210 screencap7[23217:97123405] 📨 GET /frame?1750841095193
+
+ScreenCap: 2025-06-25 10:44:55.228 screencap7[23217:97123405] 📨 GET /frame?1750841095227
+
+ScreenCap: 2025-06-25 10:44:55.262 screencap7[23217:97123405] 📨 GET /frame?1750841095260
+
+ScreenCap: 2025-06-25 10:44:55.294 screencap7[23217:97123405] 📨 GET /frame?1750841095293
+
+ScreenCap: 2025-06-25 10:44:55.327 screencap7[23217:97123405] 📨 GET /frame?1750841095326
+
+ScreenCap: 2025-06-25 10:44:55.360 screencap7[23217:97123405] 📨 GET /frame?1750841095359
+
+ScreenCap: 2025-06-25 10:44:55.392 screencap7[23217:97123405] 📨 GET /frame?1750841095391
+
+ScreenCap: 2025-06-25 10:44:55.425 screencap7[23217:97123405] 📨 GET /frame?1750841095424
+
+ScreenCap: 2025-06-25 10:44:55.458 screencap7[23217:97123405] 📨 GET /frame?1750841095457
+
+ScreenCap: 2025-06-25 10:44:55.493 screencap7[23217:97123405] 📨 GET /frame?1750841095491
+
+ScreenCap: 2025-06-25 10:44:55.526 screencap7[23217:97123405] 📨 GET /frame?1750841095524
+
+ScreenCap: 2025-06-25 10:44:55.558 screencap7[23217:97123405] 📨 GET /frame?1750841095556
+
+ScreenCap: 2025-06-25 10:44:55.596 screencap7[23217:97123405] 📨 GET /frame?1750841095590
+
+ScreenCap: 2025-06-25 10:44:55.625 screencap7[23217:97123405] 📨 GET /frame?1750841095623
+
+ScreenCap: 2025-06-25 10:44:55.658 screencap7[23217:97123405] 📨 GET /frame?1750841095656
+
+ScreenCap: 2025-06-25 10:44:55.691 screencap7[23217:97123405] 📨 GET /frame?1750841095689
+
+ScreenCap: 2025-06-25 10:44:55.724 screencap7[23217:97123405] 📨 GET /frame?1750841095722
+
+ScreenCap: 2025-06-25 10:44:55.757 screencap7[23217:97123405] 📨 GET /frame?1750841095755
+
+ScreenCap: 2025-06-25 10:44:55.789 screencap7[23217:97123405] 📨 GET /frame?1750841095787
+
+ScreenCap: 2025-06-25 10:44:55.823 screencap7[23217:97123405] 📨 GET /frame?1750841095821
+
+ScreenCap: 2025-06-25 10:44:55.854 screencap7[23217:97123405] 📨 GET /frame?1750841095853
+
+ScreenCap: 2025-06-25 10:44:55.888 screencap7[23217:97123405] 📨 GET /frame?1750841095887
+
+ScreenCap: 2025-06-25 10:44:55.921 screencap7[23217:97123405] 📨 GET /frame?1750841095920
+
+ScreenCap: 2025-06-25 10:44:55.954 screencap7[23217:97123405] 📨 GET /frame?1750841095952
+
+ScreenCap: 2025-06-25 10:44:55.987 screencap7[23217:97123405] 📨 GET /frame?1750841095985
+
+ScreenCap: 2025-06-25 10:44:56.020 screencap7[23217:97123405] 📨 GET /frame?1750841096018
+
+ScreenCap: 2025-06-25 10:44:56.054 screencap7[23217:97123405] 📨 GET /frame?1750841096052
+
+ScreenCap: 2025-06-25 10:44:56.086 screencap7[23217:97123405] 📨 GET /frame?1750841096084
+
+ScreenCap: 2025-06-25 10:44:56.119 screencap7[23217:97123405] 📨 GET /frame?1750841096117
+
+ScreenCap: 2025-06-25 10:44:56.154 screencap7[23217:97123405] 📨 GET /frame?1750841096152
+
+ScreenCap: 2025-06-25 10:44:56.187 screencap7[23217:97123405] 📨 GET /frame?1750841096184
+
+ScreenCap: 2025-06-25 10:44:56.219 screencap7[23217:97123405] 📨 GET /frame?1750841096217
+
+ScreenCap: 2025-06-25 10:44:56.259 screencap7[23217:97123405] 📨 GET /frame?1750841096250
+
+
+> node-remote-desktop@1.0.0 dev
+> nodemon server.js --watch native/osx/*.m --ext js,m
+
+[33m[nodemon] 3.1.10[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): native/osx/list_windows_cg.m[39m
+[33m[nodemon] watching extensions: js,m[39m
+[32m[nodemon] starting `node server.js native/osx/screencap7_clean.m native/osx/vp9_encoder.m`[39m
+🚀 Starting HTTP API screen capture server...
+🔨 Recompiling native binaries...
+
+╔════════════════════════════════════════╗
+║      Remote Desktop VNC v2 (HTTP)     ║
+╠════════════════════════════════════════╣
+║  URL: http://0.0.0.0:3030               ║
+║  Platform: darwin                    ║
+║  Method: ScreenCaptureKit HTTP API    ║
+║  Native API: http://0.0.0.0:8080       ║
+║  Display: default              ║
+╚════════════════════════════════════════╝
+  
+✅ list_windows_cg compiled successfully
+✅ screencap7 compiled successfully
+🔥 Starting native macOS ScreenCaptureKit HTTP server...
+✅ Native macOS HTTP server started on port 8080!
+ScreenCap: 2025-06-25 10:54:05.852 screencap7[58735:97225603] 🔥 ScreenCaptureKit HTTP Server v7 Starting...
+
+ScreenCap: 2025-06-25 10:54:05.883 screencap7[58735:97225603] 📋 Permission Status:
+2025-06-25 10:54:05.883 screencap7[58735:97225603]    Screen Recording: ✅ GRANTED
+2025-06-25 10:54:05.883 screencap7[58735:97225603]    Accessibility: ✅ GRANTED
+
+ScreenCap: 2025-06-25 10:54:05.883 screencap7[58735:97225603] 🚀 Setting up ScreenCaptureKit...
+
+ScreenCap: 2025-06-25 10:54:05.895 screencap7[58735:97225603] 🌐 Starting HTTP server on port 8080...
+2025-06-25 10:54:05.895 screencap7[58735:97225603] 📸 Starting capture with standard MJPEG mode
+2025-06-25 10:54:05.895 screencap7[58735:97225603] 🚀 Setting up ScreenCaptureKit...
+
+ScreenCap: 2025-06-25 10:54:05.907 screencap7[58735:97225603] 📝 API Endpoints:
+2025-06-25 10:54:05.907 screencap7[58735:97225603]    GET  /apps           - List applications
+2025-06-25 10:54:05.907 screencap7[58735:97225603]    GET  /windows        - List windows (Core Graphics)
+2025-06-25 10:54:05.907 screencap7[58735:97225603]    GET  /display        - Get display info (resolution, scaling)
+
+ScreenCap: 2025-06-25 10:54:05.907 screencap7[58735:97225603]    GET  /frame          - Get current frame (JPEG)
+2025-06-25 10:54:05.907 screencap7[58735:97225603]    GET  /vp9-frame      - Get current VP9 encoded frame
+2025-06-25 10:54:05.907 screencap7[58735:97225603]    POST /capture        - Start capture {type, index}
+2025-06-25 10:54:05.907 screencap7[58735:97225603]    POST /click          - Send click {x, y}
+2025-06-25 10:54:05.907 screencap7[58735:97225603]    POST /click-window   - Send click to window {x, y, cgWindowID}
+2025-06-25 10:54:05.907 screencap7[58735:97225603]    POST /click-background - Send click to background window {x, y, cgWindowID}
+2025-06-25 10:54:05.907 screencap7[58735:97225603]    POST /key            - Send key {key}
+2025-06-25 10:54:05.907 screencap7[58735:97225603]    POST /key-window     - Send key to window {key, cgWindowID}
+2025-06-25 10:54:05.907 screencap7[58735:97225603]    POST /key-background - Send key to background window {key, cgWindowID}
+2025-06-25 10:54:05.907 screencap7[58735:97225603]    POST /screenshot     - Get window screenshot {cgWindowID}
+2025-06-25 10:54:05.907 screencap7[58735:97225603]    POST /stop           - Stop capture
+
+ScreenCap: 2025-06-25 10:54:05.908 screencap7[58735:97225646] ✅ HTTP server listening on port 8080
+
+ScreenCap: 2025-06-25 10:54:06.022 screencap7[58735:97225643] ✅ Found display: 4 (3840 x 1620)
+
+ScreenCap: 2025-06-25 10:54:06.024 screencap7[58735:97225643] 🔧 Desktop capture: Size 3840x1620
+2025-06-25 10:54:06.024 screencap7[58735:97225643] 🔧 Attempting headless capture configuration...
+
+ScreenCap: 2025-06-25 10:54:06.024 screencap7[58735:97225643] 🔧 Configured stream for headless capture (locked screen / lid closed support)
+
+ScreenCap: 2025-06-25 10:54:06.242 screencap7[58735:97225643] ✅ Found display: 4 (3840 x 1620)
+
+ScreenCap: 2025-06-25 10:54:06.264 screencap7[58735:97225643] 🔧 Desktop capture: Size 3840x1620
+2025-06-25 10:54:06.264 screencap7[58735:97225643] 🔧 Attempting headless capture configuration...
+
+ScreenCap: 2025-06-25 10:54:06.264 screencap7[58735:97225643] 🔧 Configured stream for headless capture (locked screen / lid closed support)
+
+ScreenCap: 2025-06-25 10:54:06.304 screencap7[58735:97225643] ✅ full desktop capture started successfully at 30 FPS!
+2025-06-25 10:54:06.304 screencap7[58735:97225643] 📝 Send commands via stdin: 'click x y' or 'key character'
+
+ScreenCap: 2025-06-25 10:54:06.447 screencap7[58735:97225659] ✅ full desktop capture started successfully at 30 FPS!
+2025-06-25 10:54:06.447 screencap7[58735:97225659] 📝 Send commands via stdin: 'click x y' or 'key character'
+
+✅ HTTP API streaming started at 30 FPS
+ScreenCap: 2025-06-25 10:54:10.921 screencap7[58735:97225658] 📨 GET /frame?1750841650858
+
+ScreenCap: 2025-06-25 10:54:10.921 screencap7[58735:97225757] 📨 GET /frame?1750841650881
+
+ScreenCap: 2025-06-25 10:54:10.924 screencap7[58735:97225757] 📨 GET /frame?1750841650914
+
+ScreenCap: 2025-06-25 10:54:10.948 screencap7[58735:97225757] 📨 GET /frame?1750841650946
+
+ScreenCap: 2025-06-25 10:54:10.981 screencap7[58735:97225759] 📨 GET /frame?1750841650979
+
+ScreenCap: 2025-06-25 10:54:11.014 screencap7[58735:97225659] 📨 GET /frame?1750841651012
+
+ScreenCap: 2025-06-25 10:54:11.046 screencap7[58735:97225659] 📨 GET /frame?1750841651045
+
+ScreenCap: 2025-06-25 10:54:11.079 screencap7[58735:97225757] 📨 GET /frame?1750841651078
+
+ScreenCap: 2025-06-25 10:54:11.112 screencap7[58735:97225778] 📨 GET /frame?1750841651111
+
+ScreenCap: 2025-06-25 10:54:11.146 screencap7[58735:97225658] 📨 GET /frame?1750841651145
+
+ScreenCap: 2025-06-25 10:54:11.178 screencap7[58735:97225763] 📨 GET /frame?1750841651177
+
+ScreenCap: 2025-06-25 10:54:11.212 screencap7[58735:97225765] 📨 GET /frame?1750841651211
+
+ScreenCap: 2025-06-25 10:54:11.245 screencap7[58735:97225765] 📨 GET /frame?1750841651243
+
+ScreenCap: 2025-06-25 10:54:11.277 screencap7[58735:97225758] 📨 GET /frame?1750841651276
+
+ScreenCap: 2025-06-25 10:54:11.310 screencap7[58735:97225757] 📨 GET /frame?1750841651309
+
+ScreenCap: 2025-06-25 10:54:11.343 screencap7[58735:97225760] 📨 GET /frame?1750841651342
+
+ScreenCap: 2025-06-25 10:54:11.378 screencap7[58735:97225659] 📨 GET /frame?1750841651376
+
+ScreenCap: 2025-06-25 10:54:11.410 screencap7[58735:97225765] 📨 GET /frame?1750841651409
+
+ScreenCap: 2025-06-25 10:54:11.443 screencap7[58735:97225765] 📨 GET /frame?1750841651442
+
+ScreenCap: 2025-06-25 10:54:11.476 screencap7[58735:97225758] 📨 GET /frame?1750841651475
+
+ScreenCap: 2025-06-25 10:54:11.508 screencap7[58735:97225757] 📨 GET /frame?1750841651507
+
+ScreenCap: 2025-06-25 10:54:11.542 screencap7[58735:97225762] 📨 GET /frame?1750841651541
+
+ScreenCap: 2025-06-25 10:54:11.575 screencap7[58735:97225763] 📨 GET /frame?1750841651574
+
+ScreenCap: 2025-06-25 10:54:11.608 screencap7[58735:97225763] 📨 GET /frame?1750841651607
+
+ScreenCap: 2025-06-25 10:54:11.646 screencap7[58735:97225760] 📨 GET /frame?1750841651639
+
+ScreenCap: 2025-06-25 10:54:11.674 screencap7[58735:97225757] 📨 GET /frame?1750841651673
+
+ScreenCap: 2025-06-25 10:54:11.706 screencap7[58735:97225760] 📨 GET /frame?1750841651705
+
+ScreenCap: 2025-06-25 10:54:11.740 screencap7[58735:97225764] 📨 GET /frame?1750841651738
+
+ScreenCap: 2025-06-25 10:54:11.772 screencap7[58735:97225763] 📨 GET /frame?1750841651771
+
+ScreenCap: 2025-06-25 10:54:11.806 screencap7[58735:97225760] 📨 GET /frame?1750841651804
+
+ScreenCap: 2025-06-25 10:54:11.840 screencap7[58735:97225760] 📨 GET /frame?1750841651837
+
+ScreenCap: 2025-06-25 10:54:11.872 screencap7[58735:97225763] 📨 GET /frame?1750841651871
+
+ScreenCap: 2025-06-25 10:54:11.905 screencap7[58735:97225763] 📨 GET /frame?1750841651904
+
+ScreenCap: 2025-06-25 10:54:11.937 screencap7[58735:97225659] 📨 GET /frame?1750841651936
+
+ScreenCap: 2025-06-25 10:54:11.977 screencap7[58735:97225765] 📨 GET /frame?1750841651969
+
+ScreenCap: 2025-06-25 10:54:12.005 screencap7[58735:97225659] 📨 GET /frame?1750841652003
+
+ScreenCap: 2025-06-25 10:54:12.039 screencap7[58735:97225763] 📨 GET /frame?1750841652035
+
+ScreenCap: 2025-06-25 10:54:12.070 screencap7[58735:97225658] 📨 GET /frame?1750841652068
+
+ScreenCap: 2025-06-25 10:54:12.103 screencap7[58735:97225762] 📨 GET /frame?1750841652101
+
+ScreenCap: 2025-06-25 10:54:12.136 screencap7[58735:97225763] 📨 GET /frame?1750841652134
+
+ScreenCap: 2025-06-25 10:54:12.169 screencap7[58735:97225761] 📨 GET /frame?1750841652168
+
+ScreenCap: 2025-06-25 10:54:12.201 screencap7[58735:97225759] 📨 GET /frame?1750841652200
+
+ScreenCap: 2025-06-25 10:54:12.234 screencap7[58735:97225764] 📨 GET /frame?1750841652233
+
+ScreenCap: 2025-06-25 10:54:12.268 screencap7[58735:97225764] 📨 GET /frame?1750841652266
+
+ScreenCap: 2025-06-25 10:54:12.301 screencap7[58735:97225763] 📨 GET /frame?1750841652300
+
+ScreenCap: 2025-06-25 10:54:12.334 screencap7[58735:97225765] 📨 GET /frame?1750841652332
+
+ScreenCap: 2025-06-25 10:54:12.367 screencap7[58735:97225778] 📨 GET /frame?1750841652366
+
+ScreenCap: 2025-06-25 10:54:12.399 screencap7[58735:97225763] 📨 GET /frame?1750841652398
+
+ScreenCap: 2025-06-25 10:54:12.433 screencap7[58735:97225762] 📨 GET /frame?1750841652432
+
+ScreenCap: 2025-06-25 10:54:12.465 screencap7[58735:97225761] 📨 GET /frame?1750841652464
+
+ScreenCap: 2025-06-25 10:54:12.499 screencap7[58735:97225659] 📨 GET /frame?1750841652498
+
+ScreenCap: 2025-06-25 10:54:12.532 screencap7[58735:97225757] 📨 GET /frame?1750841652531
+
+ScreenCap: 2025-06-25 10:54:12.564 screencap7[58735:97225778] 📨 GET /frame?1750841652563
+
+ScreenCap: 2025-06-25 10:54:12.622 screencap7[58735:97225761] 📨 GET /frame?1750841652596
+
+ScreenCap: 2025-06-25 10:54:14.947 screencap7[58735:97225658] 📨 OPTIONS /capture
+
+ScreenCap: 2025-06-25 10:54:14.948 screencap7[58735:97225658] 📨 POST /capture
+
+ScreenCap: 2025-06-25 10:54:14.948 screencap7[58735:97225658] 🛑 Stopping current capture...
+
+ScreenCap: 2025-06-25 10:54:14.953 screencap7[58735:97225763] ✅ Capture stopped
+
+ScreenCap: 2025-06-25 10:54:15.049 screencap7[58735:97225658] 📸 Starting capture with standard MJPEG mode
+2025-06-25 10:54:15.049 screencap7[58735:97225658] 🚀 Setting up ScreenCaptureKit...
+
+ScreenCap: 2025-06-25 10:54:15.197 screencap7[58735:97225658] ✅ Found display: 4 (3840 x 1620)
+
+ScreenCap: 2025-06-25 10:54:15.197 screencap7[58735:97225658] 🔧 Desktop capture: Size 3840x1620
+2025-06-25 10:54:15.197 screencap7[58735:97225658] 🔧 Attempting headless capture configuration...
+2025-06-25 10:54:15.197 screencap7[58735:97225658] 🔧 Configured stream for headless capture (locked screen / lid closed support)
+
+ScreenCap: 2025-06-25 10:54:15.279 screencap7[58735:97225762] ✅ full desktop capture started successfully at 30 FPS!
+2025-06-25 10:54:15.279 screencap7[58735:97225762] 📝 Send commands via stdin: 'click x y' or 'key character'
+
+Client connected - streaming server screen automatically
+📝 Reset capture mode to desktop
+ScreenCap: 2025-06-25 10:54:19.386 screencap7[58735:97225658] 📸 Captured 300 frames | Mode: Full Desktop | Size: 3840x1620
+
+ScreenCap: 2025-06-25 10:54:21.624 screencap7[58735:97225659] 📨 OPTIONS /capture
+
+ScreenCap: 2025-06-25 10:54:21.727 screencap7[58735:97225765] 📨 POST /capture
+2025-06-25 10:54:21.728 screencap7[58735:97225765] 🛑 Stopping current capture...
+
+ScreenCap: 2025-06-25 10:54:21.835 screencap7[58735:97225759] ✅ Capture stopped
+
+ScreenCap: 2025-06-25 10:54:21.837 screencap7[58735:97225765] 🚀 Starting capture with High Quality mode enabled
+2025-06-25 10:54:21.837 screencap7[58735:97225765] 🚀 Setting up ScreenCaptureKit...
+
+ScreenCap: 2025-06-25 10:54:21.962 screencap7[58735:97225760] 📨 GET /frame?1750841661961
+
+ScreenCap: 2025-06-25 10:54:21.996 screencap7[58735:97225760] 📨 GET /frame?1750841661995
+
+ScreenCap: 2025-06-25 10:54:22.016 screencap7[58735:97225765] ✅ Found display: 4 (3840 x 1620)
+
+ScreenCap: 2025-06-25 10:54:22.016 screencap7[58735:97225765] 🔧 Desktop capture: Size 3840x1620
+2025-06-25 10:54:22.016 screencap7[58735:97225765] 🔧 Attempting headless capture configuration...
+2025-06-25 10:54:22.016 screencap7[58735:97225765] 🔧 Configured stream for headless capture (locked screen / lid closed support)
+2025-06-25 10:54:22.016 screencap7[58735:97225765] 🚀 High Quality mode enabled: 3840x1620
+
+ScreenCap: 2025-06-25 10:54:22.029 screencap7[58735:97225765] 📨 GET /frame?1750841662028
+
+ScreenCap: 2025-06-25 10:54:22.063 screencap7[58735:97225765] 📨 GET /frame?1750841662062
+
+ScreenCap: 2025-06-25 10:54:22.095 screencap7[58735:97225760] 📨 GET /frame?1750841662094
+
+ScreenCap: 2025-06-25 10:54:22.108 screencap7[58735:97225658] ✅ full desktop capture started successfully at 30 FPS!
+2025-06-25 10:54:22.108 screencap7[58735:97225658] 📝 Send commands via stdin: 'click x y' or 'key character'
+
+ScreenCap: 2025-06-25 10:54:22.128 screencap7[58735:97225658] 📨 GET /frame?1750841662127
+
+ScreenCap: 2025-06-25 10:54:22.161 screencap7[58735:97225658] 📨 GET /frame?1750841662160
+
+ScreenCap: 2025-06-25 10:54:22.193 screencap7[58735:97225658] 📨 GET /frame?1750841662192
+
+ScreenCap: 2025-06-25 10:54:22.227 screencap7[58735:97225658] 📨 GET /frame?1750841662226
+
+ScreenCap: 2025-06-25 10:54:22.259 screencap7[58735:97225658] 📨 GET /frame?1750841662258
+
+ScreenCap: 2025-06-25 10:54:22.292 screencap7[58735:97225658] 📨 GET /frame?1750841662291
+
+ScreenCap: 2025-06-25 10:54:22.326 screencap7[58735:97225658] 📨 GET /frame?1750841662325
+
+ScreenCap: 2025-06-25 10:54:22.358 screencap7[58735:97225658] 📨 GET /frame?1750841662357
+
+ScreenCap: 2025-06-25 10:54:22.392 screencap7[58735:97225658] 📨 GET /frame?1750841662391
+
+ScreenCap: 2025-06-25 10:54:22.425 screencap7[58735:97225658] 📨 GET /frame?1750841662423
+
+ScreenCap: 2025-06-25 10:54:22.458 screencap7[58735:97225658] 📨 GET /frame?1750841662457
+
+ScreenCap: 2025-06-25 10:54:22.491 screencap7[58735:97225658] 📨 GET /frame?1750841662489
+
+ScreenCap: 2025-06-25 10:54:22.524 screencap7[58735:97225658] 📨 GET /frame?1750841662523
+
+ScreenCap: 2025-06-25 10:54:22.557 screencap7[58735:97225658] 📨 GET /frame?1750841662556
+
+ScreenCap: 2025-06-25 10:54:22.590 screencap7[58735:97225658] 📨 GET /frame?1750841662588
+
+ScreenCap: 2025-06-25 10:54:22.623 screencap7[58735:97225658] 📨 GET /frame?1750841662622
+
+ScreenCap: 2025-06-25 10:54:22.655 screencap7[58735:97225658] 📨 GET /frame?1750841662654
+
+ScreenCap: 2025-06-25 10:54:22.689 screencap7[58735:97225658] 📨 GET /frame?1750841662687
+
+ScreenCap: 2025-06-25 10:54:22.721 screencap7[58735:97225658] 📨 GET /frame?1750841662720
+
+ScreenCap: 2025-06-25 10:54:22.770 screencap7[58735:97225658] 📨 GET /frame?1750841662753
+
+ScreenCap: 2025-06-25 10:54:22.787 screencap7[58735:97225658] 📨 GET /frame?1750841662786
+
+ScreenCap: 2025-06-25 10:54:22.821 screencap7[58735:97225658] 📨 GET /frame?1750841662820
+
+ScreenCap: 2025-06-25 10:54:22.854 screencap7[58735:97225658] 📨 GET /frame?1750841662853
+
+ScreenCap: 2025-06-25 10:54:22.861 screencap7[58735:97225765] 📨 OPTIONS /key
+
+ScreenCap: 2025-06-25 10:54:22.863 screencap7[58735:97225765] 📨 POST /key
+
+ScreenCap: 2025-06-25 10:54:22.863 screencap7[58735:97225765] 📦 Key request body: {"key":"Meta"}
+2025-06-25 10:54:22.863 screencap7[58735:97225765] ⌨️ Key press: Meta
+2025-06-25 10:54:22.863 screencap7[58735:97225765] ⌨️ Key press: Meta (target window: 0)
+2025-06-25 10:54:22.863 screencap7[58735:97225765] 🔤 Processing character: 'M' (unicode: 77)
+2025-06-25 10:54:22.863 screencap7[58735:97225765] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:54:22.863 screencap7[58735:97225765] 📝 Created keyboard events: down=0x600000780a60, up=0x6000007edc40
+2025-06-25 10:54:22.863 screencap7[58735:97225765] 📤 Posting global keyboard events...
+
+ScreenCap: 2025-06-25 10:54:22.881 screencap7[58735:97225765] ✅ Key press completed and events released
+
+ScreenCap: 2025-06-25 10:54:22.881 screencap7[58735:97225765] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:54:22.887 screencap7[58735:97225765] 📨 GET /frame?1750841662886
+
+ScreenCap: 2025-06-25 10:54:22.898 screencap7[58735:97225765] 📨 POST /key
+2025-06-25 10:54:22.898 screencap7[58735:97225765] 📦 Key request body: {"key":"m"}
+2025-06-25 10:54:22.898 screencap7[58735:97225765] ⌨️ Key press: m
+2025-06-25 10:54:22.898 screencap7[58735:97225765] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:54:22.898 screencap7[58735:97225765] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:54:22.898 screencap7[58735:97225765] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:54:22.898 screencap7[58735:97225765] 📝 Created keyboard events: down=0x6000007fb380, up=0x6000007f9520
+2025-06-25 10:54:22.899 screencap7[58735:97225765] 📤 Posting global keyboard events...
+
+ScreenCap: 2025-06-25 10:54:22.899 screencap7[58735:97225765] ✅ Key press completed and events released
+2025-06-25 10:54:22.899 screencap7[58735:97225765] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:54:22.901 screencap7[58735:97225765] 📨 POST /key
+2025-06-25 10:54:22.901 screencap7[58735:97225765] 📦 Key request body: {"key":"m"}
+
+ScreenCap: 2025-06-25 10:54:22.901 screencap7[58735:97225765] ⌨️ Key press: m
+2025-06-25 10:54:22.901 screencap7[58735:97225765] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:54:22.901 screencap7[58735:97225765] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:54:22.901 screencap7[58735:97225765] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:54:22.901 screencap7[58735:97225765] 📝 Created keyboard events: down=0x60000078c800, up=0x60000078c840
+2025-06-25 10:54:22.901 screencap7[58735:97225765] 📤 Posting global keyboard events...
+
+ScreenCap: 2025-06-25 10:54:22.901 screencap7[58735:97225765] ✅ Key press completed and events released
+2025-06-25 10:54:22.901 screencap7[58735:97225765] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:54:22.904 screencap7[58735:97225765] 📨 POST /key
+2025-06-25 10:54:22.904 screencap7[58735:97225765] 📦 Key request body: {"key":"m"}
+
+ScreenCap: 2025-06-25 10:54:22.904 screencap7[58735:97225765] ⌨️ Key press: m
+2025-06-25 10:54:22.904 screencap7[58735:97225765] ⌨️ Key press: m (target window: 0)
+
+ScreenCap: 2025-06-25 10:54:22.904 screencap7[58735:97225765] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:54:22.904 screencap7[58735:97225765] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:54:22.904 screencap7[58735:97225765] 📝 Created keyboard events: down=0x6000007fb2e0, up=0x6000007dcd80
+2025-06-25 10:54:22.904 screencap7[58735:97225765] 📤 Posting global keyboard events...
+2025-06-25 10:54:22.904 screencap7[58735:97225765] ✅ Key press completed and events released
+
+ScreenCap: 2025-06-25 10:54:22.904 screencap7[58735:97225765] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:54:22.912 screencap7[58735:97225765] 📨 POST /key
+
+ScreenCap: 2025-06-25 10:54:22.912 screencap7[58735:97225765] 📦 Key request body: {"key":"m"}
+2025-06-25 10:54:22.912 screencap7[58735:97225765] ⌨️ Key press: m
+2025-06-25 10:54:22.912 screencap7[58735:97225765] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:54:22.912 screencap7[58735:97225765] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:54:22.912 screencap7[58735:97225765] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:54:22.912 screencap7[58735:97225765] 📝 Created keyboard events: down=0x6000007ecd40, up=0x6000007ecfa0
+2025-06-25 10:54:22.912 screencap7[58735:97225765] 📤 Posting global keyboard events...
+2025-06-25 10:54:22.912 screencap7[58735:97225765] ✅ Key press completed and events released
+2025-06-25 10:54:22.912 screencap7[58735:97225765] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:54:22.915 screencap7[58735:97225765] 📨 POST /key
+2025-06-25 10:54:22.915 screencap7[58735:97225765] 📦 Key request body: {"key":"m"}
+
+ScreenCap: 2025-06-25 10:54:22.915 screencap7[58735:97225765] ⌨️ Key press: m
+2025-06-25 10:54:22.915 screencap7[58735:97225765] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:54:22.915 screencap7[58735:97225765] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:54:22.915 screencap7[58735:97225765] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:54:22.917 screencap7[58735:97225765] 📝 Created keyboard events: down=0x6000007ec420, up=0x6000007ecfa0
+2025-06-25 10:54:22.917 screencap7[58735:97225765] 📤 Posting global keyboard events...
+2025-06-25 10:54:22.917 screencap7[58735:97225765] ✅ Key press completed and events released
+2025-06-25 10:54:22.917 screencap7[58735:97225765] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:54:22.919 screencap7[58735:97225765] 📨 POST /key
+2025-06-25 10:54:22.919 screencap7[58735:97225658] 📨 GET /frame?1750841662918
+2025-06-25 10:54:22.919 screencap7[58735:97225765] 📦 Key request body: {"key":"m"}
+
+ScreenCap: 2025-06-25 10:54:22.919 screencap7[58735:97225765] ⌨️ Key press: m
+2025-06-25 10:54:22.919 screencap7[58735:97225765] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:54:22.919 screencap7[58735:97225765] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:54:22.919 screencap7[58735:97225765] 📤 Creating keyboard events for keyCode: 46
+2025-06-25 10:54:22.920 screencap7[58735:97225765] 📝 Created keyboard events: down=0x60000078c840, up=0x600000788840
+2025-06-25 10:54:22.920 screencap7[58735:97225765] 📤 Posting global keyboard events...
+2025-06-25 10:54:22.920 screencap7[58735:97225765] ✅ Key press completed and events released
+2025-06-25 10:54:22.920 screencap7[58735:97225765] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:54:22.921 screencap7[58735:97225658] 📨 POST /key
+2025-06-25 10:54:22.921 screencap7[58735:97225658] 📦 Key request body: {"key":"m"}
+2025-06-25 10:54:22.921 screencap7[58735:97225658] ⌨️ Key press: m
+2025-06-25 10:54:22.921 screencap7[58735:97225658] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:54:22.921 screencap7[58735:97225658] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:54:22.921 screencap7[58735:97225658] 📤 Creating keyboard events for keyCode: 46
+2025-06-25 10:54:22.922 screencap7[58735:97225658] 📝 Created keyboard events: down=0x6000007e8560, up=0x6000007e8140
+2025-06-25 10:54:22.922 screencap7[58735:97225658] 📤 Posting global keyboard events...
+2025-06-25 10:54:22.922 screencap7[58735:97225658] ✅ Key press completed and events released
+2025-06-25 10:54:22.922 screencap7[58735:97225658] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:54:22.927 screencap7[58735:97225658] 📨 POST /key
+2025-06-25 10:54:22.927 screencap7[58735:97225658] 📦 Key request body: {"key":"m"}
+2025-06-25 10:54:22.927 screencap7[58735:97225658] ⌨️ Key press: m
+
+ScreenCap: 2025-06-25 10:54:22.927 screencap7[58735:97225658] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:54:22.927 screencap7[58735:97225658] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:54:22.927 screencap7[58735:97225658] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:54:22.928 screencap7[58735:97225658] 📝 Created keyboard events: down=0x6000007fa1c0, up=0x6000007f9520
+2025-06-25 10:54:22.928 screencap7[58735:97225658] 📤 Posting global keyboard events...
+
+ScreenCap: 2025-06-25 10:54:22.928 screencap7[58735:97225658] ✅ Key press completed and events released
+2025-06-25 10:54:22.928 screencap7[58735:97225658] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:54:22.930 screencap7[58735:97225658] 📨 POST /key
+2025-06-25 10:54:22.930 screencap7[58735:97225658] 📦 Key request body: {"key":"m"}
+2025-06-25 10:54:22.930 screencap7[58735:97225658] ⌨️ Key press: m
+
+ScreenCap: 2025-06-25 10:54:22.930 screencap7[58735:97225658] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:54:22.930 screencap7[58735:97225658] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:54:22.930 screencap7[58735:97225658] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:54:22.931 screencap7[58735:97225658] 📝 Created keyboard events: down=0x600000780c80, up=0x600000780ce0
+2025-06-25 10:54:22.931 screencap7[58735:97225658] 📤 Posting global keyboard events...
+2025-06-25 10:54:22.931 screencap7[58735:97225658] ✅ Key press completed and events released
+2025-06-25 10:54:22.931 screencap7[58735:97225658] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:54:22.933 screencap7[58735:97225658] 📨 POST /key
+2025-06-25 10:54:22.933 screencap7[58735:97225658] 📦 Key request body: {"key":"m"}
+2025-06-25 10:54:22.933 screencap7[58735:97225658] ⌨️ Key press: m
+2025-06-25 10:54:22.933 screencap7[58735:97225658] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:54:22.933 screencap7[58735:97225658] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:54:22.933 screencap7[58735:97225658] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:54:22.933 screencap7[58735:97225658] 📝 Created keyboard events: down=0x6000007d4ba0, up=0x6000007d5880
+2025-06-25 10:54:22.933 screencap7[58735:97225658] 📤 Posting global keyboard events...
+2025-06-25 10:54:22.933 screencap7[58735:97225658] ✅ Key press completed and events released
+2025-06-25 10:54:22.933 screencap7[58735:97225658] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:54:22.935 screencap7[58735:97225658] 📨 POST /key
+
+ScreenCap: 2025-06-25 10:54:22.935 screencap7[58735:97225658] 📦 Key request body: {"key":"m"}
+
+ScreenCap: 2025-06-25 10:54:22.935 screencap7[58735:97225658] ⌨️ Key press: m
+
+ScreenCap: 2025-06-25 10:54:22.935 screencap7[58735:97225658] ⌨️ Key press: m (target window: 0)
+
+ScreenCap: 2025-06-25 10:54:22.935 screencap7[58735:97225658] 🔤 Processing character: 'm' (unicode: 109)
+
+ScreenCap: 2025-06-25 10:54:22.935 screencap7[58735:97225658] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:54:22.936 screencap7[58735:97225658] 📝 Created keyboard events: down=0x6000007e8700, up=0x6000007c7920
+2025-06-25 10:54:22.936 screencap7[58735:97225658] 📤 Posting global keyboard events...
+2025-06-25 10:54:22.936 screencap7[58735:97225658] ✅ Key press completed and events released
+
+ScreenCap: 2025-06-25 10:54:22.936 screencap7[58735:97225658] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:54:22.939 screencap7[58735:97225658] 📨 POST /key
+2025-06-25 10:54:22.939 screencap7[58735:97225658] 📦 Key request body: {"key":"m"}
+2025-06-25 10:54:22.939 screencap7[58735:97225658] ⌨️ Key press: m
+
+ScreenCap: 2025-06-25 10:54:22.939 screencap7[58735:97225658] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:54:22.939 screencap7[58735:97225658] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:54:22.939 screencap7[58735:97225658] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:54:22.939 screencap7[58735:97225658] 📝 Created keyboard events: down=0x600000780ce0, up=0x600000780c80
+2025-06-25 10:54:22.939 screencap7[58735:97225658] 📤 Posting global keyboard events...
+2025-06-25 10:54:22.939 screencap7[58735:97225658] ✅ Key press completed and events released
+
+ScreenCap: 2025-06-25 10:54:22.939 screencap7[58735:97225658] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:54:22.946 screencap7[58735:97225658] 📨 POST /key
+
+ScreenCap: 2025-06-25 10:54:22.946 screencap7[58735:97225658] 📦 Key request body: {"key":"m"}
+2025-06-25 10:54:22.946 screencap7[58735:97225658] ⌨️ Key press: m
+2025-06-25 10:54:22.946 screencap7[58735:97225658] ⌨️ Key press: m (target window: 0)
+2025-06-25 10:54:22.946 screencap7[58735:97225658] 🔤 Processing character: 'm' (unicode: 109)
+2025-06-25 10:54:22.946 screencap7[58735:97225658] 📤 Creating keyboard events for keyCode: 46
+
+ScreenCap: 2025-06-25 10:54:22.946 screencap7[58735:97225658] 📝 Created keyboard events: down=0x6000007d42a0, up=0x6000007f9ee0
+2025-06-25 10:54:22.946 screencap7[58735:97225658] 📤 Posting global keyboard events...
+2025-06-25 10:54:22.946 screencap7[58735:97225658] ✅ Key press completed and events released
+2025-06-25 10:54:22.946 screencap7[58735:97225658] ✅ Key press response sent
+
+ScreenCap: 2025-06-25 10:54:22.952 screencap7[58735:97225658] 📨 GET /frame?1750841662951
+
+ScreenCap: 2025-06-25 10:54:23.009 screencap7[58735:97225658] 📨 GET /frame?1750841662984
+
+ScreenCap: 2025-06-25 10:54:23.030 screencap7[58735:97225658] 📨 GET /frame?1750841663018
+
+ScreenCap: 2025-06-25 10:54:23.053 screencap7[58735:97225658] 📨 GET /frame?1750841663051
+
+ScreenCap: 2025-06-25 10:54:23.086 screencap7[58735:97225658] 📨 GET /frame?1750841663083
+
+ScreenCap: 2025-06-25 10:54:23.119 screencap7[58735:97225658] 📨 GET /frame?1750841663117
+
+ScreenCap: 2025-06-25 10:54:23.151 screencap7[58735:97225658] 📨 GET /frame?1750841663150
+
+ScreenCap: 2025-06-25 10:54:23.184 screencap7[58735:97225658] 📨 GET /frame?1750841663182
+
+ScreenCap: 2025-06-25 10:54:23.217 screencap7[58735:97225658] 📨 GET /frame?1750841663215
+
+ScreenCap: 2025-06-25 10:54:23.252 screencap7[58735:97225658] 📨 GET /frame?1750841663248
+
+ScreenCap: 2025-06-25 10:54:23.284 screencap7[58735:97225658] 📨 GET /frame?1750841663282
+
+ScreenCap: 2025-06-25 10:54:23.315 screencap7[58735:97225658] 📨 GET /frame?1750841663314
+
+ScreenCap: 2025-06-25 10:54:23.354 screencap7[58735:97225658] 📨 GET /frame?1750841663348
+
+ScreenCap: 2025-06-25 10:54:23.382 screencap7[58735:97225658] 📨 GET /frame?1750841663381
+
+ScreenCap: 2025-06-25 10:54:23.414 screencap7[58735:97225658] 📨 GET /frame?1750841663413
+
+ScreenCap: 2025-06-25 10:54:23.447 screencap7[58735:97225658] 📨 GET /frame?1750841663446
+
+ScreenCap: 2025-06-25 10:54:23.481 screencap7[58735:97225658] 📨 GET /frame?1750841663480
+
+ScreenCap: 2025-06-25 10:54:23.514 screencap7[58735:97225658] 📨 GET /frame?1750841663513
+
+ScreenCap: 2025-06-25 10:54:23.547 screencap7[58735:97225658] 📨 GET /frame?1750841663546
+
+ScreenCap: 2025-06-25 10:54:23.582 screencap7[58735:97225658] 📨 GET /frame?1750841663580
+
+ScreenCap: 2025-06-25 10:54:23.614 screencap7[58735:97225658] 📨 GET /frame?1750841663612
+
+ScreenCap: 2025-06-25 10:54:23.648 screencap7[58735:97225765] 📨 GET /frame?1750841663645
+
+ScreenCap: 2025-06-25 10:54:23.680 screencap7[58735:97225658] 📨 GET /frame?1750841663678
+
+ScreenCap: 2025-06-25 10:54:23.712 screencap7[58735:97225658] 📨 GET /frame?1750841663711
+
+ScreenCap: 2025-06-25 10:54:23.744 screencap7[58735:97225658] 📨 GET /frame?1750841663743
+
+ScreenCap: 2025-06-25 10:54:23.778 screencap7[58735:97225658] 📨 GET /frame?1750841663777
+
+ScreenCap: 2025-06-25 10:54:23.811 screencap7[58735:97225658] 📨 GET /frame?1750841663810
+
+ScreenCap: 2025-06-25 10:54:23.843 screencap7[58735:97225658] 📨 GET /frame?1750841663842
+
+ScreenCap: 2025-06-25 10:54:23.877 screencap7[58735:97225658] 📨 GET /frame?1750841663876
+
+ScreenCap: 2025-06-25 10:54:23.909 screencap7[58735:97225658] 📨 GET /frame?1750841663908
+
+ScreenCap: 2025-06-25 10:54:23.943 screencap7[58735:97225658] 📨 GET /frame?1750841663942
+
+ScreenCap: 2025-06-25 10:54:23.976 screencap7[58735:97225658] 📨 GET /frame?1750841663975
+
+ScreenCap: 2025-06-25 10:54:24.009 screencap7[58735:97225658] 📨 GET /frame?1750841664008
+
+ScreenCap: 2025-06-25 10:54:24.041 screencap7[58735:97225658] 📨 GET /frame?1750841664040
+
+ScreenCap: 2025-06-25 10:54:24.076 screencap7[58735:97225658] 📨 GET /frame?1750841664074
+
+ScreenCap: 2025-06-25 10:54:24.109 screencap7[58735:97225658] 📨 GET /frame?1750841664107
+
+ScreenCap: 2025-06-25 10:54:24.142 screencap7[58735:97225658] 📨 GET /frame?1750841664140
+
+ScreenCap: 2025-06-25 10:54:24.175 screencap7[58735:97225658] 📨 GET /frame?1750841664173
+
+ScreenCap: 2025-06-25 10:54:24.209 screencap7[58735:97225658] 📨 GET /frame?1750841664207
+
+ScreenCap: 2025-06-25 10:54:24.240 screencap7[58735:97225658] 📨 GET /frame?1750841664239
+
+ScreenCap: 2025-06-25 10:54:24.272 screencap7[58735:97225658] 📨 GET /frame?1750841664271
+
+ScreenCap: 2025-06-25 10:54:24.306 screencap7[58735:97225658] 📨 GET /frame?1750841664305
+
+ScreenCap: 2025-06-25 10:54:24.339 screencap7[58735:97225658] 📨 GET /frame?1750841664337
+
+ScreenCap: 2025-06-25 10:54:24.380 screencap7[58735:97225658] 📨 GET /frame?1750841664371
+
+ScreenCap: 2025-06-25 10:54:24.410 screencap7[58735:97225658] 📨 GET /frame?1750841664404
+
+ScreenCap: 2025-06-25 10:54:24.438 screencap7[58735:97225658] 📨 GET /frame?1750841664436
+
+ScreenCap: 2025-06-25 10:54:24.471 screencap7[58735:97225658] 📨 GET /frame?1750841664470
+
+ScreenCap: 2025-06-25 10:54:24.504 screencap7[58735:97225658] 📨 GET /frame?1750841664503
+
+ScreenCap: 2025-06-25 10:54:24.537 screencap7[58735:97225658] 📨 GET /frame?1750841664536
+
+ScreenCap: 2025-06-25 10:54:24.569 screencap7[58735:97225658] 📨 GET /frame?1750841664568
+
+ScreenCap: 2025-06-25 10:54:24.603 screencap7[58735:97225658] 📨 GET /frame?1750841664602
+
+ScreenCap: 2025-06-25 10:54:24.636 screencap7[58735:97225658] 📨 GET /frame?1750841664635
+
+ScreenCap: 2025-06-25 10:54:24.669 screencap7[58735:97225658] 📨 GET /frame?1750841664667
+
+ScreenCap: 2025-06-25 10:54:24.702 screencap7[58735:97225658] 📨 GET /frame?1750841664701
+
+ScreenCap: 2025-06-25 10:54:24.735 screencap7[58735:97225658] 📨 GET /frame?1750841664734
+
+ScreenCap: 2025-06-25 10:54:24.769 screencap7[58735:97225658] 📨 GET /frame?1750841664767
+
+ScreenCap: 2025-06-25 10:54:24.801 screencap7[58735:97225658] 📨 GET /frame?1750841664799
+
+ScreenCap: 2025-06-25 10:54:24.834 screencap7[58735:97225658] 📨 GET /frame?1750841664833
+
+ScreenCap: 2025-06-25 10:54:24.867 screencap7[58735:97225658] 📨 GET /frame?1750841664866
+
+ScreenCap: 2025-06-25 10:54:24.899 screencap7[58735:97225658] 📨 GET /frame?1750841664898
+
+ScreenCap: 2025-06-25 10:54:24.932 screencap7[58735:97225658] 📨 GET /frame?1750841664931
+
+ScreenCap: 2025-06-25 10:54:24.966 screencap7[58735:97225658] 📨 GET /frame?1750841664964
+
+ScreenCap: 2025-06-25 10:54:24.998 screencap7[58735:97225658] 📨 GET /frame?1750841664997
+
+ScreenCap: 2025-06-25 10:54:25.031 screencap7[58735:97225658] 📨 GET /frame?1750841665030
+
+ScreenCap: 2025-06-25 10:54:25.066 screencap7[58735:97225658] 📨 GET /frame?1750841665064
+
+ScreenCap: 2025-06-25 10:54:25.098 screencap7[58735:97225658] 📨 GET /frame?1750841665096
+
+ScreenCap: 2025-06-25 10:54:25.132 screencap7[58735:97225658] 📨 GET /frame?1750841665130
+
+ScreenCap: 2025-06-25 10:54:25.165 screencap7[58735:97225658] 📨 GET /frame?1750841665162
+
+ScreenCap: 2025-06-25 10:54:25.199 screencap7[58735:97225658] 📨 GET /frame?1750841665196
+
+ScreenCap: 2025-06-25 10:54:25.239 screencap7[58735:97225658] 📨 GET /frame?1750841665229
+
+ScreenCap: 2025-06-25 10:54:25.263 screencap7[58735:97225658] 📨 GET /frame?1750841665261
+
+ScreenCap: 2025-06-25 10:54:25.295 screencap7[58735:97225658] 📨 GET /frame?1750841665294
+
+ScreenCap: 2025-06-25 10:54:25.328 screencap7[58735:97225658] 📨 GET /frame?1750841665327
+
+ScreenCap: 2025-06-25 10:54:25.363 screencap7[58735:97225658] 📨 GET /frame?1750841665361
+
+ScreenCap: 2025-06-25 10:54:25.395 screencap7[58735:97225658] 📨 GET /frame?1750841665394
+
+ScreenCap: 2025-06-25 10:54:25.428 screencap7[58735:97225658] 📨 GET /frame?1750841665427
+
+ScreenCap: 2025-06-25 10:54:25.462 screencap7[58735:97225658] 📨 GET /frame?1750841665460
+
+ScreenCap: 2025-06-25 10:54:25.495 screencap7[58735:97225658] 📨 GET /frame?1750841665493
+
+ScreenCap: 2025-06-25 10:54:25.528 screencap7[58735:97225658] 📨 GET /frame?1750841665527
+
+ScreenCap: 2025-06-25 10:54:25.560 screencap7[58735:97225658] 📨 GET /frame?1750841665558
+
+ScreenCap: 2025-06-25 10:54:25.594 screencap7[58735:97225658] 📨 GET /frame?1750841665592
+
+ScreenCap: 2025-06-25 10:54:25.626 screencap7[58735:97225658] 📨 GET /frame?1750841665625
+
+ScreenCap: 2025-06-25 10:54:25.660 screencap7[58735:97225658] 📨 GET /frame?1750841665658
+
+ScreenCap: 2025-06-25 10:54:25.702 screencap7[58735:97225658] 📨 GET /frame?1750841665690
+
+ScreenCap: 2025-06-25 10:54:25.725 screencap7[58735:97225658] 📨 GET /frame?1750841665724
+
+ScreenCap: 2025-06-25 10:54:25.761 screencap7[58735:97225658] 📨 GET /frame?1750841665757
+
+ScreenCap: 2025-06-25 10:54:25.791 screencap7[58735:97225658] 📨 GET /frame?1750841665789
+
+ScreenCap: 2025-06-25 10:54:25.824 screencap7[58735:97225658] 📨 GET /frame?1750841665823
+
+ScreenCap: 2025-06-25 10:54:25.857 screencap7[58735:97225658] 📨 GET /frame?1750841665856
+
+ScreenCap: 2025-06-25 10:54:25.890 screencap7[58735:97225765] 📨 GET /frame?1750841665889
+
+ScreenCap: 2025-06-25 10:54:25.923 screencap7[58735:97225658] 📨 GET /frame?1750841665921
+
+ScreenCap: 2025-06-25 10:54:25.955 screencap7[58735:97225658] 📨 GET /frame?1750841665954
+
+ScreenCap: 2025-06-25 10:54:25.992 screencap7[58735:97225658] 📨 GET /frame?1750841665988
+
+ScreenCap: 2025-06-25 10:54:26.022 screencap7[58735:97225658] 📨 GET /frame?1750841666021
+
+ScreenCap: 2025-06-25 10:54:26.055 screencap7[58735:97225658] 📨 GET /frame?1750841666054
+
+ScreenCap: 2025-06-25 10:54:26.089 screencap7[58735:97225658] 📨 GET /frame?1750841666086
+
+ScreenCap: 2025-06-25 10:54:26.122 screencap7[58735:97225658] 📨 GET /frame?1750841666119
+
+ScreenCap: 2025-06-25 10:54:26.155 screencap7[58735:97225658] 📨 GET /frame?1750841666153
+
+ScreenCap: 2025-06-25 10:54:26.187 screencap7[58735:97225658] 📨 GET /frame?1750841666185
+
+ScreenCap: 2025-06-25 10:54:26.220 screencap7[58735:97225658] 📨 GET /frame?1750841666219
+
+ScreenCap: 2025-06-25 10:54:26.252 screencap7[58735:97225658] 📨 GET /frame?1750841666251
+
+ScreenCap: 2025-06-25 10:54:26.286 screencap7[58735:97225658] 📨 GET /frame?1750841666285
+
+ScreenCap: 2025-06-25 10:54:26.319 screencap7[58735:97225765] 📨 GET /frame?1750841666318
+
+ScreenCap: 2025-06-25 10:54:26.352 screencap7[58735:97225658] 📨 GET /frame?1750841666351
+
+ScreenCap: 2025-06-25 10:54:26.385 screencap7[58735:97225658] 📨 GET /frame?1750841666384
+
+ScreenCap: 2025-06-25 10:54:26.417 screencap7[58735:97225658] 📨 GET /frame?1750841666416
+
+ScreenCap: 2025-06-25 10:54:26.451 screencap7[58735:97225762] 📨 GET /frame?1750841666449
+
+ScreenCap: 2025-06-25 10:54:26.484 screencap7[58735:97225762] 📨 GET /frame?1750841666482
+
+ScreenCap: 2025-06-25 10:54:26.517 screencap7[58735:97225762] 📨 GET /frame?1750841666516
+
+ScreenCap: 2025-06-25 10:54:26.550 screencap7[58735:97225762] 📨 GET /frame?1750841666549
+
+ScreenCap: 2025-06-25 10:54:26.582 screencap7[58735:97225762] 📨 GET /frame?1750841666581
+
+ScreenCap: 2025-06-25 10:54:26.615 screencap7[58735:97225762] 📨 GET /frame?1750841666614
+
+ScreenCap: 2025-06-25 10:54:26.650 screencap7[58735:97225762] 📨 GET /frame?1750841666648
+
+ScreenCap: 2025-06-25 10:54:26.682 screencap7[58735:97225761] 📨 GET /frame?1750841666680
+
+ScreenCap: 2025-06-25 10:54:26.715 screencap7[58735:97225761] 📨 GET /frame?1750841666714
+
+ScreenCap: 2025-06-25 10:54:26.757 screencap7[58735:97225761] 📨 GET /frame?1750841666746
+
+ScreenCap: 2025-06-25 10:54:26.781 screencap7[58735:97225761] 📨 GET /frame?1750841666780
+
+ScreenCap: 2025-06-25 10:54:26.814 screencap7[58735:97225659] 📨 GET /frame?1750841666813
+
+ScreenCap: 2025-06-25 10:54:26.847 screencap7[58735:97225659] 📨 GET /frame?1750841666846
+
+ScreenCap: 2025-06-25 10:54:26.879 screencap7[58735:97225659] 📨 GET /frame?1750841666878
+

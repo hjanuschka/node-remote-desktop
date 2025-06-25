@@ -28,7 +28,7 @@ async function startServerScreenCapture() {
     
     // Compile main capture binary first
     const compileScreencap = new Promise((resolve, reject) => {
-      exec(`cd "${nativeDir}" && clang -o screencap7 screencap7_clean.m vp9_encoder.m -framework Foundation -framework ScreenCaptureKit -framework CoreMedia -framework CoreVideo -framework ImageIO -framework UniformTypeIdentifiers -framework CoreGraphics -framework AppKit -framework VideoToolbox -framework QuartzCore`, (error) => {
+      exec(`cd "${nativeDir}" && clang -o screencap7 screencap7_clean.m -framework Foundation -framework ScreenCaptureKit -framework CoreMedia -framework CoreVideo -framework ImageIO -framework UniformTypeIdentifiers -framework CoreGraphics -framework AppKit`, (error) => {
         if (error) {
           console.error('❌ Failed to compile screencap7:', error.message);
           reject(error);

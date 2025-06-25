@@ -7,7 +7,7 @@
 #import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #import <CoreGraphics/CoreGraphics.h>
 #import <ApplicationServices/ApplicationServices.h>
-#import "vp9_encoder.h"
+// VP9 encoder removed - using High Quality JPEG instead
 
 typedef enum {
     CaptureTypeFullDesktop = 0,
@@ -26,9 +26,7 @@ typedef enum {
 @property (nonatomic, assign) BOOL isCapturing;
 @property (nonatomic, strong) NSString *cachedWindowsList;
 @property (nonatomic, strong) NSTimer *windowsUpdateTimer;
-@property (nonatomic, strong) VP9Encoder *vp9Encoder;
 @property (nonatomic, assign) BOOL useVP9Mode;
-@property (nonatomic, strong) NSMutableData *currentEncodedFrame;
 @end
 
 @implementation ScreenCapture
@@ -46,7 +44,6 @@ typedef enum {
         self.captureType = captureType;
         self.targetIndex = targetIndex;
         self.currentFrame = [NSMutableData data];
-        self.currentEncodedFrame = [NSMutableData data];
         self.isCapturing = NO;
         self.cachedWindowsList = @"[]"; // Default empty list
         [self startWindowsCaching];
@@ -823,11 +820,7 @@ typedef enum {
     }
 }
 
-- (NSData *)getCurrentEncodedFrame {
-    @synchronized(self.currentEncodedFrame) {
-        return [self.currentEncodedFrame copy];
-    }
-}
+// getCurrentEncodedFrame method removed - using High Quality JPEG instead
 
 - (void)startCaptureWithType:(CaptureType)captureType targetIndex:(int)targetIndex {
     [self startCaptureWithType:captureType targetIndex:targetIndex vp9Mode:NO];
@@ -1235,7 +1228,6 @@ void listApplicationsAndWindows() {
     NSLog(@"   GET  /windows        - List windows (Core Graphics)");
     NSLog(@"   GET  /display        - Get display info (resolution, scaling)");
     NSLog(@"   GET  /frame          - Get current frame (JPEG)");
-    NSLog(@"   GET  /vp9-frame      - Get current VP9 encoded frame");
     NSLog(@"   POST /capture        - Start capture {type, index}");
     NSLog(@"   POST /click          - Send click {x, y}");
     NSLog(@"   POST /click-window   - Send click to window {x, y, cgWindowID}");
@@ -1336,8 +1328,7 @@ void listApplicationsAndWindows() {
         [self sendDisplayInfoResponse:client_fd];
     } else if ([method isEqualToString:@"GET"] && [path isEqualToString:@"/frame"]) {
         [self sendFrameResponse:client_fd];
-    } else if ([method isEqualToString:@"GET"] && [path isEqualToString:@"/vp9-frame"]) {
-        [self sendVP9FrameResponse:client_fd];
+    // VP9 frame endpoint removed - using High Quality JPEG instead
     } else if ([method isEqualToString:@"POST"] && [path isEqualToString:@"/click"]) {
         [self handleClickRequest:client_fd request:request];
     } else if ([method isEqualToString:@"POST"] && [path isEqualToString:@"/click-window"]) {
@@ -1436,22 +1427,7 @@ void listApplicationsAndWindows() {
     send(client_fd, frameData.bytes, frameData.length, 0);
 }
 
-- (void)sendVP9FrameResponse:(int)client_fd {
-    NSData *frameData = [self.captureServer getCurrentEncodedFrame];
-    
-    if (frameData.length == 0) {
-        // No VP9 frame yet, send 204 No Content
-        NSString *header = @"HTTP/1.1 204 No Content\r\nAccess-Control-Allow-Origin: *\r\n\r\n";
-        send(client_fd, [header UTF8String], header.length, 0);
-        return;
-    }
-    
-    NSString *header = [NSString stringWithFormat:@"HTTP/1.1 200 OK\r\nContent-Type: video/vp9\r\nContent-Length: %lu\r\nAccess-Control-Allow-Origin: *\r\nCache-Control: no-cache\r\n\r\n", 
-                       (unsigned long)frameData.length];
-    
-    send(client_fd, [header UTF8String], header.length, 0);
-    send(client_fd, frameData.bytes, frameData.length, 0);
-}
+// VP9 frame response method removed - using High Quality JPEG instead
 
 - (void)handleClickRequest:(int)client_fd request:(NSString *)request {
     NSRange bodyRange = [request rangeOfString:@"\r\n\r\n"];
