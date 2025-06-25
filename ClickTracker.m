@@ -24,107 +24,129 @@
 }
 
 - (void)createWindow {
-    // Create window
-    NSRect windowFrame = NSMakeRect(100, 100, 500, 500);
-    self.window = [[NSWindow alloc] initWithContentRect:windowFrame
-                                              styleMask:(NSWindowStyleMaskTitled | 
-                                                       NSWindowStyleMaskClosable | 
-                                                       NSWindowStyleMaskMiniaturizable)
+    // Create fullscreen window for accurate coordinate testing
+    NSScreen *mainScreen = [NSScreen mainScreen];
+    NSRect screenFrame = [mainScreen frame];
+    self.window = [[NSWindow alloc] initWithContentRect:screenFrame
+                                              styleMask:NSWindowStyleMaskBorderless
                                                 backing:NSBackingStoreBuffered
                                                   defer:NO];
     
-    [self.window setTitle:@"Click Tracker"];
+    [self.window setTitle:@"Click Tracker - Fullscreen"];
     [self.window setReleasedWhenClosed:NO];
+    [self.window setLevel:NSFloatingWindowLevel]; // Keep on top
+    [self.window setBackgroundColor:[NSColor blackColor]];
     
     // Create content view
-    NSView *contentView = [[NSView alloc] initWithFrame:windowFrame];
+    NSView *contentView = [[NSView alloc] initWithFrame:screenFrame];
     [self.window setContentView:contentView];
     
-    // Title label
-    NSTextField *titleLabel = [[NSTextField alloc] initWithFrame:NSMakeRect(20, 450, 460, 30)];
-    [titleLabel setStringValue:@"Click Tracker - Coordinate Testing"];
+    // Calculate centered positions for fullscreen
+    CGFloat screenWidth = screenFrame.size.width;
+    CGFloat screenHeight = screenFrame.size.height;
+    CGFloat centerX = screenWidth / 2;
+    
+    // Title label - centered at top
+    NSTextField *titleLabel = [[NSTextField alloc] initWithFrame:NSMakeRect(centerX - 300, screenHeight - 100, 600, 40)];
+    [titleLabel setStringValue:@"CLICK TRACKER - FULLSCREEN COORDINATE TESTING"];
     [titleLabel setBezeled:NO];
     [titleLabel setDrawsBackground:NO];
     [titleLabel setEditable:NO];
     [titleLabel setSelectable:NO];
-    [titleLabel setFont:[NSFont boldSystemFontOfSize:16]];
+    [titleLabel setAlignment:NSTextAlignmentCenter];
+    [titleLabel setFont:[NSFont boldSystemFontOfSize:24]];
+    [titleLabel setTextColor:[NSColor whiteColor]];
     [contentView addSubview:titleLabel];
     
-    // Status label
-    self.statusLabel = [[NSTextField alloc] initWithFrame:NSMakeRect(20, 420, 460, 20)];
+    // Status label - centered
+    self.statusLabel = [[NSTextField alloc] initWithFrame:NSMakeRect(centerX - 300, screenHeight - 150, 600, 30)];
     [self.statusLabel setStringValue:@"Connecting to server..."];
     [self.statusLabel setBezeled:NO];
     [self.statusLabel setDrawsBackground:NO];
     [self.statusLabel setEditable:NO];
     [self.statusLabel setSelectable:NO];
+    [self.statusLabel setAlignment:NSTextAlignmentCenter];
+    [self.statusLabel setFont:[NSFont systemFontOfSize:18]];
+    [self.statusLabel setTextColor:[NSColor yellowColor]];
     [contentView addSubview:self.statusLabel];
     
-    // Coordinates label
-    self.coordsLabel = [[NSTextField alloc] initWithFrame:NSMakeRect(20, 390, 460, 20)];
-    [self.coordsLabel setStringValue:@"Click anywhere in this window to test coordinates"];
+    // Coordinates label - centered
+    self.coordsLabel = [[NSTextField alloc] initWithFrame:NSMakeRect(centerX - 400, screenHeight/2 + 100, 800, 30)];
+    [self.coordsLabel setStringValue:@"Click anywhere on this fullscreen window to test coordinates"];
     [self.coordsLabel setBezeled:NO];
     [self.coordsLabel setDrawsBackground:NO];
     [self.coordsLabel setEditable:NO];
     [self.coordsLabel setSelectable:NO];
+    [self.coordsLabel setAlignment:NSTextAlignmentCenter];
+    [self.coordsLabel setFont:[NSFont systemFontOfSize:16]];
+    [self.coordsLabel setTextColor:[NSColor cyanColor]];
     [contentView addSubview:self.coordsLabel];
     
-    // Instructions
-    NSTextField *instructions = [[NSTextField alloc] initWithFrame:NSMakeRect(20, 300, 460, 80)];
-    [instructions setStringValue:@"This 500x500px window will:\n• Track your clicks in this window\n• Send coordinates to the screencap7 server\n• Log both local and server coordinates\n• Test both full screen and window capture modes"];
+    // Instructions - centered
+    NSTextField *instructions = [[NSTextField alloc] initWithFrame:NSMakeRect(centerX - 400, screenHeight/2, 800, 80)];
+    [instructions setStringValue:@"FULLSCREEN COORDINATE TESTING:\n• Click anywhere to track coordinates\n• Data sent to screencap7 server\n• Press ESC to exit fullscreen"];
     [instructions setBezeled:NO];
     [instructions setDrawsBackground:NO];
     [instructions setEditable:NO];
     [instructions setSelectable:NO];
+    [instructions setAlignment:NSTextAlignmentCenter];
+    [instructions setFont:[NSFont systemFontOfSize:16]];
+    [instructions setTextColor:[NSColor lightGrayColor]];
     [contentView addSubview:instructions];
     
-    // Connect button
-    self.connectButton = [[NSButton alloc] initWithFrame:NSMakeRect(200, 250, 100, 30)];
+    // Connect button - centered
+    self.connectButton = [[NSButton alloc] initWithFrame:NSMakeRect(centerX - 50, screenHeight/2 - 100, 100, 40)];
     [self.connectButton setTitle:@"Reconnect"];
     [self.connectButton setTarget:self];
     [self.connectButton setAction:@selector(reconnectToServer:)];
+    [self.connectButton setFont:[NSFont systemFontOfSize:16]];
     [contentView addSubview:self.connectButton];
     
-    // Server URL label
-    NSTextField *urlLabel = [[NSTextField alloc] initWithFrame:NSMakeRect(20, 220, 460, 20)];
-    [urlLabel setStringValue:[NSString stringWithFormat:@"Server: %@", self.serverURL]];
-    [urlLabel setBezeled:NO];
-    [urlLabel setDrawsBackground:NO];
-    [urlLabel setEditable:NO];
-    [urlLabel setSelectable:NO];
-    [urlLabel setFont:[NSFont systemFontOfSize:11]];
-    [contentView addSubview:urlLabel];
-    
-    // Window info
-    NSTextField *windowInfo = [[NSTextField alloc] initWithFrame:NSMakeRect(20, 190, 460, 20)];
+    // Window info - centered at bottom
     CGWindowID windowID = (CGWindowID)[self.window windowNumber];
-    [windowInfo setStringValue:[NSString stringWithFormat:@"This window's CGWindowID: %d (500x500px)", (int)windowID]];
+    NSTextField *windowInfo = [[NSTextField alloc] initWithFrame:NSMakeRect(centerX - 300, 50, 600, 40)];
+    [windowInfo setStringValue:[NSString stringWithFormat:@"CGWindowID: %d | Resolution: %.0fx%.0f | Server: %@", 
+                               (int)windowID, screenWidth, screenHeight, self.serverURL]];
     [windowInfo setBezeled:NO];
     [windowInfo setDrawsBackground:NO];
     [windowInfo setEditable:NO];
     [windowInfo setSelectable:NO];
-    [windowInfo setFont:[NSFont systemFontOfSize:11]];
+    [windowInfo setAlignment:NSTextAlignmentCenter];
+    [windowInfo setFont:[NSFont systemFontOfSize:14]];
+    [windowInfo setTextColor:[NSColor darkGrayColor]];
     [contentView addSubview:windowInfo];
     
-    // Large click area visualization
-    NSTextField *clickArea = [[NSTextField alloc] initWithFrame:NSMakeRect(50, 50, 400, 120)];
-    [clickArea setStringValue:@"LARGE CLICK AREA\n\nClick anywhere in this area to test coordinate accuracy.\nThis will help compare:\n• Client coordinates (from web UI)\n• Server coordinates (screencap7 processing)\n• Native app coordinates (this app)"];
-    [clickArea setBezeled:YES];
-    [clickArea setDrawsBackground:YES];
-    [clickArea setBackgroundColor:[NSColor colorWithWhite:0.95 alpha:1.0]];
-    [clickArea setEditable:NO];
-    [clickArea setSelectable:NO];
-    [clickArea setAlignment:NSTextAlignmentCenter];
-    [clickArea setFont:[NSFont systemFontOfSize:14]];
-    [contentView addSubview:clickArea];
-    
-    // Set up click tracking
+    // Set up click tracking for fullscreen
     [contentView setAcceptsTouchEvents:YES];
     
     // Add click gesture recognizer
     NSClickGestureRecognizer *clickGesture = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(handleClick:)];
     [contentView addGestureRecognizer:clickGesture];
     
+    // Add ESC key handler
+    [self.window setAcceptsMouseMovedEvents:YES];
     [self.window makeKeyAndOrderFront:nil];
+    
+    // Add exit instructions
+    NSTextField *exitLabel = [[NSTextField alloc] initWithFrame:NSMakeRect(centerX - 200, 100, 400, 30)];
+    [exitLabel setStringValue:@"Press ESC or Cmd+Q to exit fullscreen"];
+    [exitLabel setBezeled:NO];
+    [exitLabel setDrawsBackground:NO];
+    [exitLabel setEditable:NO];
+    [exitLabel setSelectable:NO];
+    [exitLabel setAlignment:NSTextAlignmentCenter];
+    [exitLabel setFont:[NSFont systemFontOfSize:12]];
+    [exitLabel setTextColor:[NSColor redColor]];
+    [contentView addSubview:exitLabel];
+}
+
+// Handle key events for ESC to exit
+- (void)keyDown:(NSEvent *)event {
+    if (event.keyCode == 53) { // ESC key
+        [NSApp terminate:self];
+    } else {
+        [super keyDown:event];
+    }
 }
 
 - (void)handleClick:(NSClickGestureRecognizer *)gesture {
