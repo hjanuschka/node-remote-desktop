@@ -593,11 +593,21 @@ typedef enum {
 }
 
 - (void)performKeyPress:(NSString *)key {
-    [self performKeyPress:key targetWindowID:0];
+    [self performKeyPress:key withModifiers:NO ctrl:NO alt:NO shift:NO];
 }
 
 - (void)performKeyPress:(NSString *)key targetWindowID:(UInt32)windowID {
-    NSLog(@"⌨️ Key press: %@ (target window: %u)", key, windowID);
+    [self performKeyPress:key withModifiers:NO ctrl:NO alt:NO shift:NO targetWindowID:windowID];
+}
+
+// New methods with modifier support
+- (void)performKeyPress:(NSString *)key withModifiers:(BOOL)cmd ctrl:(BOOL)ctrl alt:(BOOL)alt shift:(BOOL)shift {
+    [self performKeyPress:key withModifiers:cmd ctrl:ctrl alt:alt shift:shift targetWindowID:0];
+}
+
+- (void)performKeyPress:(NSString *)key withModifiers:(BOOL)cmd ctrl:(BOOL)ctrl alt:(BOOL)alt shift:(BOOL)shift targetWindowID:(UInt32)windowID {
+    NSLog(@"⌨️ Key press with modifiers: %@ (target window: %u, cmd:%@, ctrl:%@, alt:%@, shift:%@)", 
+          key, windowID, cmd ? @"YES" : @"NO", ctrl ? @"YES" : @"NO", alt ? @"YES" : @"NO", shift ? @"YES" : @"NO");
     
     if (!key || key.length == 0) {
         NSLog(@"❌ Empty key string");
@@ -618,80 +628,123 @@ typedef enum {
     }
     
     CGKeyCode keyCode = 0;
-    unichar character = [key characterAtIndex:0];
-    NSLog(@"🔤 Processing character: '%c' (unicode: %d)", character, character);
+    NSLog(@"🔤 Processing key: '%@'", key);
 
-    // Complete key mapping for all letters and common keys
-    switch (character) {
-        case 'a': case 'A': keyCode = 0; break;
-        case 's': case 'S': keyCode = 1; break;
-        case 'd': case 'D': keyCode = 2; break;
-        case 'f': case 'F': keyCode = 3; break;
-        case 'h': case 'H': keyCode = 4; break;
-        case 'g': case 'G': keyCode = 5; break;
-        case 'z': case 'Z': keyCode = 6; break;
-        case 'x': case 'X': keyCode = 7; break;
-        case 'c': case 'C': keyCode = 8; break;
-        case 'v': case 'V': keyCode = 9; break;
-        case 'b': case 'B': keyCode = 11; break;
-        case 'q': case 'Q': keyCode = 12; break;
-        case 'w': case 'W': keyCode = 13; break;
-        case 'e': case 'E': keyCode = 14; break;
-        case 'r': case 'R': keyCode = 15; break;
-        case 'y': case 'Y': keyCode = 16; break;
-        case 't': case 'T': keyCode = 17; break;
-        case '1': keyCode = 18; break;
-        case '2': keyCode = 19; break;
-        case '3': keyCode = 20; break;
-        case '4': keyCode = 21; break;
-        case '6': keyCode = 22; break;
-        case '5': keyCode = 23; break;
-        case '=': keyCode = 24; break;
-        case '9': keyCode = 25; break;
-        case '7': keyCode = 26; break;
-        case '-': keyCode = 27; break;
-        case '8': keyCode = 28; break;
-        case '0': keyCode = 29; break;
-        case ']': keyCode = 30; break;
-        case 'o': case 'O': keyCode = 31; break;
-        case 'u': case 'U': keyCode = 32; break;
-        case '[': keyCode = 33; break;
-        case 'i': case 'I': keyCode = 34; break;
-        case 'p': case 'P': keyCode = 35; break;
-        case 'l': case 'L': keyCode = 37; break;
-        case 'j': case 'J': keyCode = 38; break;
-        case '\'': keyCode = 39; break;
-        case 'k': case 'K': keyCode = 40; break;
-        case ';': keyCode = 41; break;
-        case '\\': keyCode = 42; break;
-        case ',': keyCode = 43; break;
-        case '/': keyCode = 44; break;
-        case 'n': case 'N': keyCode = 45; break;
-        case 'm': case 'M': keyCode = 46; break;
-        case '.': keyCode = 47; break;
-        case ' ': keyCode = 49; break; // Space
-        default:
-            NSLog(@"❓ Unknown key: %@", key);
-            return;
+    // Handle special keys first (from event.key strings)
+    if ([key isEqualToString:@"Enter"] || [key isEqualToString:@"Return"]) {
+        keyCode = 36; // Return/Enter
+    } else if ([key isEqualToString:@"Backspace"]) {
+        keyCode = 51; // Delete/Backspace
+    } else if ([key isEqualToString:@"Delete"]) {
+        keyCode = 117; // Forward Delete
+    } else if ([key isEqualToString:@"Tab"]) {
+        keyCode = 48; // Tab
+    } else if ([key isEqualToString:@"Escape"]) {
+        keyCode = 53; // Escape
+    } else if ([key isEqualToString:@"ArrowUp"]) {
+        keyCode = 126; // Up Arrow
+    } else if ([key isEqualToString:@"ArrowDown"]) {
+        keyCode = 125; // Down Arrow
+    } else if ([key isEqualToString:@"ArrowLeft"]) {
+        keyCode = 123; // Left Arrow
+    } else if ([key isEqualToString:@"ArrowRight"]) {
+        keyCode = 124; // Right Arrow
+    } else if ([key isEqualToString:@"Home"]) {
+        keyCode = 115; // Home
+    } else if ([key isEqualToString:@"End"]) {
+        keyCode = 119; // End
+    } else if ([key isEqualToString:@"PageUp"]) {
+        keyCode = 116; // Page Up
+    } else if ([key isEqualToString:@"PageDown"]) {
+        keyCode = 121; // Page Down
+    } else if (key.length == 1) {
+        // Handle single character keys
+        unichar character = [key characterAtIndex:0];
+        NSLog(@"🔤 Processing character: '%c' (unicode: %d)", character, character);
+
+        switch (character) {
+            case 'a': case 'A': keyCode = 0; break;
+            case 's': case 'S': keyCode = 1; break;
+            case 'd': case 'D': keyCode = 2; break;
+            case 'f': case 'F': keyCode = 3; break;
+            case 'h': case 'H': keyCode = 4; break;
+            case 'g': case 'G': keyCode = 5; break;
+            case 'z': case 'Z': keyCode = 6; break;
+            case 'x': case 'X': keyCode = 7; break;
+            case 'c': case 'C': keyCode = 8; break;
+            case 'v': case 'V': keyCode = 9; break;
+            case 'b': case 'B': keyCode = 11; break;
+            case 'q': case 'Q': keyCode = 12; break;
+            case 'w': case 'W': keyCode = 13; break;
+            case 'e': case 'E': keyCode = 14; break;
+            case 'r': case 'R': keyCode = 15; break;
+            case 'y': case 'Y': keyCode = 16; break;
+            case 't': case 'T': keyCode = 17; break;
+            case '1': keyCode = 18; break;
+            case '2': keyCode = 19; break;
+            case '3': keyCode = 20; break;
+            case '4': keyCode = 21; break;
+            case '6': keyCode = 22; break;
+            case '5': keyCode = 23; break;
+            case '=': keyCode = 24; break;
+            case '9': keyCode = 25; break;
+            case '7': keyCode = 26; break;
+            case '-': keyCode = 27; break;
+            case '8': keyCode = 28; break;
+            case '0': keyCode = 29; break;
+            case ']': keyCode = 30; break;
+            case 'o': case 'O': keyCode = 31; break;
+            case 'u': case 'U': keyCode = 32; break;
+            case '[': keyCode = 33; break;
+            case 'i': case 'I': keyCode = 34; break;
+            case 'p': case 'P': keyCode = 35; break;
+            case 'l': case 'L': keyCode = 37; break;
+            case 'j': case 'J': keyCode = 38; break;
+            case '\'': keyCode = 39; break;
+            case 'k': case 'K': keyCode = 40; break;
+            case ';': keyCode = 41; break;
+            case '\\': keyCode = 42; break;
+            case ',': keyCode = 43; break;
+            case '/': keyCode = 44; break;
+            case 'n': case 'N': keyCode = 45; break;
+            case 'm': case 'M': keyCode = 46; break;
+            case '.': keyCode = 47; break;
+            case ' ': keyCode = 49; break; // Space
+            case '`': keyCode = 50; break; // Backtick
+            default:
+                NSLog(@"❓ Unknown character: '%c' (unicode: %d)", character, character);
+                return;
+        }
+    } else {
+        NSLog(@"❓ Unknown key: %@", key);
+        return;
     }
     
-    NSLog(@"📤 Creating keyboard events for keyCode: %d", keyCode);
+    NSLog(@"📤 Creating keyboard events with modifiers for keyCode: %d", keyCode);
     
-    // Create key events synchronously and post them
+    // Create key events with modifier flags
+    CGEventFlags flags = 0;
+    if (cmd) flags |= kCGEventFlagMaskCommand;
+    if (ctrl) flags |= kCGEventFlagMaskControl;
+    if (alt) flags |= kCGEventFlagMaskAlternate;
+    if (shift) flags |= kCGEventFlagMaskShift;
+    
     CGEventRef keyDown = CGEventCreateKeyboardEvent(NULL, keyCode, true);
     CGEventRef keyUp = CGEventCreateKeyboardEvent(NULL, keyCode, false);
     
-    NSLog(@"📝 Created keyboard events: down=%p, up=%p", keyDown, keyUp);
-    
     if (keyDown && keyUp) {
-        // Always use global events now that the target window is in focus
-        NSLog(@"📤 Posting global keyboard events...");
+        // Always set modifier flags (even if 0 to clear existing flags)
+        CGEventSetFlags(keyDown, flags);
+        CGEventSetFlags(keyUp, flags);
+        NSLog(@"📤 Set modifier flags: 0x%llx", (unsigned long long)flags);
+        
+        NSLog(@"📤 Posting keyboard events with modifiers...");
         CGEventPost(kCGHIDEventTap, keyDown);
         CGEventPost(kCGHIDEventTap, keyUp);
         
         CFRelease(keyDown);
         CFRelease(keyUp);
-        NSLog(@"✅ Key press completed and events released");
+        NSLog(@"✅ Key press with modifiers completed");
     } else {
         NSLog(@"❌ Failed to create keyboard events");
         if (keyDown) CFRelease(keyDown);
@@ -1737,8 +1790,6 @@ void listApplicationsAndWindows() {
     }
     
     NSTimeInterval frameAge = [[NSDate date] timeIntervalSince1970] - self.captureServer.lastFrameTime;
-    NSLog(@"🖼️ Frame request: frameData.length = %lu, isCapturing = %@, frameAge: %.1fs", 
-          frameData.length, actuallyCapturing ? @"YES" : @"NO", frameAge);
     
     if (frameData.length == 0) {
         NSLog(@"❌ No frame data available - sending 404");
@@ -2051,10 +2102,17 @@ void listApplicationsAndWindows() {
     }
     
     NSString *key = json[@"key"];
-    NSLog(@"⌨️ Key press: %@", key);
+    BOOL metaKey = [json[@"metaKey"] boolValue];
+    BOOL ctrlKey = [json[@"ctrlKey"] boolValue];
+    BOOL altKey = [json[@"altKey"] boolValue];
+    BOOL shiftKey = [json[@"shiftKey"] boolValue];
+    
+    NSLog(@"⌨️ Key press: %@ (cmd:%@, ctrl:%@, alt:%@, shift:%@)", 
+          key, metaKey ? @"YES" : @"NO", ctrlKey ? @"YES" : @"NO", 
+          altKey ? @"YES" : @"NO", shiftKey ? @"YES" : @"NO");
     
     @try {
-        [self.captureServer performKeyPress:key];
+        [self.captureServer performKeyPress:key withModifiers:metaKey ctrl:ctrlKey alt:altKey shift:shiftKey];
         [self sendJSONResponse:client_fd data:@{@"status": @"key_pressed", @"key": key}];
         NSLog(@"✅ Key press response sent");
     } @catch (NSException *exception) {
@@ -2146,10 +2204,17 @@ void listApplicationsAndWindows() {
     
     NSString *key = json[@"key"];
     UInt32 windowID = [json[@"cgWindowID"] unsignedIntValue];
-    NSLog(@"⌨️ Window key press: %@ targeting window %u", key, windowID);
+    BOOL metaKey = [json[@"metaKey"] boolValue];
+    BOOL ctrlKey = [json[@"ctrlKey"] boolValue];
+    BOOL altKey = [json[@"altKey"] boolValue];
+    BOOL shiftKey = [json[@"shiftKey"] boolValue];
+    
+    NSLog(@"⌨️ Window key press: %@ targeting window %u (cmd:%@, ctrl:%@, alt:%@, shift:%@)", 
+          key, windowID, metaKey ? @"YES" : @"NO", ctrlKey ? @"YES" : @"NO", 
+          altKey ? @"YES" : @"NO", shiftKey ? @"YES" : @"NO");
     
     @try {
-        [self.captureServer performKeyPress:key targetWindowID:windowID];
+        [self.captureServer performKeyPress:key withModifiers:metaKey ctrl:ctrlKey alt:altKey shift:shiftKey targetWindowID:windowID];
         [self sendJSONResponse:client_fd data:@{@"status": @"key_pressed", @"key": key, @"cgWindowID": @(windowID)}];
         NSLog(@"✅ Window key press response sent");
     } @catch (NSException *exception) {
@@ -2689,8 +2754,8 @@ void listApplicationsAndWindows() {
                      @"            try {\n"
                      @"                const endpoint = currentWindowId === 0 ? '/key' : '/key-window';\n"
                      @"                const body = currentWindowId === 0 ? \n"
-                     @"                    { key: event.key } : \n"
-                     @"                    { key: event.key, cgWindowID: getCGWindowID(currentWindowId) };\n"
+                     @"                    { key: event.key, metaKey: event.metaKey, ctrlKey: event.ctrlKey, altKey: event.altKey, shiftKey: event.shiftKey } : \n"
+                     @"                    { key: event.key, cgWindowID: getCGWindowID(currentWindowId), metaKey: event.metaKey, ctrlKey: event.ctrlKey, altKey: event.altKey, shiftKey: event.shiftKey };\n"
                      @"                \n"
                      @"                await fetch(endpoint, {\n"
                      @"                    method: 'POST',\n"
