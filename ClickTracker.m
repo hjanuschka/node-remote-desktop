@@ -1,7 +1,34 @@
 #import <Cocoa/Cocoa.h>
 #import <Foundation/Foundation.h>
 
-@interface ClickTracker : NSObject
+@protocol ClickableViewDelegate <NSObject>
+- (void)clickableView:(NSView *)view didClickAtPoint:(NSPoint)point;
+@end
+
+@interface ClickableView : NSView
+@property (nonatomic, assign) id<ClickableViewDelegate> delegate;
+@end
+
+@implementation ClickableView
+
+- (void)mouseDown:(NSEvent *)event {
+    NSLog(@"CLICK-CALIBRATE: 🔍 mouseDown detected in ClickableView");
+    NSPoint locationInWindow = [event locationInWindow];
+    NSPoint locationInView = [self convertPoint:locationInWindow fromView:nil];
+    NSPoint mouseLocation = [NSEvent mouseLocation]; // Global screen coordinates
+    
+    NSLog(@"CLICK-CALIBRATE: 🎯 Raw event location: (%.0f, %.0f)", locationInWindow.x, locationInWindow.y);
+    NSLog(@"CLICK-CALIBRATE: 🎯 View coordinates: (%.0f, %.0f)", locationInView.x, locationInView.y);
+    NSLog(@"CLICK-CALIBRATE: 🎯 Mouse screen location: (%.0f, %.0f)", mouseLocation.x, mouseLocation.y);
+    
+    if (self.delegate) {
+        [self.delegate clickableView:self didClickAtPoint:locationInView];
+    }
+}
+
+@end
+
+@interface ClickTracker : NSObject <ClickableViewDelegate>
 @property (nonatomic, strong) NSWindow *window;
 @property (nonatomic, strong) NSTextField *statusLabel;
 @property (nonatomic, strong) NSTextField *coordsLabel;
@@ -116,17 +143,6 @@
     [windowInfo setTextColor:[NSColor darkGrayColor]];
     [contentView addSubview:windowInfo];
     
-    // Set up click tracking for fullscreen
-    [contentView setAcceptsTouchEvents:YES];
-    
-    // Add click gesture recognizer
-    NSClickGestureRecognizer *clickGesture = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(handleClick:)];
-    [contentView addGestureRecognizer:clickGesture];
-    
-    // Add ESC key handler
-    [self.window setAcceptsMouseMovedEvents:YES];
-    [self.window makeKeyAndOrderFront:nil];
-    
     // Add exit instructions
     NSTextField *exitLabel = [[NSTextField alloc] initWithFrame:NSMakeRect(centerX - 200, 100, 400, 30)];
     [exitLabel setStringValue:@"Press ESC or Cmd+Q to exit fullscreen"];
@@ -137,7 +153,28 @@
     [exitLabel setAlignment:NSTextAlignmentCenter];
     [exitLabel setFont:[NSFont systemFontOfSize:12]];
     [exitLabel setTextColor:[NSColor redColor]];
-    [contentView addSubview:exitLabel];
+    
+    // Set up click tracking for fullscreen
+    [contentView setAcceptsTouchEvents:YES];
+    
+    // Override mouse events directly instead of gesture recognizer
+    // Create a custom view that captures mouse events
+    ClickableView *clickView = [[ClickableView alloc] initWithFrame:screenFrame];
+    clickView.delegate = self;
+    [self.window setContentView:clickView];
+    
+    // Re-add all UI elements to the new clickable view
+    [clickView addSubview:titleLabel];
+    [clickView addSubview:self.statusLabel];
+    [clickView addSubview:self.coordsLabel];
+    [clickView addSubview:instructions];
+    [clickView addSubview:self.connectButton];
+    [clickView addSubview:windowInfo];
+    [clickView addSubview:exitLabel];
+    
+    // Add ESC key handler
+    [self.window setAcceptsMouseMovedEvents:YES];
+    [self.window makeKeyAndOrderFront:nil];
 }
 
 // Handle key events for ESC to exit
@@ -149,11 +186,10 @@
     }
 }
 
-- (void)handleClick:(NSClickGestureRecognizer *)gesture {
-    if (gesture.state == NSGestureRecognizerStateEnded) {
-        NSPoint locationInView = [gesture locationInView:gesture.view];
-        NSPoint locationInWindow = [gesture.view convertPoint:locationInView toView:nil];
-        NSPoint locationOnScreen = [self.window convertPointToScreen:locationInWindow];
+- (void)clickableView:(NSView *)view didClickAtPoint:(NSPoint)locationInView {
+    NSLog(@"CLICK-CALIBRATE: 🎯 Processing click from delegate...");
+    NSPoint locationInWindow = [view convertPoint:locationInView toView:nil];
+    NSPoint locationOnScreen = [self.window convertPointToScreen:locationInWindow];
         
         // Get window bounds for context
         NSRect windowFrame = [self.window frame];
@@ -166,32 +202,39 @@
                                locationOnScreen.x, locationOnScreen.y];
         [self.coordsLabel setStringValue:coordsText];
         
+        // Add red dot at click location
+        [self drawRedDotAt:locationInView];
+        
         // Send to server
+        NSLog(@"CLICK-CALIBRATE: 📤 About to send click data to server...");
         [self sendClickToServer:locationInView 
                  windowLocation:locationInWindow 
                  screenLocation:locationOnScreen 
                        windowID:windowID
                     windowFrame:windowFrame];
         
-        NSLog(@"CLICK-CALIBRATE: 🖱️ LOCAL CLICK: View(%.0f,%.0f) Window(%.0f,%.0f) Screen(%.0f,%.0f) WindowID:%d", 
+        NSLog(@"CLICK-CALIBRATE: 🖱️ NATIVE CLICK: View(%.0f,%.0f) Window(%.0f,%.0f) Screen(%.0f,%.0f) WindowID:%d", 
               locationInView.x, locationInView.y,
               locationInWindow.x, locationInWindow.y,
               locationOnScreen.x, locationOnScreen.y, (int)windowID);
-    }
 }
 
 - (void)sendClickToServer:(NSPoint)viewCoords windowLocation:(NSPoint)windowCoords screenLocation:(NSPoint)screenCoords windowID:(CGWindowID)windowID windowFrame:(NSRect)windowFrame {
+    NSLog(@"CLICK-CALIBRATE: 🚀 sendClickToServer called - connected: %@, URL: %@", 
+          self.isConnected ? @"YES" : @"NO", self.serverURL);
+    
     if (!self.isConnected) {
-        NSLog(@"❌ Not connected to server, skipping click report");
+        NSLog(@"CLICK-CALIBRATE: ❌ Not connected to server, skipping click report");
         return;
     }
     
     if (!self.serverURL) {
-        NSLog(@"❌ Server URL is nil, cannot send click data");
+        NSLog(@"CLICK-CALIBRATE: ❌ Server URL is nil, cannot send click data");
         return;
     }
     
     // Create payload with comprehensive coordinate data
+    NSLog(@"CLICK-CALIBRATE: 📝 Creating JSON payload...");
     NSDictionary *payload = @{
         @"event": @"click_tracking",
         @"source": @"ClickTracker_App",
@@ -232,9 +275,11 @@
     NSError *error = nil;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:payload options:0 error:&error];
     if (error || !jsonData) {
-        NSLog(@"❌ JSON serialization error: %@", error ? error.localizedDescription : @"Unknown error");
+        NSLog(@"CLICK-CALIBRATE: ❌ JSON serialization error: %@", error ? error.localizedDescription : @"Unknown error");
         return;
     }
+    
+    NSLog(@"CLICK-CALIBRATE: ✅ JSON created successfully, length: %lu bytes", (unsigned long)jsonData.length);
     
     [request setHTTPBody:jsonData];
     
@@ -256,17 +301,18 @@
         } else {
             NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
             if (httpResponse && httpResponse.statusCode == 200) {
-                NSLog(@"✅ Click data sent to server successfully");
+                NSLog(@"CLICK-CALIBRATE: ✅ Native click data sent to server successfully");
             } else {
-                NSLog(@"⚠️ Server responded with status: %ld", httpResponse ? (long)httpResponse.statusCode : -1);
+                NSLog(@"CLICK-CALIBRATE: ⚠️ Server responded with status: %ld", httpResponse ? (long)httpResponse.statusCode : -1);
             }
         }
     }];
     
     if (task) {
+        NSLog(@"CLICK-CALIBRATE: 🚀 Sending HTTP request to server...");
         [task resume];
     } else {
-        NSLog(@"❌ Failed to create data task");
+        NSLog(@"CLICK-CALIBRATE: ❌ Failed to create data task");
     }
 }
 
@@ -302,6 +348,31 @@
 - (void)reconnectToServer:(id)sender {
     [self.statusLabel setStringValue:@"Connecting..."];
     [self testServerConnection];
+}
+
+- (void)drawRedDotAt:(NSPoint)location {
+    // Remove any existing red dots
+    NSView *contentView = [self.window contentView];
+    NSArray *subviews = [contentView subviews];
+    for (NSView *view in subviews) {
+        if ([view.identifier isEqualToString:@"redDot"]) {
+            [view removeFromSuperview];
+        }
+    }
+    
+    // Create new red dot at click location
+    NSView *redDot = [[NSView alloc] initWithFrame:NSMakeRect(location.x - 5, location.y - 5, 10, 10)];
+    [redDot setWantsLayer:YES];
+    redDot.layer.backgroundColor = [NSColor redColor].CGColor;
+    redDot.layer.cornerRadius = 5.0;
+    redDot.identifier = @"redDot";
+    
+    [contentView addSubview:redDot];
+    
+    // Remove the dot after 3 seconds
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 3 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [redDot removeFromSuperview];
+    });
 }
 
 @end
