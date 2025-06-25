@@ -547,6 +547,9 @@ let cachedDisplayInfo = null;
 const CLICK_OFFSET_X = 0;  // Positive = click more to the right
 const CLICK_OFFSET_Y = 0;  // Positive = click more down
 
+// Debug mode for coordinate testing
+const DEBUG_COORDINATES = process.env.DEBUG_COORDS === 'true';
+
 async function getDisplayInfo() {
   if (cachedDisplayInfo) {
     return cachedDisplayInfo;
@@ -563,7 +566,13 @@ async function getDisplayInfo() {
   }
   
   // Fallback to default if API fails
-  return { width: 3840, height: 1620 };
+  return { 
+    width: 1920,          // Logical width
+    height: 1080,         // Logical height
+    physicalWidth: 3840,  // Physical width (Retina)
+    physicalHeight: 2160, // Physical height (Retina)
+    scaleFactor: 2        // Retina scale factor
+  };
 }
 
 async function sendClickToNativeBinary(x, y, canvasWidth, canvasHeight) {
@@ -574,19 +583,45 @@ async function sendClickToNativeBinary(x, y, canvasWidth, canvasHeight) {
   
   if (platform === 'darwin' && canvasWidth && canvasHeight) {
     console.log('Current capture mode:', currentCaptureMode, 'WindowID:', currentWindowID);
+    
+    // Get display info for scaling calculations
+    const displayInfo = await getDisplayInfo();
+    const scaleFactor = displayInfo.scaleFactor || 2; // Default to 2x for Retina
+    
     if (currentCaptureMode === 'window') {
-      // Window capture: coordinates from browser are already in window space
-      // The frontend getScaledCoords() handles the canvas-to-window scaling
-      scaledX = Math.round(x) + CLICK_OFFSET_X;
-      scaledY = Math.round(y) + CLICK_OFFSET_Y;
-      console.log('Window capture coordinates: ' + x + ',' + y + ' -> ' + scaledX + ',' + scaledY + ' (canvas: ' + canvasWidth + 'x' + canvasHeight + ')');
-    } else {
-      // Desktop capture: Don't scale - use coordinates as-is
-      // The canvas dimensions from ScreenCaptureKit are the actual clickable area
-      scaledX = Math.round(x) + CLICK_OFFSET_X;
-      scaledY = Math.round(y) + CLICK_OFFSET_Y;
+      // Window capture: Need to handle Retina scaling
+      // The canvas might be at 2x resolution, but clicks need logical coordinates
       
-      console.log('Desktop capture direct coordinates: ' + x + ',' + y + ' -> ' + scaledX + ',' + scaledY + ' (canvas ' + canvasWidth + 'x' + canvasHeight + ')');
+      // First, check if we're dealing with a Retina capture
+      // Windows smaller than full screen are often captured at 2x on Retina displays
+      const isRetinaCapture = canvasWidth < displayInfo.physicalWidth && canvasHeight < displayInfo.physicalHeight;
+      
+      if (isRetinaCapture) {
+        // For Retina window captures, we need to scale down by the display scale factor
+        // because the window is captured at physical resolution but clicks use logical coordinates
+        scaledX = Math.round(x / scaleFactor) + CLICK_OFFSET_X;
+        scaledY = Math.round(y / scaleFactor) + CLICK_OFFSET_Y;
+        console.log(`Window capture Retina scaling: ${x},${y} -> ${scaledX},${scaledY} (scale: ${scaleFactor}x, canvas: ${canvasWidth}x${canvasHeight})`);
+      } else {
+        // Non-Retina or full-size window, use coordinates as-is
+        scaledX = Math.round(x) + CLICK_OFFSET_X;
+        scaledY = Math.round(y) + CLICK_OFFSET_Y;
+        console.log(`Window capture direct: ${x},${y} -> ${scaledX},${scaledY} (canvas: ${canvasWidth}x${canvasHeight})`);
+      }
+    } else {
+      // Desktop capture: The coordinates should match the logical display coordinates
+      // ScreenCaptureKit captures at physical resolution, but we need logical coordinates for clicks
+      if (canvasWidth === displayInfo.physicalWidth && canvasHeight === displayInfo.physicalHeight) {
+        // Full desktop at physical resolution - scale down to logical coordinates
+        scaledX = Math.round(x / scaleFactor) + CLICK_OFFSET_X;
+        scaledY = Math.round(y / scaleFactor) + CLICK_OFFSET_Y;
+        console.log(`Desktop capture scaling: ${x},${y} -> ${scaledX},${scaledY} (scale: ${scaleFactor}x, canvas: ${canvasWidth}x${canvasHeight})`);
+      } else {
+        // Already at logical resolution or unknown state
+        scaledX = Math.round(x) + CLICK_OFFSET_X;
+        scaledY = Math.round(y) + CLICK_OFFSET_Y;
+        console.log(`Desktop capture direct: ${x},${y} -> ${scaledX},${scaledY} (canvas: ${canvasWidth}x${canvasHeight})`);
+      }
     }
     
     // Send click command to HTTP API - use window-targeted endpoint if in window mode
@@ -719,6 +754,28 @@ app.get('/coordtest', (req, res) => {
     status: 'Coordinate test app started', 
     pid: testProcess.pid,
     mode: windowed ? 'windowed (500x500)' : 'fullscreen'
+  });
+});
+
+// Route for coordinate debugging info
+app.get('/coord-info', async (req, res) => {
+  const displayInfo = await getDisplayInfo();
+  
+  res.json({
+    captureMode: currentCaptureMode,
+    windowID: currentWindowID,
+    displayInfo: displayInfo,
+    debugMode: DEBUG_COORDINATES,
+    calibrationOffsets: {
+      x: CLICK_OFFSET_X,
+      y: CLICK_OFFSET_Y
+    },
+    instructions: {
+      enableDebug: 'Set DEBUG_COORDS=true environment variable to enable visual debugging',
+      testDesktop: 'Visit /?test=desktop to test desktop capture',
+      testWindow: 'Visit /?test=window to test window capture',
+      coordTest: 'Visit /coordtest to start coordinate test app'
+    }
   });
 });
 
@@ -1126,6 +1183,9 @@ app.get('/', (req, res) => {
     let frameCount = 0;
     let lastSecond = Date.now();
     
+    // Debug mode flag
+    window.DEBUG_COORDINATES = ${DEBUG_COORDINATES};
+    
     // Dynamic host detection for remote access
     const currentHost = window.location.hostname;
     const nativeApiUrl = 'http://' + currentHost + ':8080';
@@ -1503,6 +1563,31 @@ app.get('/', (req, res) => {
     document.getElementById('canvas').addEventListener('click', (e) => {
       if (ws && ws.readyState === WebSocket.OPEN) {
         const coords = getScaledCoords(e);
+        
+        // Visual feedback for debugging
+        if (window.DEBUG_COORDINATES) {
+          const canvas = document.getElementById('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          // Draw a red circle at the click location
+          ctx.fillStyle = 'red';
+          ctx.beginPath();
+          ctx.arc(coords.x, coords.y, 5, 0, 2 * Math.PI);
+          ctx.fill();
+          
+          // Draw coordinates text
+          ctx.fillStyle = 'white';
+          ctx.font = '12px monospace';
+          ctx.fillText('(' + coords.x + ', ' + coords.y + ')', coords.x + 10, coords.y - 10);
+          
+          // Log detailed coordinate info
+          console.log('=== CLICK DEBUG ===');
+          console.log('Browser click:', e.clientX, e.clientY);
+          console.log('Canvas coords:', coords.x, coords.y);
+          console.log('Canvas size:', canvas.width, 'x', canvas.height);
+          console.log('Display size:', canvas.style.width, 'x', canvas.style.height);
+          console.log('==================');
+        }
         
         ws.send(JSON.stringify({
           type: 'input',
