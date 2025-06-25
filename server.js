@@ -28,7 +28,7 @@ async function startServerScreenCapture() {
     
     // Compile main capture binary first
     const compileScreencap = new Promise((resolve, reject) => {
-      exec(`cd "${nativeDir}" && clang -o screencap7 screencap7_clean.m -framework Foundation -framework ScreenCaptureKit -framework CoreMedia -framework CoreVideo -framework ImageIO -framework UniformTypeIdentifiers -framework CoreGraphics -framework AppKit`, (error) => {
+      exec(`cd "${nativeDir}" && clang -o screencap7 screencap7_clean.m webrtc_encoder.m -framework Foundation -framework ScreenCaptureKit -framework CoreMedia -framework CoreVideo -framework ImageIO -framework UniformTypeIdentifiers -framework CoreGraphics -framework AppKit -framework VideoToolbox -framework QuartzCore`, (error) => {
         if (error) {
           console.error('❌ Failed to compile screencap7:', error.message);
           reject(error);
@@ -150,7 +150,10 @@ async function switchToWindowCapture(cgWindowID) {
     const response = await fetch('http://127.0.0.1:8080/capture-window', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cgWindowID: parseInt(cgWindowID) })
+      body: JSON.stringify({ 
+        cgWindowID: parseInt(cgWindowID),
+        webrtc: selectedMode === 'webrtc'
+      })
     });
     
     if (response.ok) {
@@ -248,7 +251,10 @@ app.post('/switch-window', async (req, res) => {
     const response = await fetch('http://127.0.0.1:8080/capture-window', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cgWindowID: parseInt(cgWindowID) })
+      body: JSON.stringify({ 
+        cgWindowID: parseInt(cgWindowID),
+        webrtc: selectedMode === 'webrtc'
+      })
     });
     
     if (response.ok) {
@@ -779,6 +785,507 @@ app.get('/coord-info', async (req, res) => {
   });
 });
 
+// WebRTC Signaling Server Implementation
+let webrtcSessions = new Map();
+let webrtcOffers = new Map();
+let currentSessionId = null;
+
+// Create WebRTC session
+app.post('/webrtc/session', (req, res) => {
+  const sessionId = uuidv4();
+  webrtcSessions.set(sessionId, {
+    id: sessionId,
+    created: Date.now(),
+    state: 'created',
+    offer: null,
+    answer: null,
+    candidates: []
+  });
+  
+  console.log(`🎯 Created WebRTC session: ${sessionId}`);
+  res.json({ sessionId });
+});
+
+// Handle WebRTC offer from client
+app.post('/webrtc/offer', (req, res) => {
+  const { sessionId, offer } = req.body;
+  
+  if (!sessionId || !webrtcSessions.has(sessionId)) {
+    return res.status(400).json({ error: 'Invalid session ID' });
+  }
+  
+  const session = webrtcSessions.get(sessionId);
+  session.offer = offer;
+  session.state = 'offer_received';
+  currentSessionId = sessionId;
+  
+  console.log(`📨 Received WebRTC offer for session: ${sessionId}`);
+  res.json({ status: 'offer_received' });
+});
+
+// Handle WebRTC answer from server
+app.post('/webrtc/answer', (req, res) => {
+  const { sessionId, answer } = req.body;
+  
+  if (!sessionId || !webrtcSessions.has(sessionId)) {
+    return res.status(400).json({ error: 'Invalid session ID' });
+  }
+  
+  const session = webrtcSessions.get(sessionId);
+  session.answer = answer;
+  session.state = 'answer_sent';
+  
+  console.log(`📤 Sent WebRTC answer for session: ${sessionId}`);
+  res.json({ status: 'answer_sent' });
+});
+
+// Handle ICE candidates
+app.post('/webrtc/ice', (req, res) => {
+  const { sessionId, candidate } = req.body;
+  
+  if (!sessionId || !webrtcSessions.has(sessionId)) {
+    return res.status(400).json({ error: 'Invalid session ID' });
+  }
+  
+  const session = webrtcSessions.get(sessionId);
+  session.candidates.push(candidate);
+  
+  console.log(`🧊 Received ICE candidate for session: ${sessionId}`);
+  res.json({ status: 'candidate_added' });
+});
+
+// Get session info
+app.get('/webrtc/session/:sessionId', (req, res) => {
+  const { sessionId } = req.params;
+  
+  if (!webrtcSessions.has(sessionId)) {
+    return res.status(404).json({ error: 'Session not found' });
+  }
+  
+  const session = webrtcSessions.get(sessionId);
+  res.json(session);
+});
+
+// Get latest offer for server to respond to
+app.get('/webrtc/latest-offer', (req, res) => {
+  if (!currentSessionId || !webrtcSessions.has(currentSessionId)) {
+    return res.json({ offer: null });
+  }
+  
+  const session = webrtcSessions.get(currentSessionId);
+  res.json({ 
+    sessionId: currentSessionId,
+    offer: session.offer,
+    state: session.state
+  });
+});
+
+// WebRTC streaming page
+app.get('/webrtc', (req, res) => {
+  res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebRTC Ultra-Low Latency Remote Desktop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      background: #000; color: white; 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+    }
+    
+    #status {
+      position: fixed; top: 20px; left: 20px; z-index: 1000;
+      background: rgba(0,0,0,0.8); padding: 15px 20px; border-radius: 10px;
+      font-weight: 600; font-size: 14px; border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    #controls {
+      position: fixed; top: 20px; right: 20px; z-index: 1000;
+      display: flex; gap: 10px;
+    }
+    
+    .btn {
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: white; border: none; padding: 10px 15px; border-radius: 8px;
+      cursor: pointer; font-weight: 600; font-size: 13px;
+      transition: transform 0.2s ease;
+    }
+    
+    .btn:hover { transform: translateY(-2px); }
+    
+    .btn.danger {
+      background: linear-gradient(45deg, #ff4757, #ff6b7a);
+    }
+    
+    #video-container {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      display: flex; justify-content: center; align-items: center;
+    }
+    
+    #remoteVideo {
+      max-width: 100%; max-height: 100%; 
+      object-fit: contain; cursor: crosshair;
+      border: 2px solid #00ff88; border-radius: 8px;
+    }
+    
+    #stats {
+      position: fixed; bottom: 20px; left: 20px; z-index: 1000;
+      background: rgba(0,0,0,0.8); padding: 10px 15px; border-radius: 8px;
+      font-family: 'SF Mono', monospace; font-size: 12px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .connecting {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 100vh; gap: 20px;
+    }
+    
+    .spinner {
+      width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.3);
+      border-top: 3px solid #00ff88; border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .error {
+      background: linear-gradient(45deg, #ff4757, #ff6b7a);
+      padding: 20px; border-radius: 10px; max-width: 500px; text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="status">🚀 Initializing WebRTC...</div>
+  
+  <div id="controls">
+    <button class="btn" onclick="toggleStats()">📊 Stats</button>
+    <button class="btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    <button class="btn danger" onclick="disconnect()">✕ Exit</button>
+  </div>
+  
+  <div id="video-container">
+    <div class="connecting">
+      <div class="spinner"></div>
+      <h2>Connecting to Ultra-Low Latency Stream...</h2>
+      <p>Establishing WebRTC P2P connection</p>
+    </div>
+  </div>
+  
+  <div id="stats" style="display:none;">
+    <div>📹 Video: <span id="video-stats">Connecting...</span></div>
+    <div>🌐 Network: <span id="network-stats">--</span></div>
+    <div>⚡ Latency: <span id="latency-stats">--</span></div>
+    <div>🎯 Input: <span id="input-stats">--</span></div>
+  </div>
+  
+  <script>
+    let peerConnection = null;
+    let dataChannel = null;
+    let sessionId = null;
+    let statsInterval = null;
+    let lastInputTime = 0;
+    let frameCount = 0;
+    let startTime = Date.now();
+    
+    // WebRTC configuration with multiple STUN servers
+    const rtcConfig = {
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' },
+        { urls: 'stun:stun2.l.google.com:19302' }
+      ],
+      iceCandidatePoolSize: 10
+    };
+    
+    async function initializeWebRTC() {
+      try {
+        updateStatus('🔗 Creating WebRTC session...');
+        
+        // Create session
+        const sessionResponse = await fetch('/webrtc/session', { method: 'POST' });
+        const { sessionId: newSessionId } = await sessionResponse.json();
+        sessionId = newSessionId;
+        
+        updateStatus('🎯 Setting up peer connection...');
+        
+        // Create peer connection
+        peerConnection = new RTCPeerConnection(rtcConfig);
+        
+        // Handle incoming stream
+        peerConnection.ontrack = handleRemoteStream;
+        
+        // Handle data channel
+        peerConnection.ondatachannel = handleDataChannel;
+        
+        // Handle ICE candidates
+        peerConnection.onicecandidate = handleIceCandidate;
+        
+        // Handle connection state
+        peerConnection.onconnectionstatechange = handleConnectionStateChange;
+        
+        updateStatus('📱 Requesting screen capture...');
+        
+        // Get display media with optimal settings
+        const stream = await navigator.mediaDevices.getDisplayMedia({
+          video: {
+            width: { ideal: 1920, max: 3840 },
+            height: { ideal: 1080, max: 2160 },
+            frameRate: { ideal: 60, max: 120 },
+            cursor: 'always'
+          },
+          audio: true
+        });
+        
+        // Add tracks to peer connection
+        stream.getTracks().forEach(track => {
+          peerConnection.addTrack(track, stream);
+        });
+        
+        // Create data channel for input
+        dataChannel = peerConnection.createDataChannel('input', {
+          ordered: false,
+          maxRetransmits: 0,
+          maxPacketLifeTime: 50
+        });
+        
+        dataChannel.onopen = () => {
+          updateStatus('✅ Input channel ready');
+          console.log('🎮 Input data channel opened');
+        };
+        
+        updateStatus('📤 Creating offer...');
+        
+        // Create and send offer
+        const offer = await peerConnection.createOffer({
+          offerToReceiveAudio: false,
+          offerToReceiveVideo: false
+        });
+        
+        await peerConnection.setLocalDescription(offer);
+        
+        // Send offer to server
+        await fetch('/webrtc/offer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId, offer })
+        });
+        
+        updateStatus('⏳ Waiting for remote connection...');
+        
+        // Poll for answer
+        pollForAnswer();
+        
+      } catch (error) {
+        console.error('WebRTC initialization failed:', error);
+        showError('Failed to initialize WebRTC: ' + error.message);
+      }
+    }
+    
+    async function pollForAnswer() {
+      try {
+        const response = await fetch('/webrtc/session/' + sessionId);
+        const session = await response.json();
+        
+        if (session.answer) {
+          await peerConnection.setRemoteDescription(session.answer);
+          updateStatus('🎉 Connected! Ultra-low latency active');
+          startStatsMonitoring();
+        } else {
+          setTimeout(pollForAnswer, 1000);
+        }
+      } catch (error) {
+        console.error('Polling error:', error);
+        setTimeout(pollForAnswer, 2000);
+      }
+    }
+    
+    function handleRemoteStream(event) {
+      const [stream] = event.streams;
+      const video = document.getElementById('remoteVideo');
+      
+      if (!video) {
+        // Create video element
+        const videoElement = document.createElement('video');
+        videoElement.id = 'remoteVideo';
+        videoElement.autoplay = true;
+        videoElement.muted = true;
+        videoElement.playsInline = true;
+        videoElement.style.cssText = 'max-width:100%; max-height:100%; object-fit:contain; cursor:crosshair; border:2px solid #00ff88; border-radius:8px;';
+        
+        document.querySelector('.connecting').style.display = 'none';
+        document.getElementById('video-container').appendChild(videoElement);
+        
+        videoElement.srcObject = stream;
+        setupInputHandlers(videoElement);
+        
+        updateStatus('📺 Video stream connected');
+      }
+    }
+    
+    function handleDataChannel(event) {
+      const channel = event.channel;
+      console.log('📨 Data channel received:', channel.label);
+    }
+    
+    function handleIceCandidate(event) {
+      if (event.candidate) {
+        fetch('/webrtc/ice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            sessionId, 
+            candidate: event.candidate 
+          })
+        });
+      }
+    }
+    
+    function handleConnectionStateChange() {
+      const state = peerConnection.connectionState;
+      console.log('🔗 Connection state:', state);
+      
+      if (state === 'connected') {
+        updateStatus('🚀 WebRTC Connected - Ultra Low Latency Active!');
+      } else if (state === 'failed') {
+        showError('Connection failed. Please refresh and try again.');
+      }
+    }
+    
+    function setupInputHandlers(video) {
+      // Mouse click handler
+      video.addEventListener('click', (e) => {
+        const coords = getVideoCoordinates(e, video);
+        sendInput('click', coords.x, coords.y, e.button);
+        lastInputTime = performance.now();
+      });
+      
+      // Mouse move handler (throttled)
+      let mouseMoveTimeout = null;
+      video.addEventListener('mousemove', (e) => {
+        if (mouseMoveTimeout) return;
+        
+        mouseMoveTimeout = setTimeout(() => {
+          const coords = getVideoCoordinates(e, video);
+          sendInput('mousemove', coords.x, coords.y);
+          mouseMoveTimeout = null;
+        }, 16); // ~60fps
+      });
+      
+      // Keyboard handler
+      document.addEventListener('keydown', (e) => {
+        if (document.getElementById('remoteVideo')) {
+          e.preventDefault();
+          sendInput('keydown', 0, 0, 0, e.key);
+          lastInputTime = performance.now();
+        }
+      });
+      
+      console.log('🎮 Input handlers setup complete');
+    }
+    
+    function getVideoCoordinates(event, video) {
+      const rect = video.getBoundingClientRect();
+      const scaleX = video.videoWidth / rect.width;
+      const scaleY = video.videoHeight / rect.height;
+      
+      return {
+        x: Math.round((event.clientX - rect.left) * scaleX),
+        y: Math.round((event.clientY - rect.top) * scaleY)
+      };
+    }
+    
+    function sendInput(type, x, y, button = 0, key = '') {
+      if (dataChannel && dataChannel.readyState === 'open') {
+        const data = JSON.stringify({
+          type, x, y, button, key,
+          timestamp: performance.now()
+        });
+        
+        dataChannel.send(data);
+        document.getElementById('input-stats').textContent = type + ' sent';
+      }
+    }
+    
+    function startStatsMonitoring() {
+      if (statsInterval) return;
+      
+      statsInterval = setInterval(async () => {
+        if (!peerConnection) return;
+        
+        const stats = await peerConnection.getStats();
+        let videoStats = 'No video';
+        let networkStats = 'No data';
+        
+        stats.forEach(report => {
+          if (report.type === 'inbound-rtp' && report.mediaType === 'video') {
+            const fps = report.framesPerSecond || 0;
+            const bitrate = Math.round((report.bytesReceived * 8) / 1000000 * 8); // Mbps estimate
+            videoStats = fps + ' FPS, ' + bitrate + ' Mbps';
+            frameCount = report.framesReceived || frameCount;
+          }
+          
+          if (report.type === 'candidate-pair' && report.state === 'succeeded') {
+            const rtt = report.currentRoundTripTime * 1000 || 0;
+            networkStats = 'RTT: ' + Math.round(rtt) + 'ms';
+            document.getElementById('latency-stats').textContent = Math.round(rtt) + 'ms';
+          }
+        });
+        
+        document.getElementById('video-stats').textContent = videoStats;
+        document.getElementById('network-stats').textContent = networkStats;
+        
+      }, 2000);
+    }
+    
+    function updateStatus(message) {
+      document.getElementById('status').textContent = message;
+      console.log('📡', message);
+    }
+    
+    function showError(message) {
+      document.getElementById('video-container').innerHTML = 
+        '<div class="connecting"><div class="error"><h2>❌ Connection Error</h2><p>' + message + '</p></div></div>';
+      updateStatus('❌ ' + message);
+    }
+    
+    function toggleStats() {
+      const stats = document.getElementById('stats');
+      stats.style.display = stats.style.display === 'none' ? 'block' : 'none';
+    }
+    
+    function toggleFullscreen() {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        document.documentElement.requestFullscreen();
+      }
+    }
+    
+    function disconnect() {
+      if (peerConnection) peerConnection.close();
+      if (statsInterval) clearInterval(statsInterval);
+      window.location.href = '/';
+    }
+    
+    // Initialize on load
+    window.onload = initializeWebRTC;
+    
+    // Cleanup on unload
+    window.onbeforeunload = () => {
+      if (peerConnection) peerConnection.close();
+    };
+  </script>
+</body>
+</html>
+  `);
+});
+
 // Route for server machine - auto-shares screen
 app.get('/server', (req, res) => {
   res.send(`
@@ -1121,6 +1628,29 @@ app.get('/', (req, res) => {
       <h1>🚀 Remote Desktop Control Center</h1>
       <p>Select any application or desktop environment to control remotely</p>
       
+      <div class="mode-selector" style="margin: 20px 0; display: flex; justify-content: center; gap: 15px;">
+        <button class="mode-btn active" id="websocket-mode" onclick="selectMode('websocket')" style="
+          background: linear-gradient(45deg, #667eea, #764ba2);
+          color: white; border: none; padding: 15px 25px; border-radius: 12px;
+          cursor: pointer; font-weight: 600; font-size: 14px;
+          transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; gap: 5px;
+          border: 2px solid #00ff88;
+        ">
+          🌐 WebSocket Mode
+          <small style="opacity: 0.8; font-size: 11px;">Stable • 200-500ms latency</small>
+        </button>
+        <button class="mode-btn" id="webrtc-mode" onclick="selectMode('webrtc')" style="
+          background: linear-gradient(45deg, #ff6b7a, #ff4757);
+          color: white; border: none; padding: 15px 25px; border-radius: 12px;
+          cursor: pointer; font-weight: 600; font-size: 14px;
+          transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; gap: 5px;
+          border: 2px solid transparent;
+        ">
+          ⚡ WebRTC Mode
+          <small style="opacity: 0.8; font-size: 11px;">Ultra-Low Latency • 20-50ms</small>
+        </button>
+      </div>
+      
       <div class="search-bar">
         <div class="search-icon">🔍</div>
         <input type="text" class="search-input" id="search-input" placeholder="Search applications and windows..." oninput="filterApps()">
@@ -1190,6 +1720,34 @@ app.get('/', (req, res) => {
     const currentHost = window.location.hostname;
     const nativeApiUrl = 'http://' + currentHost + ':8080';
     const wsUrl = 'ws://' + currentHost + ':9090';
+    
+    // Mode selection variables
+    let selectedMode = 'websocket'; // Default mode
+    
+    function selectMode(mode) {
+      selectedMode = mode;
+      
+      // Update button styles
+      document.getElementById('websocket-mode').style.border = mode === 'websocket' ? '2px solid #00ff88' : '2px solid transparent';
+      document.getElementById('webrtc-mode').style.border = mode === 'webrtc' ? '2px solid #00ff88' : '2px solid transparent';
+      
+      console.log('🎯 Selected mode:', mode);
+      
+      // Update status message
+      if (mode === 'webrtc') {
+        document.getElementById('status').innerHTML = 
+          '<div style="display: flex; align-items: center; justify-content: center; gap: 10px;">' +
+            '<span style="font-size: 1.2rem;">⚡</span>' +
+            '<span><strong>WebRTC Mode Selected</strong> - Ultra-low latency streaming ready!</span>' +
+          '</div>';
+      } else {
+        document.getElementById('status').innerHTML = 
+          '<div style="display: flex; align-items: center; justify-content: center; gap: 10px;">' +
+            '<span style="font-size: 1.2rem;">🌐</span>' +
+            '<span><strong>WebSocket Mode Selected</strong> - Stable streaming mode</span>' +
+          '</div>';
+      }
+    }
     
     // Load applications grid with screenshots
     async function loadApps() {
@@ -1345,63 +1903,88 @@ app.get('/', (req, res) => {
       
       document.getElementById('viewer-app-name').textContent = 'Controlling: ' + app.name;
       
-      // Start capture for this app
+      // Start capture for this app based on selected mode
       try {
-        if (app.type === 'desktop') {
-          // For desktop, use the native HTTP API and reset capture mode
-          currentCaptureMode = 'desktop';
-          currentWindowID = null;
-          console.log('📝 Set capture mode to desktop');
+        if (selectedMode === 'webrtc') {
+          // WebRTC Mode - redirect to WebRTC interface
+          console.log('🚀 Starting WebRTC mode for', app.name);
           
-          const response = await fetch(nativeApiUrl + '/capture', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ type: 0, index: 0 })
-          });
+          document.getElementById('status').innerHTML = 
+            '<div style="display: flex; align-items: center; justify-content: center; gap: 10px;">' +
+              '<span style="font-size: 1.2rem;">⚡</span>' +
+              '<span>Launching <strong>WebRTC Ultra-Low Latency</strong> mode...</span>' +
+            '</div>';
           
-          if (response.ok) {
-            document.getElementById('status').innerHTML = 
-              '<div style="display: flex; align-items: center; justify-content: center; gap: 10px;">' +
-                '<span style="font-size: 1.2rem;">🎯</span>' +
-                '<span>Successfully connected to <strong>' + app.name + '</strong></span>' +
-              '</div>';
-            setTimeout(() => {
-              showViewer();
-              connectWebSocket();
-            }, 800);
-          } else {
-            document.getElementById('status').innerHTML = 
-              '<div style="display: flex; align-items: center; justify-content: center; gap: 10px;">' +
-                '<span style="font-size: 1.2rem;">❌</span>' +
-                '<span>Failed to start desktop capture</span>' +
-              '</div>';
-          }
+          // Store selected app for WebRTC mode
+          localStorage.setItem('selectedApp', JSON.stringify(app));
+          
+          // Redirect to WebRTC interface
+          setTimeout(() => {
+            window.location.href = '/webrtc';
+          }, 1000);
+          
         } else {
-          // For individual windows, use simple script approach (Carmack-style: use what works)
-          const response = await fetch('/switch-window', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cgWindowID: app.cgWindowID })
-          });
-          
-          if (response.ok) {
-            const result = await response.json();
-            console.log('Window switched:', result.message);
-            document.getElementById('status').innerHTML = 
-              '<div style="display: flex; align-items: center; justify-content: center; gap: 10px;">' +
-                '<span style="font-size: 1.2rem;">🪟</span>' +
-                '<span>Successfully connected to <strong>' + app.name + '</strong></span>' +
-              '</div>';
-            setTimeout(() => {
-              showViewer();
-              connectWebSocket();
-            }, 800);
+          // WebSocket Mode - original implementation
+          if (app.type === 'desktop') {
+            // For desktop, use the native HTTP API and reset capture mode
+            currentCaptureMode = 'desktop';
+            currentWindowID = null;
+            console.log('📝 Set capture mode to desktop');
+            
+            const response = await fetch(nativeApiUrl + '/capture', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ 
+                type: 0, 
+                index: 0, 
+                webrtc: selectedMode === 'webrtc' 
+              })
+            });
+            
+            if (response.ok) {
+              document.getElementById('status').innerHTML = 
+                '<div style="display: flex; align-items: center; justify-content: center; gap: 10px;">' +
+                  '<span style="font-size: 1.2rem;">🎯</span>' +
+                  '<span>Successfully connected to <strong>' + app.name + '</strong></span>' +
+                '</div>';
+              setTimeout(() => {
+                showViewer();
+                connectWebSocket();
+              }, 800);
+            } else {
+              document.getElementById('status').innerHTML = 
+                '<div style="display: flex; align-items: center; justify-content: center; gap: 10px;">' +
+                  '<span style="font-size: 1.2rem;">❌</span>' +
+                  '<span>Failed to start desktop capture</span>' +
+                '</div>';
+            }
           } else {
-            document.getElementById('status').innerHTML = 
-              '<div style="display: flex; align-items: center; justify-content: center; gap: 10px;">' +
-                '<span style="font-size: 1.2rem;">❌</span>' +
-                '<span>Failed to switch to window</span>' +
-              '</div>';
+            // For individual windows, use simple script approach (Carmack-style: use what works)
+            const response = await fetch('/switch-window', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ cgWindowID: app.cgWindowID })
+            });
+            
+            if (response.ok) {
+              const result = await response.json();
+              console.log('Window switched:', result.message);
+              document.getElementById('status').innerHTML = 
+                '<div style="display: flex; align-items: center; justify-content: center; gap: 10px;">' +
+                  '<span style="font-size: 1.2rem;">🪟</span>' +
+                  '<span>Successfully connected to <strong>' + app.name + '</strong></span>' +
+                '</div>';
+              setTimeout(() => {
+                showViewer();
+                connectWebSocket();
+              }, 800);
+            } else {
+              document.getElementById('status').innerHTML = 
+                '<div style="display: flex; align-items: center; justify-content: center; gap: 10px;">' +
+                  '<span style="font-size: 1.2rem;">❌</span>' +
+                  '<span>Failed to switch to window</span>' +
+                '</div>';
+            }
           }
         }
       } catch (error) {

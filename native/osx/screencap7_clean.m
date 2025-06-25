@@ -7,6 +7,7 @@
 #import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #import <CoreGraphics/CoreGraphics.h>
 #import <ApplicationServices/ApplicationServices.h>
+#import "webrtc_encoder.h"
 
 typedef enum {
     CaptureTypeFullDesktop = 0,
@@ -25,6 +26,8 @@ typedef enum {
 @property (nonatomic, assign) BOOL isCapturing;
 @property (nonatomic, strong) NSString *cachedWindowsList;
 @property (nonatomic, strong) NSTimer *windowsUpdateTimer;
+@property (nonatomic, strong) WebRTCEncoder *webrtcEncoder;
+@property (nonatomic, assign) BOOL useWebRTCMode;
 @end
 
 @implementation ScreenCapture
@@ -251,6 +254,17 @@ typedef enum {
         }
         
         NSLog(@"🔧 Configured stream for headless capture (locked screen / lid closed support)");
+        
+        // Initialize WebRTC encoder for hardware acceleration
+        if (self.useWebRTCMode) {
+            self.webrtcEncoder = [[WebRTCEncoder alloc] 
+                initWithCodec:kCMVideoCodecType_H264 
+                       width:config.width 
+                      height:config.height 
+                     bitrate:10000000  // 10 Mbps
+                   framerate:30];
+            NSLog(@"🚀 WebRTC hardware encoder initialized: %zux%zu H.264", config.width, config.height);
+        }
         
         // Create stream with error delegate
         self.stream = [[SCStream alloc] initWithFilter:filter configuration:config delegate:self];
@@ -776,6 +790,21 @@ typedef enum {
                     [self.currentFrame setData:jpegData];
                 }
                 
+                // If WebRTC mode is enabled, also encode with hardware accelerated encoder
+                if (self.useWebRTCMode && self.webrtcEncoder) {
+                    NSData *h264Data = [self.webrtcEncoder encodeFrame:imageBuffer];
+                    if (h264Data && h264Data.length > 0) {
+                        // Store H.264 data separately for WebRTC streaming
+                        // This could be sent via WebRTC data channel or HTTP endpoint
+                        static int h264FrameCount = 0;
+                        h264FrameCount++;
+                        if (h264FrameCount % 300 == 0) { // Every 10 seconds at 30fps
+                            NSLog(@"🎥 WebRTC H.264 encoded %d frames, latest: %zu bytes", 
+                                  h264FrameCount, h264Data.length);
+                        }
+                    }
+                }
+                
                 // Log progress occasionally (disabled to reduce spam)
                 static int frameCount = 0;
                 frameCount++;
@@ -809,17 +838,40 @@ typedef enum {
 }
 
 - (void)startCaptureWithType:(CaptureType)captureType targetIndex:(int)targetIndex {
+    [self startCaptureWithType:captureType targetIndex:targetIndex webrtcMode:NO];
+}
+
+- (void)startCaptureWithType:(CaptureType)captureType targetIndex:(int)targetIndex webrtcMode:(BOOL)useWebRTC {
     self.captureType = captureType;
     self.targetIndex = targetIndex;
+    self.useWebRTCMode = useWebRTC;
+    
+    if (useWebRTC) {
+        NSLog(@"🚀 Starting capture with WebRTC hardware acceleration enabled");
+    } else {
+        NSLog(@"📸 Starting capture with standard MJPEG mode");
+    }
+    
     [self setupCapture];
 }
 
 - (void)startCaptureWithWindowID:(UInt32)windowID {
-    NSLog(@"🎯 startCaptureWithWindowID called with ID: %u", windowID);
+    [self startCaptureWithWindowID:windowID webrtcMode:NO];
+}
+
+- (void)startCaptureWithWindowID:(UInt32)windowID webrtcMode:(BOOL)useWebRTC {
+    NSLog(@"🎯 startCaptureWithWindowID called with ID: %u, WebRTC: %@", windowID, useWebRTC ? @"YES" : @"NO");
     
     // Special method for capturing specific windows by CGWindowID
     self.captureType = CaptureTypeWindow;
     self.targetIndex = (int)windowID; // Store windowID in targetIndex
+    self.useWebRTCMode = useWebRTC;
+    
+    if (useWebRTC) {
+        NSLog(@"🚀 Window capture with WebRTC hardware acceleration enabled");
+    } else {
+        NSLog(@"📸 Window capture with standard MJPEG mode");
+    }
     
     NSLog(@"🎯 About to call setupWindowCapture...");
     [self setupWindowCapture:windowID];
@@ -1567,11 +1619,18 @@ void listApplicationsAndWindows() {
     
     int type = [json[@"type"] intValue]; // 0=desktop, 1=app
     int index = [json[@"index"] intValue];
+    BOOL webrtcMode = [json[@"webrtc"] boolValue]; // WebRTC hardware acceleration
     
     [self.captureServer stopCapture];
-    [self.captureServer startCaptureWithType:type targetIndex:index];
+    [self.captureServer startCaptureWithType:type targetIndex:index webrtcMode:webrtcMode];
     
-    [self sendJSONResponse:client_fd data:@{@"status": @"capture_started", @"type": @(type), @"index": @(index)}];
+    NSString *modeStr = webrtcMode ? @"WebRTC" : @"MJPEG";
+    [self sendJSONResponse:client_fd data:@{
+        @"status": @"capture_started", 
+        @"type": @(type), 
+        @"index": @(index),
+        @"mode": modeStr
+    }];
 }
 
 - (void)handleWindowCaptureRequest:(int)client_fd request:(NSString *)request {
@@ -1624,7 +1683,9 @@ void listApplicationsAndWindows() {
         return;
     }
     
-    NSLog(@"🪟 Window selection request: CGWindowID %u", windowID);
+    BOOL webrtcMode = [json[@"webrtc"] boolValue]; // WebRTC hardware acceleration
+    
+    NSLog(@"🪟 Window selection request: CGWindowID %u, WebRTC: %@", windowID, webrtcMode ? @"YES" : @"NO");
     
     if (!self.captureServer) {
         NSLog(@"❌ Capture server not initialized!");
@@ -1639,10 +1700,15 @@ void listApplicationsAndWindows() {
         [self.captureServer stopCapture];
         NSLog(@"📌 Stop capture completed, starting window capture...");
         
-        [self.captureServer startCaptureWithWindowID:windowID];
+        [self.captureServer startCaptureWithWindowID:windowID webrtcMode:webrtcMode];
         NSLog(@"📌 Window capture started successfully");
         
-        [self sendJSONResponse:client_fd data:@{@"status": @"window_capture_started", @"cgWindowID": @(windowID)}];
+        NSString *modeStr = webrtcMode ? @"WebRTC" : @"MJPEG";
+        [self sendJSONResponse:client_fd data:@{
+            @"status": @"window_capture_started", 
+            @"cgWindowID": @(windowID),
+            @"mode": modeStr
+        }];
         NSLog(@"📌 Response sent to client");
     } @catch (NSException *exception) {
         NSLog(@"❌ Exception in window capture: %@", exception);

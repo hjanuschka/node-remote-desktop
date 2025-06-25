@@ -24,3 +24,1051 @@
 ✅ list_windows_cg compiled successfully
 ✅ screencap7 compiled successfully
 ✅ HTTP API streaming started at 30 FPS
+
+> node-remote-desktop@1.0.0 dev
+> nodemon server.js --watch native/osx/*.m --ext js,m
+
+[33m[nodemon] 3.1.10[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): native/osx/list_windows_cg.m[39m
+[33m[nodemon] watching extensions: js,m[39m
+[32m[nodemon] starting `node server.js native/osx/screencap7_clean.m`[39m
+/Users/hjanuschka/node-sharer/server.js:1578
+          ctx.fillText(`(${coords.x}, ${coords.y})`, coords.x + 10, coords.y - 10);
+                         ^
+
+SyntaxError: missing ) after argument list
+    at wrapSafe (node:internal/modules/cjs/loader:1666:18)
+    at Module._compile (node:internal/modules/cjs/loader:1708:20)
+    at Object..js (node:internal/modules/cjs/loader:1899:10)
+    at Module.load (node:internal/modules/cjs/loader:1469:32)
+    at Module._load (node:internal/modules/cjs/loader:1286:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:152:5)
+    at node:internal/main/run_main_module:33:47
+
+Node.js v24.2.0
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+
+> node-remote-desktop@1.0.0 dev
+> nodemon server.js --watch native/osx/*.m --ext js,m
+
+[33m[nodemon] 3.1.10[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): native/osx/list_windows_cg.m[39m
+[33m[nodemon] watching extensions: js,m[39m
+[32m[nodemon] starting `node server.js native/osx/screencap7_clean.m`[39m
+🚀 Starting HTTP API screen capture server...
+🔨 Recompiling native binaries...
+
+╔════════════════════════════════════════╗
+║      Remote Desktop VNC v2 (HTTP)     ║
+╠════════════════════════════════════════╣
+║  URL: http://0.0.0.0:3030               ║
+║  Platform: darwin                    ║
+║  Method: ScreenCaptureKit HTTP API    ║
+║  Native API: http://0.0.0.0:8080       ║
+║  Display: default              ║
+╚════════════════════════════════════════╝
+  
+✅ list_windows_cg compiled successfully
+✅ screencap7 compiled successfully
+🔥 Starting native macOS ScreenCaptureKit HTTP server...
+✅ Native macOS HTTP server started on port 8080!
+ScreenCap: 2025-06-25 09:03:01.865 screencap7[39407:96054294] 🔥 ScreenCaptureKit HTTP Server v7 Starting...
+
+ScreenCap: 2025-06-25 09:03:01.895 screencap7[39407:96054294] 📋 Permission Status:
+2025-06-25 09:03:01.895 screencap7[39407:96054294]    Screen Recording: ✅ GRANTED
+2025-06-25 09:03:01.895 screencap7[39407:96054294]    Accessibility: ✅ GRANTED
+
+ScreenCap: 2025-06-25 09:03:01.895 screencap7[39407:96054294] 🚀 Setting up ScreenCaptureKit...
+
+ScreenCap: 2025-06-25 09:03:01.911 screencap7[39407:96054294] 🌐 Starting HTTP server on port 8080...
+2025-06-25 09:03:01.911 screencap7[39407:96054294] 🚀 Setting up ScreenCaptureKit...
+
+ScreenCap: 2025-06-25 09:03:01.924 screencap7[39407:96054294] 📝 API Endpoints:
+2025-06-25 09:03:01.924 screencap7[39407:96054294]    GET  /apps           - List applications
+2025-06-25 09:03:01.924 screencap7[39407:96054294]    GET  /windows        - List windows (Core Graphics)
+2025-06-25 09:03:01.924 screencap7[39407:96054294]    GET  /display        - Get display info (resolution, scaling)
+2025-06-25 09:03:01.924 screencap7[39407:96054294]    GET  /frame          - Get current frame (JPEG)
+2025-06-25 09:03:01.924 screencap7[39407:96054294]    POST /capture        - Start capture {type, index}
+2025-06-25 09:03:01.924 screencap7[39407:96054294]    POST /click          - Send click {x, y}
+2025-06-25 09:03:01.924 screencap7[39407:96054294]    POST /click-window   - Send click to window {x, y, cgWindowID}
+2025-06-25 09:03:01.924 screencap7[39407:96054294]    POST /click-background - Send click to background window {x, y, cgWindowID}
+
+ScreenCap: 2025-06-25 09:03:01.924 screencap7[39407:96054294]    POST /key            - Send key {key}
+2025-06-25 09:03:01.924 screencap7[39407:96054294]    POST /key-window     - Send key to window {key, cgWindowID}
+2025-06-25 09:03:01.924 screencap7[39407:96054294]    POST /key-background - Send key to background window {key, cgWindowID}
+2025-06-25 09:03:01.924 screencap7[39407:96054294]    POST /screenshot     - Get window screenshot {cgWindowID}
+2025-06-25 09:03:01.924 screencap7[39407:96054294]    POST /stop           - Stop capture
+
+ScreenCap: 2025-06-25 09:03:01.924 screencap7[39407:96054335] ✅ HTTP server listening on port 8080
+
+ScreenCap: 2025-06-25 09:03:02.036 screencap7[39407:96054329] ✅ Found display: 4 (3840 x 1620)
+
+ScreenCap: 2025-06-25 09:03:02.039 screencap7[39407:96054329] 🔧 Desktop capture: Size 3840x1620
+2025-06-25 09:03:02.039 screencap7[39407:96054329] 🔧 Attempting headless capture configuration...
+2025-06-25 09:03:02.039 screencap7[39407:96054329] 🔧 Configured stream for headless capture (locked screen / lid closed support)
+
+ScreenCap: 2025-06-25 09:03:02.283 screencap7[39407:96054329] ✅ Found display: 4 (3840 x 1620)
+
+ScreenCap: 2025-06-25 09:03:02.283 screencap7[39407:96054329] 🔧 Desktop capture: Size 3840x1620
+2025-06-25 09:03:02.283 screencap7[39407:96054329] 🔧 Attempting headless capture configuration...
+2025-06-25 09:03:02.283 screencap7[39407:96054329] 🔧 Configured stream for headless capture (locked screen / lid closed support)
+
+ScreenCap: 2025-06-25 09:03:02.286 screencap7[39407:96054345] ✅ full desktop capture started successfully at 30 FPS!
+2025-06-25 09:03:02.286 screencap7[39407:96054345] 📝 Send commands via stdin: 'click x y' or 'key character'
+
+ScreenCap: 2025-06-25 09:03:02.449 screencap7[39407:96054345] ✅ full desktop capture started successfully at 30 FPS!
+2025-06-25 09:03:02.449 screencap7[39407:96054345] 📝 Send commands via stdin: 'click x y' or 'key character'
+
+✅ HTTP API streaming started at 30 FPS
+ScreenCap: 2025-06-25 09:03:06.673 screencap7[39407:96054329] 📨 OPTIONS /capture
+
+ScreenCap: 2025-06-25 09:03:06.674 screencap7[39407:96054329] 📨 POST /capture
+2025-06-25 09:03:06.674 screencap7[39407:96054329] 🛑 Stopping current capture...
+
+ScreenCap: 2025-06-25 09:03:06.679 screencap7[39407:96054467] ✅ Capture stopped
+
+ScreenCap: 2025-06-25 09:03:06.778 screencap7[39407:96054329] 🚀 Setting up ScreenCaptureKit...
+
+ScreenCap: 2025-06-25 09:03:06.934 screencap7[39407:96054329] ✅ Found display: 4 (3840 x 1620)
+
+ScreenCap: 2025-06-25 09:03:06.934 screencap7[39407:96054329] 🔧 Desktop capture: Size 3840x1620
+2025-06-25 09:03:06.934 screencap7[39407:96054329] 🔧 Attempting headless capture configuration...
+2025-06-25 09:03:06.934 screencap7[39407:96054329] 🔧 Configured stream for headless capture (locked screen / lid closed support)
+
+ScreenCap: 2025-06-25 09:03:06.998 screencap7[39407:96054329] ✅ full desktop capture started successfully at 30 FPS!
+2025-06-25 09:03:06.998 screencap7[39407:96054329] 📝 Send commands via stdin: 'click x y' or 'key character'
+
+Client connected - streaming server screen automatically
+Input received: click 535 177
+Current capture mode: desktop WindowID: null
+ScreenCap: 2025-06-25 09:03:09.494 screencap7[39407:96054329] 🔍 Display info: Physical=3840x1620, Logical=3840x1620 (for clicks), Scale=1.0x
+
+Desktop capture direct: 535,177 -> 535,177 (canvas: 1920x810)
+🖱️ Sending global click: 535,177
+ScreenCap: 2025-06-25 09:03:09.497 screencap7[39407:96054329] 📨 POST /click
+2025-06-25 09:03:09.497 screencap7[39407:96054329] 📦 Click request body: {"x":535,"y":177}
+2025-06-25 09:03:09.497 screencap7[39407:96054329] 🖱️ Click at (535, 177)
+2025-06-25 09:03:09.497 screencap7[39407:96054329] 🖱️ Clicking at 535,177 (target window: 0, activate: YES)
+2025-06-25 09:03:09.497 screencap7[39407:96054329] ✅ Accessibility permission verified
+2025-06-25 09:03:09.497 screencap7[39407:96054329] 📝 Created mouse events: down=0x600003ff4360, up=0x600003ff40a0
+2025-06-25 09:03:09.497 screencap7[39407:96054329] 📤 Posting global mouse events...
+
+ScreenCap: 2025-06-25 09:03:09.516 screencap7[39407:96054329] ✅ Click executed and events released
+
+✅ Click sent via HTTP API: clicked
+Input received: click 179 43
+Current capture mode: desktop WindowID: null
+Desktop capture direct: 179,43 -> 179,43 (canvas: 1920x810)
+🖱️ Sending global click: 179,43
+ScreenCap: 2025-06-25 09:03:12.867 screencap7[39407:96054464] 📨 POST /click
+2025-06-25 09:03:12.867 screencap7[39407:96054464] 📦 Click request body: {"x":179,"y":43}
+
+ScreenCap: 2025-06-25 09:03:12.867 screencap7[39407:96054464] 🖱️ Click at (179, 43)
+2025-06-25 09:03:12.867 screencap7[39407:96054464] 🖱️ Clicking at 179,43 (target window: 0, activate: YES)
+2025-06-25 09:03:12.867 screencap7[39407:96054464] ✅ Accessibility permission verified
+2025-06-25 09:03:12.867 screencap7[39407:96054464] 📝 Created mouse events: down=0x600003fca460, up=0x600003fc9400
+2025-06-25 09:03:12.867 screencap7[39407:96054464] 📤 Posting global mouse events...
+2025-06-25 09:03:12.867 screencap7[39407:96054464] ✅ Click executed and events released
+
+✅ Click sent via HTTP API: clicked
+ScreenCap: 2025-06-25 09:03:16.092 screencap7[39407:96054465] 📸 Captured 300 frames | Mode: Full Desktop | Size: 3840x1620
+
+📝 Reset capture mode to desktop
+🪟 Window selection: 103263
+ScreenCap: 2025-06-25 09:03:25.465 screencap7[39407:96054460] 📨 POST /capture-window
+2025-06-25 09:03:25.465 screencap7[39407:96054460] 📦 Request body: {"cgWindowID":103263}
+
+ScreenCap: 2025-06-25 09:03:25.465 screencap7[39407:96054460] 📌 Parsed JSON successfully: {
+    cgWindowID = 103263;
+}
+2025-06-25 09:03:25.465 screencap7[39407:96054460] 📌 About to extract windowID from JSON...
+2025-06-25 09:03:25.465 screencap7[39407:96054460] 📌 windowID value type: __NSCFNumber, value: 103263
+2025-06-25 09:03:25.465 screencap7[39407:96054460] 🪟 Window selection request: CGWindowID 103263
+2025-06-25 09:03:25.465 screencap7[39407:96054460] 📌 Capture server exists, stopping current capture...
+2025-06-25 09:03:25.465 screencap7[39407:96054460] 🛑 Stopping current capture...
+
+ScreenCap: 2025-06-25 09:03:25.474 screencap7[39407:96054466] ✅ Capture stopped
+
+ScreenCap: 2025-06-25 09:03:25.568 screencap7[39407:96054460] 📌 Stop capture completed, starting window capture...
+2025-06-25 09:03:25.568 screencap7[39407:96054460] 🎯 startCaptureWithWindowID called with ID: 103263
+
+ScreenCap: 2025-06-25 09:03:25.568 screencap7[39407:96054460] 🎯 About to call setupWindowCapture...
+2025-06-25 09:03:25.568 screencap7[39407:96054460] 🚀 Setting up window capture for CGWindowID: 103263
+
+ScreenCap: 2025-06-25 09:03:25.585 screencap7[39407:96054460] 🎯 setupWindowCapture returned
+2025-06-25 09:03:25.585 screencap7[39407:96054460] 📌 Window capture started successfully
+
+ScreenCap: 2025-06-25 09:03:25.585 screencap7[39407:96054460] 📌 Response sent to client
+
+✅ Successfully switched to window: { status: 'window_capture_started', cgWindowID: 103263 }
+📝 Updated capture mode: window, window: 103263
+ScreenCap: 2025-06-25 09:03:25.710 screencap7[39407:96054460] ✅ Found window: ‎WhatsApp (ID: 103263)
+
+ScreenCap: 2025-06-25 09:03:25.710 screencap7[39407:96054460] 🔧 Attempting headless window capture configuration...
+2025-06-25 09:03:25.710 screencap7[39407:96054460] 🔧 Configured window stream for headless capture
+
+ScreenCap: 2025-06-25 09:03:25.862 screencap7[39407:96054465] ✅ Window capture started successfully at 30 FPS! Window: ‎WhatsApp (ID: 103263)
+
+Client connected - streaming server screen automatically
+Input received: click 562 1027
+Current capture mode: window WindowID: 103263
+Window capture Retina scaling: 562,1027 -> 562,1027 (scale: 1x, canvas: 1920x1057)
+🎯 Sending targeted click to window 103263: 562,1027
+ScreenCap: 2025-06-25 09:03:29.102 screencap7[39407:96054465] 📨 POST /click-window
+2025-06-25 09:03:29.102 screencap7[39407:96054465] 📦 Window click request body: {"x":562,"y":1027,"cgWindowID":103263}
+2025-06-25 09:03:29.102 screencap7[39407:96054465] 🖱️ Window click at (562, 1027) targeting window 103263
+2025-06-25 09:03:29.102 screencap7[39407:96054465] 🖱️ Clicking at 562,1027 (target window: 103263, activate: YES)
+2025-06-25 09:03:29.102 screencap7[39407:96054465] ✅ Accessibility permission verified
+
+ScreenCap: 2025-06-25 09:03:29.102 screencap7[39407:96054465] 🎯 Targeting specific window ID: 103263 at coordinates 562,1027
+2025-06-25 09:03:29.102 screencap7[39407:96054465] 🎯 Attempting to activate specific window 103263 for better event delivery
+
+ScreenCap: 2025-06-25 09:03:29.104 screencap7[39407:96054465] 🎯 Found target window: '‎WhatsApp' from '‎WhatsApp'
+
+ScreenCap: 2025-06-25 09:03:29.105 screencap7[39407:96054465] 🎯 Activating application: ‎WhatsApp
+
+ScreenCap: 2025-06-25 09:03:29.339 screencap7[39407:96054465] 🔍 Found 2 windows in app, looking for window 103263
+
+ScreenCap: 2025-06-25 09:03:29.339 screencap7[39407:96054465] ✅ Successfully brought window to front using AX
+
+ScreenCap: 2025-06-25 09:03:29.443 screencap7[39407:96054465] ✅ Window activation sequence completed
+2025-06-25 09:03:29.443 screencap7[39407:96054465] 🎯 Using provided coordinates directly (already scaled): 562,1027
+2025-06-25 09:03:29.443 screencap7[39407:96054465] 🎯 Sending window-specific click events to window 103263
+
+ScreenCap: 2025-06-25 09:03:29.557 screencap7[39407:96054465] ✅ Brought specific window to front, using original coordinates
+
+ScreenCap: 2025-06-25 09:03:29.557 screencap7[39407:96054465] 📤 Posting targeted click at original coordinates 562,1027
+
+ScreenCap: 2025-06-25 09:03:29.568 screencap7[39407:96054465] ✅ Window-specific click completed successfully
+
+ScreenCap: 2025-06-25 09:03:29.568 screencap7[39407:96054465] ✅ Window click response sent
+
+✅ Click sent via HTTP API: clicked
+ScreenCap: 2025-06-25 09:03:31.612 screencap7[39407:96054467] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+Input received: click 555 1025
+Current capture mode: window WindowID: 103263
+Window capture Retina scaling: 555,1025 -> 555,1025 (scale: 1x, canvas: 1920x1057)
+🎯 Sending targeted click to window 103263: 555,1025
+ScreenCap: 2025-06-25 09:03:33.626 screencap7[39407:96054467] 📨 POST /click-window
+2025-06-25 09:03:33.626 screencap7[39407:96054467] 📦 Window click request body: {"x":555,"y":1025,"cgWindowID":103263}
+2025-06-25 09:03:33.626 screencap7[39407:96054467] 🖱️ Window click at (555, 1025) targeting window 103263
+2025-06-25 09:03:33.626 screencap7[39407:96054467] 🖱️ Clicking at 555,1025 (target window: 103263, activate: YES)
+2025-06-25 09:03:33.626 screencap7[39407:96054467] ✅ Accessibility permission verified
+2025-06-25 09:03:33.626 screencap7[39407:96054467] 🎯 Targeting specific window ID: 103263 at coordinates 555,1025
+2025-06-25 09:03:33.626 screencap7[39407:96054467] 🎯 Attempting to activate specific window 103263 for better event delivery
+
+ScreenCap: 2025-06-25 09:03:33.628 screencap7[39407:96054467] 🎯 Found target window: '‎WhatsApp' from '‎WhatsApp'
+
+ScreenCap: 2025-06-25 09:03:33.630 screencap7[39407:96054467] 🎯 Activating application: ‎WhatsApp
+
+ScreenCap: 2025-06-25 09:03:33.804 screencap7[39407:96054466] 📸 Captured 600 frames | Mode: Window ID: 103263 | Size: 1800x991
+
+ScreenCap: 2025-06-25 09:03:33.844 screencap7[39407:96054467] 🔍 Found 2 windows in app, looking for window 103263
+
+ScreenCap: 2025-06-25 09:03:33.844 screencap7[39407:96054467] ✅ Successfully brought window to front using AX
+
+ScreenCap: 2025-06-25 09:03:33.944 screencap7[39407:96054467] ✅ Window activation sequence completed
+2025-06-25 09:03:33.944 screencap7[39407:96054467] 🎯 Using provided coordinates directly (already scaled): 555,1025
+
+ScreenCap: 2025-06-25 09:03:33.944 screencap7[39407:96054467] 🎯 Sending window-specific click events to window 103263
+
+ScreenCap: 2025-06-25 09:03:34.056 screencap7[39407:96054467] ✅ Brought specific window to front, using original coordinates
+
+ScreenCap: 2025-06-25 09:03:34.056 screencap7[39407:96054467] 📤 Posting targeted click at original coordinates 555,1025
+
+ScreenCap: 2025-06-25 09:03:34.068 screencap7[39407:96054467] ✅ Window-specific click completed successfully
+
+ScreenCap: 2025-06-25 09:03:34.068 screencap7[39407:96054467] ✅ Window click response sent
+
+✅ Click sent via HTTP API: clicked
+ScreenCap: 2025-06-25 09:03:35.888 screencap7[39407:96054466] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+Input received: keydown undefined undefined
+🎯 Sending targeted key 'a' to window 103263
+ScreenCap: 2025-06-25 09:03:35.927 screencap7[39407:96054466] 📨 POST /key-window
+2025-06-25 09:03:35.927 screencap7[39407:96054466] 📦 Window key request body: {"key":"a","cgWindowID":103263}
+2025-06-25 09:03:35.927 screencap7[39407:96054466] ⌨️ Window key press: a targeting window 103263
+2025-06-25 09:03:35.927 screencap7[39407:96054466] ⌨️ Key press: a (target window: 103263)
+2025-06-25 09:03:35.927 screencap7[39407:96054466] 🎯 Targeting specific window ID: 103263
+2025-06-25 09:03:35.927 screencap7[39407:96054466] 🎯 Attempting to activate specific window 103263 for better event delivery
+
+ScreenCap: 2025-06-25 09:03:35.929 screencap7[39407:96054466] 🎯 Found target window: '‎WhatsApp' from '‎WhatsApp'
+
+ScreenCap: 2025-06-25 09:03:35.931 screencap7[39407:96054466] 🎯 Activating application: ‎WhatsApp
+
+ScreenCap: 2025-06-25 09:03:36.167 screencap7[39407:96054466] 🔍 Found 2 windows in app, looking for window 103263
+
+ScreenCap: 2025-06-25 09:03:36.167 screencap7[39407:96054466] ✅ Successfully brought window to front using AX
+
+ScreenCap: 2025-06-25 09:03:36.267 screencap7[39407:96054466] ✅ Window activation sequence completed
+
+ScreenCap: 2025-06-25 09:03:36.267 screencap7[39407:96054466] 🔤 Processing character: 'a' (unicode: 97)
+2025-06-25 09:03:36.268 screencap7[39407:96054466] 📤 Creating keyboard events for keyCode: 0
+
+ScreenCap: 2025-06-25 09:03:36.268 screencap7[39407:96054466] 📝 Created keyboard events: down=0x600003fdc300, up=0x600003fc18a0
+2025-06-25 09:03:36.268 screencap7[39407:96054466] 📤 Posting global keyboard events...
+
+ScreenCap: 2025-06-25 09:03:36.269 screencap7[39407:96054466] ✅ Key press completed and events released
+
+ScreenCap: 2025-06-25 09:03:36.269 screencap7[39407:96054466] ✅ Window key press response sent
+
+✅ Key sent via HTTP API: key_pressed
+📝 Reset capture mode to desktop
+ScreenCap: 2025-06-25 09:03:41.860 screencap7[39407:96054467] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:03:52.199 screencap7[39407:96054463] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:04:02.419 screencap7[39407:96054467] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:04:06.746 screencap7[39407:96054467] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:04:12.657 screencap7[39407:96054463] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:04:22.900 screencap7[39407:96054463] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:04:33.236 screencap7[39407:96054463] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:04:37.652 screencap7[39407:96054463] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:04:43.540 screencap7[39407:96054467] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:04:53.738 screencap7[39407:96054467] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:05:03.970 screencap7[39407:96054463] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:05:08.362 screencap7[39407:96054467] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:05:14.171 screencap7[39407:96054467] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:05:24.420 screencap7[39407:96054463] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:05:34.695 screencap7[39407:96054467] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:05:39.115 screencap7[39407:96054463] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:05:44.995 screencap7[39407:96054463] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:05:55.313 screencap7[39407:96054461] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:06:01.091 screencap7[39407:96054461] 📸 Captured 900 frames | Mode: Window ID: 103263 | Size: 1800x991
+
+ScreenCap: 2025-06-25 09:06:05.591 screencap7[39407:96054463] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:06:10.018 screencap7[39407:96054461] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:06:15.817 screencap7[39407:96054463] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:06:26.501 screencap7[39407:96054463] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:06:36.877 screencap7[39407:96102657] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:06:41.501 screencap7[39407:96054463] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:06:47.373 screencap7[39407:96054463] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:06:57.828 screencap7[39407:96104941] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:07:08.135 screencap7[39407:96102657] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:07:12.635 screencap7[39407:96104941] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:07:18.362 screencap7[39407:96102657] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:07:28.583 screencap7[39407:96104941] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:07:38.792 screencap7[39407:96102657] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:07:43.416 screencap7[39407:96112306] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:07:49.086 screencap7[39407:96102657] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:07:59.338 screencap7[39407:96102657] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:08:09.645 screencap7[39407:96102657] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:08:14.274 screencap7[39407:96116608] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:08:19.895 screencap7[39407:96102657] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:08:30.125 screencap7[39407:96116608] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:08:40.385 screencap7[39407:96102657] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:08:45.000 screencap7[39407:96122150] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:08:50.619 screencap7[39407:96122150] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:09:00.895 screencap7[39407:96102657] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:09:11.209 screencap7[39407:96123677] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:09:15.847 screencap7[39407:96102657] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:09:23.704 screencap7[39407:96128222] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:09:34.536 screencap7[39407:96123677] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:09:38.652 screencap7[39407:96123677] 📸 Captured 1200 frames | Mode: Window ID: 103263 | Size: 1800x991
+
+ScreenCap: 2025-06-25 09:09:45.142 screencap7[39407:96130949] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:09:46.818 screencap7[39407:96123677] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:09:55.872 screencap7[39407:96130949] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:10:06.145 screencap7[39407:96130949] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:10:16.691 screencap7[39407:96130949] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:10:17.669 screencap7[39407:96130949] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:10:26.933 screencap7[39407:96130949] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:10:37.354 screencap7[39407:96130949] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:10:44.981 screencap7[39407:96128222] 📸 Captured 1500 frames | Mode: Window ID: 103263 | Size: 1800x991
+
+ScreenCap: 2025-06-25 09:10:48.440 screencap7[39407:96128222] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:10:48.656 screencap7[39407:96130949] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:10:59.142 screencap7[39407:96128222] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:11:09.625 screencap7[39407:96123677] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:11:19.138 screencap7[39407:96128222] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:11:19.860 screencap7[39407:96123677] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:11:30.087 screencap7[39407:96123677] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:11:32.424 screencap7[39407:96123677] 📸 Captured 1800 frames | Mode: Window ID: 103263 | Size: 1800x991
+
+ScreenCap: 2025-06-25 09:11:40.565 screencap7[39407:96123677] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:11:49.879 screencap7[39407:96128222] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:11:50.774 screencap7[39407:96123677] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:12:01.379 screencap7[39407:96123677] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:12:11.587 screencap7[39407:96123677] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:12:20.594 screencap7[39407:96123677] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:12:22.340 screencap7[39407:96128222] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:12:33.493 screencap7[39407:96130949] 📸 Captured 2100 frames | Mode: Window ID: 103263 | Size: 1800x991
+
+ScreenCap: 2025-06-25 09:12:33.685 screencap7[39407:96130949] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:12:44.452 screencap7[39407:96123677] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:12:51.465 screencap7[39407:96128222] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:12:54.649 screencap7[39407:96128222] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:13:02.822 screencap7[39407:96123677] 📸 Captured 2400 frames | Mode: Window ID: 103263 | Size: 1800x991
+
+ScreenCap: 2025-06-25 09:13:04.837 screencap7[39407:96123677] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:13:15.031 screencap7[39407:96128222] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:13:22.144 screencap7[39407:96128222] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:13:25.289 screencap7[39407:96128222] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:13:36.383 screencap7[39407:96130949] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:13:46.590 screencap7[39407:96128222] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:13:52.942 screencap7[39407:96130949] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:13:57.012 screencap7[39407:96123677] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:14:07.259 screencap7[39407:96123677] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:14:17.536 screencap7[39407:96130949] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:14:23.794 screencap7[39407:96123677] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:14:27.864 screencap7[39407:96123677] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:14:38.152 screencap7[39407:96128222] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:14:48.360 screencap7[39407:96128222] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:14:52.314 screencap7[39407:96128222] 📸 Captured 2700 frames | Mode: Window ID: 103263 | Size: 1800x991
+
+ScreenCap: 2025-06-25 09:14:54.562 screencap7[39407:96128222] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:14:58.817 screencap7[39407:96130949] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:15:09.557 screencap7[39407:96130949] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:15:21.049 screencap7[39407:96128222] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:15:25.473 screencap7[39407:96123677] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:15:31.557 screencap7[39407:96130949] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:15:41.594 screencap7[39407:96130949] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:15:51.846 screencap7[39407:96123677] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:15:56.213 screencap7[39407:96130949] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:16:02.569 screencap7[39407:96123677] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:16:12.803 screencap7[39407:96123677] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:16:23.108 screencap7[39407:96130949] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:16:27.108 screencap7[39407:96123677] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:16:33.381 screencap7[39407:96123677] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:16:43.677 screencap7[39407:96123677] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:16:53.911 screencap7[39407:96128222] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:16:57.904 screencap7[39407:96123677] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:17:04.172 screencap7[39407:96128222] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:17:14.401 screencap7[39407:96128222] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:17:24.737 screencap7[39407:96123677] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:17:28.779 screencap7[39407:96123677] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:17:35.055 screencap7[39407:96128222] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:17:45.179 screencap7[39407:96123677] 📸 Captured 3000 frames | Mode: Window ID: 103263 | Size: 1800x991
+
+ScreenCap: 2025-06-25 09:17:45.303 screencap7[39407:96123677] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:17:55.642 screencap7[39407:96130951] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:17:59.666 screencap7[39407:96130951] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:18:05.869 screencap7[39407:96130950] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:18:16.187 screencap7[39407:96130950] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:18:26.381 screencap7[39407:96219268] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:18:30.418 screencap7[39407:96219268] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:18:36.584 screencap7[39407:96130950] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:18:46.782 screencap7[39407:96219268] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:18:56.974 screencap7[39407:96219268] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:19:01.036 screencap7[39407:96130950] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:19:07.200 screencap7[39407:96130950] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:19:17.470 screencap7[39407:96130950] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:19:27.684 screencap7[39407:96130950] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:19:31.734 screencap7[39407:96219268] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:19:37.873 screencap7[39407:96219268] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:19:48.097 screencap7[39407:96219268] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:19:58.307 screencap7[39407:96130950] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:20:02.399 screencap7[39407:96219268] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:20:08.561 screencap7[39407:96219268] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:20:18.801 screencap7[39407:96238216] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:20:29.885 screencap7[39407:96239268] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:20:33.655 screencap7[39407:96239268] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:20:40.095 screencap7[39407:96241413] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:20:50.361 screencap7[39407:96239268] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:21:00.606 screencap7[39407:96241413] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:21:04.414 screencap7[39407:96241413] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:21:10.866 screencap7[39407:96239268] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:21:21.263 screencap7[39407:96241413] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:21:31.641 screencap7[39407:96241413] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:21:35.453 screencap7[39407:96239268] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:21:41.877 screencap7[39407:96239268] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:21:52.148 screencap7[39407:96239268] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:22:02.393 screencap7[39407:96256254] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:22:06.193 screencap7[39407:96256254] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:22:12.627 screencap7[39407:96256254] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:22:22.828 screencap7[39407:96256254] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:22:33.022 screencap7[39407:96256254] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:22:36.892 screencap7[39407:96256254] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:22:43.389 screencap7[39407:96239268] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:22:53.624 screencap7[39407:96239268] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:23:03.879 screencap7[39407:96239268] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:23:07.763 screencap7[39407:96239268] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:23:14.118 screencap7[39407:96239268] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:23:24.344 screencap7[39407:96276827] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:23:34.631 screencap7[39407:96256254] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:23:38.534 screencap7[39407:96256254] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:23:44.897 screencap7[39407:96256254] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:23:55.126 screencap7[39407:96276827] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:24:05.408 screencap7[39407:96283795] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:24:09.255 screencap7[39407:96283795] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:24:15.619 screencap7[39407:96285159] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:24:26.419 screencap7[39407:96285159] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:24:36.736 screencap7[39407:96285159] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:24:40.889 screencap7[39407:96285159] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:24:46.940 screencap7[39407:96276827] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:24:57.177 screencap7[39407:96290487] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:25:07.874 screencap7[39407:96292375] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:25:12.060 screencap7[39407:96276827] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:25:18.133 screencap7[39407:96276827] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:25:28.607 screencap7[39407:96292375] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:25:38.933 screencap7[39407:96276827] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:25:43.031 screencap7[39407:96276827] 📸 Captured 3300 frames | Mode: Window ID: 103263 | Size: 1800x991
+
+ScreenCap: 2025-06-25 09:25:43.143 screencap7[39407:96276827] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:25:49.258 screencap7[39407:96292375] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:25:59.545 screencap7[39407:96292375] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:26:10.165 screencap7[39407:96276827] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:26:14.443 screencap7[39407:96292375] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:26:20.471 screencap7[39407:96276827] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:26:30.663 screencap7[39407:96292375] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:26:40.900 screencap7[39407:96276827] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:26:45.145 screencap7[39407:96276827] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:26:51.135 screencap7[39407:96292375] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:27:01.380 screencap7[39407:96313846] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:27:11.598 screencap7[39407:96276827] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:27:12.767 screencap7[39407:96276827] 📸 Captured 3600 frames | Mode: Window ID: 103263 | Size: 1800x991
+
+ScreenCap: 2025-06-25 09:27:15.849 screencap7[39407:96313846] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:27:21.890 screencap7[39407:96315379] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:27:32.109 screencap7[39407:96315379] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:27:42.537 screencap7[39407:96315379] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:27:46.815 screencap7[39407:96276827] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:27:52.844 screencap7[39407:96315379] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:28:03.184 screencap7[39407:96276827] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:28:13.480 screencap7[39407:96323578] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:28:18.110 screencap7[39407:96276827] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:28:23.922 screencap7[39407:96323578] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:28:34.318 screencap7[39407:96323578] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:28:44.644 screencap7[39407:96328067] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:28:49.068 screencap7[39407:96329630] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:28:55.374 screencap7[39407:96332028] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:29:05.626 screencap7[39407:96335044] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:29:15.959 screencap7[39407:96339190] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:29:19.789 screencap7[39407:96329630] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:29:26.191 screencap7[39407:96329630] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:29:36.416 screencap7[39407:96335044] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:29:46.645 screencap7[39407:96329630] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:29:50.502 screencap7[39407:96329630] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:29:57.000 screencap7[39407:96347437] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:30:07.220 screencap7[39407:96329630] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:30:17.468 screencap7[39407:96329630] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:30:21.401 screencap7[39407:96347437] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:30:27.756 screencap7[39407:96329630] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:30:38.087 screencap7[39407:96329630] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:30:48.286 screencap7[39407:96347437] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:30:52.199 screencap7[39407:96347437] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:30:58.493 screencap7[39407:96329630] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:31:08.693 screencap7[39407:96329630] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:31:18.947 screencap7[39407:96347437] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:31:23.224 screencap7[39407:96329630] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:31:29.382 screencap7[39407:96329630] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:31:39.616 screencap7[39407:96347437] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:31:50.255 screencap7[39407:96347437] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:31:54.352 screencap7[39407:96347437] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:32:00.467 screencap7[39407:96366321] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:32:10.728 screencap7[39407:96366321] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:32:20.963 screencap7[39407:96366321] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:32:25.088 screencap7[39407:96366321] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:32:31.176 screencap7[39407:96366321] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:32:41.404 screencap7[39407:96347437] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:32:51.648 screencap7[39407:96377525] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:32:55.793 screencap7[39407:96377525] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:33:01.882 screencap7[39407:96377525] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:33:12.137 screencap7[39407:96377525] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:33:22.377 screencap7[39407:96347437] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:33:26.629 screencap7[39407:96347437] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:33:32.581 screencap7[39407:96347437] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:33:42.854 screencap7[39407:96347437] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:33:53.155 screencap7[39407:96377525] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:33:57.485 screencap7[39407:96377525] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:34:03.388 screencap7[39407:96347437] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:34:13.630 screencap7[39407:96377525] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:34:23.880 screencap7[39407:96377525] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:34:28.214 screencap7[39407:96387474] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:34:34.151 screencap7[39407:96347437] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:34:44.385 screencap7[39407:96387474] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:34:54.615 screencap7[39407:96387474] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:34:59.019 screencap7[39407:96387474] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:35:04.872 screencap7[39407:96347437] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:35:15.108 screencap7[39407:96347437] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:35:25.344 screencap7[39407:96347437] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:35:29.747 screencap7[39407:96387474] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+ScreenCap: 2025-06-25 09:35:35.597 screencap7[39407:96403689] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:35:45.827 screencap7[39407:96387474] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:35:56.111 screencap7[39407:96387474] 🚫 Ignoring frame from old stream 0x102604a00 (current: 0x102c05230)
+
+ScreenCap: 2025-06-25 09:36:00.560 screencap7[39407:96403689] 🎬 Frame from current stream 0x102c05230 | Mode: 2 | Target: 103263
+
+
+> node-remote-desktop@1.0.0 dev
+> nodemon server.js --watch native/osx/*.m --ext js,m
+
+[33m[nodemon] 3.1.10[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): native/osx/list_windows_cg.m[39m
+[33m[nodemon] watching extensions: js,m[39m
+[32m[nodemon] starting `node server.js native/osx/screencap7_clean.m native/osx/webrtc_encoder.m`[39m
+🚀 Starting HTTP API screen capture server...
+🔨 Recompiling native binaries...
+
+╔════════════════════════════════════════╗
+║      Remote Desktop VNC v2 (HTTP)     ║
+╠════════════════════════════════════════╣
+║  URL: http://0.0.0.0:3030               ║
+║  Platform: darwin                    ║
+║  Method: ScreenCaptureKit HTTP API    ║
+║  Native API: http://0.0.0.0:8080       ║
+║  Display: default              ║
+╚════════════════════════════════════════╝
+  
+✅ list_windows_cg compiled successfully
+✅ screencap7 compiled successfully
+🔥 Starting native macOS ScreenCaptureKit HTTP server...
+✅ Native macOS HTTP server started on port 8080!
+ScreenCap: 2025-06-25 09:36:06.858 screencap7[65926:96410281] 🔥 ScreenCaptureKit HTTP Server v7 Starting...
+
+ScreenCap: 2025-06-25 09:36:06.889 screencap7[65926:96410281] 📋 Permission Status:
+2025-06-25 09:36:06.890 screencap7[65926:96410281]    Screen Recording: ✅ GRANTED
+2025-06-25 09:36:06.890 screencap7[65926:96410281]    Accessibility: ✅ GRANTED
+
+ScreenCap: 2025-06-25 09:36:06.890 screencap7[65926:96410281] 🚀 Setting up ScreenCaptureKit...
+
+ScreenCap: 2025-06-25 09:36:06.901 screencap7[65926:96410281] 🌐 Starting HTTP server on port 8080...
+2025-06-25 09:36:06.901 screencap7[65926:96410281] 🚀 Setting up ScreenCaptureKit...
+
+ScreenCap: 2025-06-25 09:36:06.914 screencap7[65926:96410281] 📝 API Endpoints:
+2025-06-25 09:36:06.914 screencap7[65926:96410281]    GET  /apps           - List applications
+2025-06-25 09:36:06.914 screencap7[65926:96410281]    GET  /windows        - List windows (Core Graphics)
+2025-06-25 09:36:06.914 screencap7[65926:96410281]    GET  /display        - Get display info (resolution, scaling)
+2025-06-25 09:36:06.914 screencap7[65926:96410281]    GET  /frame          - Get current frame (JPEG)
+2025-06-25 09:36:06.914 screencap7[65926:96410281]    POST /capture        - Start capture {type, index}
+2025-06-25 09:36:06.914 screencap7[65926:96410281]    POST /click          - Send click {x, y}
+2025-06-25 09:36:06.914 screencap7[65926:96410281]    POST /click-window   - Send click to window {x, y, cgWindowID}
+2025-06-25 09:36:06.914 screencap7[65926:96410281]    POST /click-background - Send click to background window {x, y, cgWindowID}
+2025-06-25 09:36:06.914 screencap7[65926:96410281]    POST /key            - Send key {key}
+
+ScreenCap: 2025-06-25 09:36:06.914 screencap7[65926:96410281]    POST /key-window     - Send key to window {key, cgWindowID}
+2025-06-25 09:36:06.914 screencap7[65926:96410281]    POST /key-background - Send key to background window {key, cgWindowID}
+2025-06-25 09:36:06.914 screencap7[65926:96410281]    POST /screenshot     - Get window screenshot {cgWindowID}
+2025-06-25 09:36:06.914 screencap7[65926:96410281]    POST /stop           - Stop capture
+2025-06-25 09:36:06.914 screencap7[65926:96410323] ✅ HTTP server listening on port 8080
+
+ScreenCap: 2025-06-25 09:36:07.029 screencap7[65926:96410316] ✅ Found display: 4 (3840 x 1620)
+
+ScreenCap: 2025-06-25 09:36:07.031 screencap7[65926:96410316] 🔧 Desktop capture: Size 3840x1620
+2025-06-25 09:36:07.031 screencap7[65926:96410316] 🔧 Attempting headless capture configuration...
+
+ScreenCap: 2025-06-25 09:36:07.031 screencap7[65926:96410316] 🔧 Configured stream for headless capture (locked screen / lid closed support)
+
+ScreenCap: 2025-06-25 09:36:07.228 screencap7[65926:96410316] ✅ Found display: 4 (3840 x 1620)
+
+ScreenCap: 2025-06-25 09:36:07.231 screencap7[65926:96410316] 🔧 Desktop capture: Size 3840x1620
+2025-06-25 09:36:07.231 screencap7[65926:96410316] 🔧 Attempting headless capture configuration...
+
+ScreenCap: 2025-06-25 09:36:07.231 screencap7[65926:96410316] 🔧 Configured stream for headless capture (locked screen / lid closed support)
+
+ScreenCap: 2025-06-25 09:36:07.232 screencap7[65926:96410328] ✅ full desktop capture started successfully at 30 FPS!
+2025-06-25 09:36:07.232 screencap7[65926:96410328] 📝 Send commands via stdin: 'click x y' or 'key character'
+
+ScreenCap: 2025-06-25 09:36:07.297 screencap7[65926:96410316] ✅ full desktop capture started successfully at 30 FPS!
+2025-06-25 09:36:07.297 screencap7[65926:96410316] 📝 Send commands via stdin: 'click x y' or 'key character'
+
+✅ HTTP API streaming started at 30 FPS
+ScreenCap: 2025-06-25 09:36:20.006 screencap7[65926:96410400] 🚫 Ignoring frame from old stream 0x149f04080 (current: 0x14990bd00)
+
+ScreenCap: 2025-06-25 09:36:26.984 screencap7[65926:96410400] 📸 Captured 300 frames | Mode: Full Desktop | Size: 3840x1620
+
+ScreenCap: 2025-06-25 09:36:30.181 screencap7[65926:96410396] 🚫 Ignoring frame from old stream 0x149f04080 (current: 0x14990bd00)
+
+ScreenCap: 2025-06-25 09:36:37.935 screencap7[65926:96410396] 🎬 Frame from current stream 0x14990bd00 | Mode: 0 | Target: 0
+
+ScreenCap: 2025-06-25 09:36:40.487 screencap7[65926:96410400] 🚫 Ignoring frame from old stream 0x149f04080 (current: 0x14990bd00)
+
+ScreenCap: 2025-06-25 09:36:50.647 screencap7[65926:96410400] 🚫 Ignoring frame from old stream 0x149f04080 (current: 0x14990bd00)
+
+ScreenCap: 2025-06-25 09:36:52.384 screencap7[65926:96410400] 📸 Captured 600 frames | Mode: Full Desktop | Size: 3840x1620
+
+ScreenCap: 2025-06-25 09:37:06.300 screencap7[65926:96410400] 🚫 Ignoring frame from old stream 0x149f04080 (current: 0x14990bd00)
+
+ScreenCap: 2025-06-25 09:37:08.181 screencap7[65926:96410400] 📸 Captured 900 frames | Mode: Full Desktop | Size: 3840x1620
+
+ScreenCap: 2025-06-25 09:37:08.585 screencap7[65926:96410400] 🎬 Frame from current stream 0x14990bd00 | Mode: 0 | Target: 0
+
+ScreenCap: 2025-06-25 09:37:20.621 screencap7[65926:96410400] 🚫 Ignoring frame from old stream 0x149f04080 (current: 0x14990bd00)
+
+ScreenCap: 2025-06-25 09:37:25.228 screencap7[65926:96410316] 📸 Captured 1200 frames | Mode: Full Desktop | Size: 3840x1620
+
+ScreenCap: 2025-06-25 09:37:32.541 screencap7[65926:96410394] 🚫 Ignoring frame from old stream 0x149f04080 (current: 0x14990bd00)
+
+ScreenCap: 2025-06-25 09:37:39.543 screencap7[65926:96410394] 🎬 Frame from current stream 0x14990bd00 | Mode: 0 | Target: 0
+
+ScreenCap: 2025-06-25 09:37:42.773 screencap7[65926:96410394] 🚫 Ignoring frame from old stream 0x149f04080 (current: 0x14990bd00)
+
+ScreenCap: 2025-06-25 09:37:51.731 screencap7[65926:96410399] 📸 Captured 1500 frames | Mode: Full Desktop | Size: 3840x1620
+
+ScreenCap: 2025-06-25 09:37:54.313 screencap7[65926:96410396] 🚫 Ignoring frame from old stream 0x149f04080 (current: 0x14990bd00)
+
+
+> node-remote-desktop@1.0.0 dev
+> nodemon server.js --watch native/osx/*.m --ext js,m
+
+[33m[nodemon] 3.1.10[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): native/osx/list_windows_cg.m[39m
+[33m[nodemon] watching extensions: js,m[39m
+[32m[nodemon] starting `node server.js native/osx/screencap7_clean.m native/osx/webrtc_encoder.m`[39m
+🚀 Starting HTTP API screen capture server...
+🔨 Recompiling native binaries...
+
+╔════════════════════════════════════════╗
+║      Remote Desktop VNC v2 (HTTP)     ║
+╠════════════════════════════════════════╣
+║  URL: http://0.0.0.0:3030               ║
+║  Platform: darwin                    ║
+║  Method: ScreenCaptureKit HTTP API    ║
+║  Native API: http://0.0.0.0:8080       ║
+║  Display: default              ║
+╚════════════════════════════════════════╝
+  
+✅ list_windows_cg compiled successfully
+✅ screencap7 compiled successfully
+🔥 Starting native macOS ScreenCaptureKit HTTP server...
+✅ Native macOS HTTP server started on port 8080!
+ScreenCap: 2025-06-25 09:38:02.393 screencap7[73184:96430227] 🔥 ScreenCaptureKit HTTP Server v7 Starting...
+
+ScreenCap: 2025-06-25 09:38:02.424 screencap7[73184:96430227] 📋 Permission Status:
+2025-06-25 09:38:02.424 screencap7[73184:96430227]    Screen Recording: ✅ GRANTED
+2025-06-25 09:38:02.424 screencap7[73184:96430227]    Accessibility: ✅ GRANTED
+
+ScreenCap: 2025-06-25 09:38:02.424 screencap7[73184:96430227] 🚀 Setting up ScreenCaptureKit...
+
+ScreenCap: 2025-06-25 09:38:02.437 screencap7[73184:96430227] 🌐 Starting HTTP server on port 8080...
+2025-06-25 09:38:02.437 screencap7[73184:96430227] 🚀 Setting up ScreenCaptureKit...
+
+ScreenCap: 2025-06-25 09:38:02.449 screencap7[73184:96430227] 📝 API Endpoints:
+2025-06-25 09:38:02.449 screencap7[73184:96430227]    GET  /apps           - List applications
+2025-06-25 09:38:02.449 screencap7[73184:96430227]    GET  /windows        - List windows (Core Graphics)
+
+ScreenCap: 2025-06-25 09:38:02.449 screencap7[73184:96430227]    GET  /display        - Get display info (resolution, scaling)
+2025-06-25 09:38:02.449 screencap7[73184:96430227]    GET  /frame          - Get current frame (JPEG)
+2025-06-25 09:38:02.449 screencap7[73184:96430227]    POST /capture        - Start capture {type, index}
+2025-06-25 09:38:02.449 screencap7[73184:96430227]    POST /click          - Send click {x, y}
+2025-06-25 09:38:02.449 screencap7[73184:96430227]    POST /click-window   - Send click to window {x, y, cgWindowID}
+2025-06-25 09:38:02.449 screencap7[73184:96430227]    POST /click-background - Send click to background window {x, y, cgWindowID}
+2025-06-25 09:38:02.449 screencap7[73184:96430227]    POST /key            - Send key {key}
+2025-06-25 09:38:02.449 screencap7[73184:96430227]    POST /key-window     - Send key to window {key, cgWindowID}
+2025-06-25 09:38:02.449 screencap7[73184:96430227]    POST /key-background - Send key to background window {key, cgWindowID}
+2025-06-25 09:38:02.449 screencap7[73184:96430227]    POST /screenshot     - Get window screenshot {cgWindowID}
+2025-06-25 09:38:02.449 screencap7[73184:96430227]    POST /stop           - Stop capture
+
+ScreenCap: 2025-06-25 09:38:02.449 screencap7[73184:96430244] ✅ HTTP server listening on port 8080
+
+ScreenCap: 2025-06-25 09:38:02.561 screencap7[73184:96430250] ✅ Found display: 4 (3840 x 1620)
+
+ScreenCap: 2025-06-25 09:38:02.563 screencap7[73184:96430250] 🔧 Desktop capture: Size 3840x1620
+2025-06-25 09:38:02.563 screencap7[73184:96430250] 🔧 Attempting headless capture configuration...
+
+ScreenCap: 2025-06-25 09:38:02.563 screencap7[73184:96430250] 🔧 Configured stream for headless capture (locked screen / lid closed support)
+
+ScreenCap: 2025-06-25 09:38:02.764 screencap7[73184:96430250] ✅ Found display: 4 (3840 x 1620)
+
+ScreenCap: 2025-06-25 09:38:02.765 screencap7[73184:96430250] 🔧 Desktop capture: Size 3840x1620
+
+ScreenCap: 2025-06-25 09:38:02.765 screencap7[73184:96430250] 🔧 Attempting headless capture configuration...
+2025-06-25 09:38:02.765 screencap7[73184:96430250] 🔧 Configured stream for headless capture (locked screen / lid closed support)
+
+ScreenCap: 2025-06-25 09:38:02.766 screencap7[73184:96430258] ✅ full desktop capture started successfully at 30 FPS!
+
+ScreenCap: 2025-06-25 09:38:02.766 screencap7[73184:96430258] 📝 Send commands via stdin: 'click x y' or 'key character'
+
+ScreenCap: 2025-06-25 09:38:02.825 screencap7[73184:96430261] ✅ full desktop capture started successfully at 30 FPS!
+2025-06-25 09:38:02.825 screencap7[73184:96430261] 📝 Send commands via stdin: 'click x y' or 'key character'
+
+✅ HTTP API streaming started at 30 FPS
+ScreenCap: 2025-06-25 09:38:14.731 screencap7[73184:96430324] 🚫 Ignoring frame from old stream 0x14c807260 (current: 0x14ce09450)
+
+ScreenCap: 2025-06-25 09:38:25.011 screencap7[73184:96430324] 🚫 Ignoring frame from old stream 0x14c807260 (current: 0x14ce09450)
+
+ScreenCap: 2025-06-25 09:38:28.872 screencap7[73184:96430324] 📸 Captured 300 frames | Mode: Full Desktop | Size: 3840x1620
+
+ScreenCap: 2025-06-25 09:38:33.680 screencap7[73184:96430324] 🎬 Frame from current stream 0x14ce09450 | Mode: 0 | Target: 0
+
+ScreenCap: 2025-06-25 09:38:40.674 screencap7[73184:96430324] 🚫 Ignoring frame from old stream 0x14c807260 (current: 0x14ce09450)
+
+ScreenCap: 2025-06-25 09:38:40.748 screencap7[73184:96430324] 📸 Captured 600 frames | Mode: Full Desktop | Size: 3840x1620
+
+
+> node-remote-desktop@1.0.0 dev
+> nodemon server.js --watch native/osx/*.m --ext js,m
+
+[33m[nodemon] 3.1.10[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): native/osx/list_windows_cg.m[39m
+[33m[nodemon] watching extensions: js,m[39m
+[32m[nodemon] starting `node server.js native/osx/screencap7_clean.m native/osx/webrtc_encoder.m`[39m
+🚀 Starting HTTP API screen capture server...
+🔨 Recompiling native binaries...
+node:events:485
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use 0.0.0.0:9090
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at node:net:2206:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+Emitted 'error' event on WebSocketServer instance at:
+    at Server.emit (node:events:507:28)
+    at emitErrorNT (node:net:1976:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 9090
+}
+
+Node.js v24.2.0
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
