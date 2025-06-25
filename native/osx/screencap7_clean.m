@@ -7,7 +7,7 @@
 #import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #import <CoreGraphics/CoreGraphics.h>
 #import <ApplicationServices/ApplicationServices.h>
-#import "webrtc_encoder.h"
+#import "vp9_encoder.h"
 
 typedef enum {
     CaptureTypeFullDesktop = 0,
@@ -26,8 +26,9 @@ typedef enum {
 @property (nonatomic, assign) BOOL isCapturing;
 @property (nonatomic, strong) NSString *cachedWindowsList;
 @property (nonatomic, strong) NSTimer *windowsUpdateTimer;
-@property (nonatomic, strong) WebRTCEncoder *webrtcEncoder;
-@property (nonatomic, assign) BOOL useWebRTCMode;
+@property (nonatomic, strong) VP9Encoder *vp9Encoder;
+@property (nonatomic, assign) BOOL useVP9Mode;
+@property (nonatomic, strong) NSMutableData *currentEncodedFrame;
 @end
 
 @implementation ScreenCapture
@@ -45,6 +46,7 @@ typedef enum {
         self.captureType = captureType;
         self.targetIndex = targetIndex;
         self.currentFrame = [NSMutableData data];
+        self.currentEncodedFrame = [NSMutableData data];
         self.isCapturing = NO;
         self.cachedWindowsList = @"[]"; // Default empty list
         [self startWindowsCaching];
@@ -255,15 +257,24 @@ typedef enum {
         
         NSLog(@"🔧 Configured stream for headless capture (locked screen / lid closed support)");
         
-        // Initialize WebRTC encoder for hardware acceleration
-        if (self.useWebRTCMode) {
-            self.webrtcEncoder = [[WebRTCEncoder alloc] 
-                initWithCodec:kCMVideoCodecType_H264 
-                       width:config.width 
-                      height:config.height 
-                     bitrate:10000000  // 10 Mbps
-                   framerate:30];
-            NSLog(@"🚀 WebRTC hardware encoder initialized: %zux%zu H.264", config.width, config.height);
+        // Initialize VP9 encoder for hardware acceleration
+        if (self.useVP9Mode) {
+            self.vp9Encoder = [[VP9Encoder alloc] 
+                initWithWidth:config.width 
+                       height:config.height 
+                      bitrate:8000000  // 8 Mbps for VP9 (more efficient)
+                    framerate:30];
+            
+            // Set up callback to store encoded frames
+            // Using __block instead of __weak for manual reference counting
+            __block ScreenCapture *blockSelf = self;
+            [self.vp9Encoder setFrameCallback:^(NSData *encodedFrame) {
+                @synchronized(blockSelf.currentEncodedFrame) {
+                    blockSelf.currentEncodedFrame = [encodedFrame mutableCopy];
+                }
+            }];
+            
+            NSLog(@"🚀 VP9 hardware encoder initialized: %zux%zu", config.width, config.height);
         }
         
         // Create stream with error delegate
@@ -790,19 +801,10 @@ typedef enum {
                     [self.currentFrame setData:jpegData];
                 }
                 
-                // If WebRTC mode is enabled, also encode with hardware accelerated encoder
-                if (self.useWebRTCMode && self.webrtcEncoder) {
-                    NSData *h264Data = [self.webrtcEncoder encodeFrame:imageBuffer];
-                    if (h264Data && h264Data.length > 0) {
-                        // Store H.264 data separately for WebRTC streaming
-                        // This could be sent via WebRTC data channel or HTTP endpoint
-                        static int h264FrameCount = 0;
-                        h264FrameCount++;
-                        if (h264FrameCount % 300 == 0) { // Every 10 seconds at 30fps
-                            NSLog(@"🎥 WebRTC H.264 encoded %d frames, latest: %zu bytes", 
-                                  h264FrameCount, h264Data.length);
-                        }
-                    }
+                // If VP9 mode is enabled, also encode with hardware accelerated encoder
+                if (self.useVP9Mode && self.vp9Encoder) {
+                    [self.vp9Encoder encodeFrame:imageBuffer];
+                    // The encoded frame will be stored via the callback
                 }
                 
                 // Log progress occasionally (disabled to reduce spam)
@@ -837,17 +839,23 @@ typedef enum {
     }
 }
 
+- (NSData *)getCurrentEncodedFrame {
+    @synchronized(self.currentEncodedFrame) {
+        return [self.currentEncodedFrame copy];
+    }
+}
+
 - (void)startCaptureWithType:(CaptureType)captureType targetIndex:(int)targetIndex {
     [self startCaptureWithType:captureType targetIndex:targetIndex webrtcMode:NO];
 }
 
-- (void)startCaptureWithType:(CaptureType)captureType targetIndex:(int)targetIndex webrtcMode:(BOOL)useWebRTC {
+- (void)startCaptureWithType:(CaptureType)captureType targetIndex:(int)targetIndex webrtcMode:(BOOL)useVP9 {
     self.captureType = captureType;
     self.targetIndex = targetIndex;
-    self.useWebRTCMode = useWebRTC;
+    self.useVP9Mode = useVP9;
     
-    if (useWebRTC) {
-        NSLog(@"🚀 Starting capture with WebRTC hardware acceleration enabled");
+    if (useVP9) {
+        NSLog(@"🚀 Starting capture with VP9 hardware acceleration enabled");
     } else {
         NSLog(@"📸 Starting capture with standard MJPEG mode");
     }
@@ -859,16 +867,16 @@ typedef enum {
     [self startCaptureWithWindowID:windowID webrtcMode:NO];
 }
 
-- (void)startCaptureWithWindowID:(UInt32)windowID webrtcMode:(BOOL)useWebRTC {
-    NSLog(@"🎯 startCaptureWithWindowID called with ID: %u, WebRTC: %@", windowID, useWebRTC ? @"YES" : @"NO");
+- (void)startCaptureWithWindowID:(UInt32)windowID webrtcMode:(BOOL)useVP9 {
+    NSLog(@"🎯 startCaptureWithWindowID called with ID: %u, VP9: %@", windowID, useVP9 ? @"YES" : @"NO");
     
     // Special method for capturing specific windows by CGWindowID
     self.captureType = CaptureTypeWindow;
     self.targetIndex = (int)windowID; // Store windowID in targetIndex
-    self.useWebRTCMode = useWebRTC;
+    self.useVP9Mode = useVP9;
     
-    if (useWebRTC) {
-        NSLog(@"🚀 Window capture with WebRTC hardware acceleration enabled");
+    if (useVP9) {
+        NSLog(@"🚀 Window capture with VP9 hardware acceleration enabled");
     } else {
         NSLog(@"📸 Window capture with standard MJPEG mode");
     }
@@ -1243,6 +1251,7 @@ void listApplicationsAndWindows() {
     NSLog(@"   GET  /windows        - List windows (Core Graphics)");
     NSLog(@"   GET  /display        - Get display info (resolution, scaling)");
     NSLog(@"   GET  /frame          - Get current frame (JPEG)");
+    NSLog(@"   GET  /vp9-frame      - Get current VP9 encoded frame");
     NSLog(@"   POST /capture        - Start capture {type, index}");
     NSLog(@"   POST /click          - Send click {x, y}");
     NSLog(@"   POST /click-window   - Send click to window {x, y, cgWindowID}");
@@ -1343,6 +1352,8 @@ void listApplicationsAndWindows() {
         [self sendDisplayInfoResponse:client_fd];
     } else if ([method isEqualToString:@"GET"] && [path isEqualToString:@"/frame"]) {
         [self sendFrameResponse:client_fd];
+    } else if ([method isEqualToString:@"GET"] && [path isEqualToString:@"/vp9-frame"]) {
+        [self sendVP9FrameResponse:client_fd];
     } else if ([method isEqualToString:@"POST"] && [path isEqualToString:@"/click"]) {
         [self handleClickRequest:client_fd request:request];
     } else if ([method isEqualToString:@"POST"] && [path isEqualToString:@"/click-window"]) {
@@ -1435,6 +1446,23 @@ void listApplicationsAndWindows() {
     }
     
     NSString *header = [NSString stringWithFormat:@"HTTP/1.1 200 OK\r\nContent-Type: image/jpeg\r\nContent-Length: %lu\r\nAccess-Control-Allow-Origin: *\r\n\r\n", 
+                       (unsigned long)frameData.length];
+    
+    send(client_fd, [header UTF8String], header.length, 0);
+    send(client_fd, frameData.bytes, frameData.length, 0);
+}
+
+- (void)sendVP9FrameResponse:(int)client_fd {
+    NSData *frameData = [self.captureServer getCurrentEncodedFrame];
+    
+    if (frameData.length == 0) {
+        // No VP9 frame yet, send 204 No Content
+        NSString *header = @"HTTP/1.1 204 No Content\r\nAccess-Control-Allow-Origin: *\r\n\r\n";
+        send(client_fd, [header UTF8String], header.length, 0);
+        return;
+    }
+    
+    NSString *header = [NSString stringWithFormat:@"HTTP/1.1 200 OK\r\nContent-Type: video/vp9\r\nContent-Length: %lu\r\nAccess-Control-Allow-Origin: *\r\nCache-Control: no-cache\r\n\r\n", 
                        (unsigned long)frameData.length];
     
     send(client_fd, [header UTF8String], header.length, 0);
@@ -1624,7 +1652,7 @@ void listApplicationsAndWindows() {
     [self.captureServer stopCapture];
     [self.captureServer startCaptureWithType:type targetIndex:index webrtcMode:webrtcMode];
     
-    NSString *modeStr = webrtcMode ? @"WebRTC" : @"MJPEG";
+    NSString *modeStr = webrtcMode ? @"VP9" : @"MJPEG";
     [self sendJSONResponse:client_fd data:@{
         @"status": @"capture_started", 
         @"type": @(type), 
@@ -1703,7 +1731,7 @@ void listApplicationsAndWindows() {
         [self.captureServer startCaptureWithWindowID:windowID webrtcMode:webrtcMode];
         NSLog(@"📌 Window capture started successfully");
         
-        NSString *modeStr = webrtcMode ? @"WebRTC" : @"MJPEG";
+        NSString *modeStr = webrtcMode ? @"VP9" : @"MJPEG";
         [self sendJSONResponse:client_fd data:@{
             @"status": @"window_capture_started", 
             @"cgWindowID": @(windowID),

@@ -28,7 +28,7 @@ async function startServerScreenCapture() {
     
     // Compile main capture binary first
     const compileScreencap = new Promise((resolve, reject) => {
-      exec(`cd "${nativeDir}" && clang -o screencap7 screencap7_clean.m webrtc_encoder.m -framework Foundation -framework ScreenCaptureKit -framework CoreMedia -framework CoreVideo -framework ImageIO -framework UniformTypeIdentifiers -framework CoreGraphics -framework AppKit -framework VideoToolbox -framework QuartzCore`, (error) => {
+      exec(`cd "${nativeDir}" && clang -o screencap7 screencap7_clean.m vp9_encoder.m -framework Foundation -framework ScreenCaptureKit -framework CoreMedia -framework CoreVideo -framework ImageIO -framework UniformTypeIdentifiers -framework CoreGraphics -framework AppKit -framework VideoToolbox -framework QuartzCore`, (error) => {
         if (error) {
           console.error('❌ Failed to compile screencap7:', error.message);
           reject(error);
@@ -880,6 +880,11 @@ app.get('/webrtc/latest-offer', (req, res) => {
   });
 });
 
+// VP9 streaming page
+app.get('/vp9', (req, res) => {
+  res.sendFile(__dirname + '/vp9-client.html');
+});
+
 // WebRTC streaming page
 app.get('/webrtc', (req, res) => {
   res.send(`
@@ -1649,6 +1654,16 @@ app.get('/', (req, res) => {
           ⚡ WebRTC Mode
           <small style="opacity: 0.8; font-size: 11px;">Ultra-Low Latency • 20-50ms</small>
         </button>
+        <button class="mode-btn" id="vp9-mode" onclick="selectMode('vp9')" style="
+          background: linear-gradient(45deg, #667eea, #764ba2);
+          color: white; border: none; padding: 15px 25px; border-radius: 12px;
+          cursor: pointer; font-weight: 600; font-size: 14px;
+          transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; gap: 5px;
+          border: 2px solid transparent;
+        ">
+          🎥 VP9 Mode
+          <small style="opacity: 0.8; font-size: 11px;">Hardware • Best quality</small>
+        </button>
       </div>
       
       <div class="search-bar">
@@ -1730,6 +1745,7 @@ app.get('/', (req, res) => {
       // Update button styles
       document.getElementById('websocket-mode').style.border = mode === 'websocket' ? '2px solid #00ff88' : '2px solid transparent';
       document.getElementById('webrtc-mode').style.border = mode === 'webrtc' ? '2px solid #00ff88' : '2px solid transparent';
+      document.getElementById('vp9-mode').style.border = mode === 'vp9' ? '2px solid #00ff88' : '2px solid transparent';
       
       console.log('🎯 Selected mode:', mode);
       
@@ -1739,6 +1755,12 @@ app.get('/', (req, res) => {
           '<div style="display: flex; align-items: center; justify-content: center; gap: 10px;">' +
             '<span style="font-size: 1.2rem;">⚡</span>' +
             '<span><strong>WebRTC Mode Selected</strong> - Ultra-low latency streaming ready!</span>' +
+          '</div>';
+      } else if (mode === 'vp9') {
+        document.getElementById('status').innerHTML = 
+          '<div style="display: flex; align-items: center; justify-content: center; gap: 10px;">' +
+            '<span style="font-size: 1.2rem;">🎥</span>' +
+            '<span><strong>VP9 Mode Selected</strong> - Hardware accelerated, best quality!</span>' +
           '</div>';
       } else {
         document.getElementById('status').innerHTML = 
@@ -1921,6 +1943,24 @@ app.get('/', (req, res) => {
           // Redirect to WebRTC interface
           setTimeout(() => {
             window.location.href = '/webrtc';
+          }, 1000);
+          
+        } else if (selectedMode === 'vp9') {
+          // VP9 Mode - redirect to VP9 interface
+          console.log('🎥 Starting VP9 mode for', app.name);
+          
+          document.getElementById('status').innerHTML = 
+            '<div style="display: flex; align-items: center; justify-content: center; gap: 10px;">' +
+              '<span style="font-size: 1.2rem;">🎥</span>' +
+              '<span>Launching <strong>VP9 Hardware Accelerated</strong> mode...</span>' +
+            '</div>';
+          
+          // Store selected app for VP9 mode
+          localStorage.setItem('selectedApp', JSON.stringify(app));
+          
+          // Redirect to VP9 interface
+          setTimeout(() => {
+            window.location.href = '/vp9';
           }, 1000);
           
         } else {

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VP9 Remote Desktop</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #1a1a1a;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow: hidden;
+        }
+        
+        #container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        #header {
+            background: #2a2a2a;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #3a3a3a;
+        }
+        
+        #stats {
+            color: #fff;
+            font-size: 14px;
+            font-family: 'SF Mono', monospace;
+        }
+        
+        .stat {
+            display: inline-block;
+            margin-right: 20px;
+            padding: 4px 8px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 4px;
+        }
+        
+        #video-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        #remoteVideo {
+            max-width: 100%;
+            max-height: 100%;
+            cursor: crosshair;
+        }
+        
+        #status {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .error {
+            color: #ff4444;
+        }
+        
+        .success {
+            color: #44ff44;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="header">
+            <h3 style="color: #fff; margin: 0;">VP9 Hardware Accelerated Remote Desktop</h3>
+            <div id="stats">
+                <span class="stat">FPS: <span id="fps">0</span></span>
+                <span class="stat">Bitrate: <span id="bitrate">0</span> Mbps</span>
+                <span class="stat">Latency: <span id="latency">0</span>ms</span>
+                <span class="stat">Codec: <span id="codec">VP9</span></span>
+            </div>
+        </div>
+        
+        <div id="video-container">
+            <video id="remoteVideo" autoplay muted></video>
+            <div id="status">Initializing VP9 stream...</div>
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById('remoteVideo');
+        const status = document.getElementById('status');
+        let mediaSource = null;
+        let sourceBuffer = null;
+        let ws = null;
+        let frameCount = 0;
+        let lastFrameTime = Date.now();
+        let bytesReceived = 0;
+        
+        async function startVP9Stream() {
+            // Enable VP9 mode on server
+            const response = await fetch('http://127.0.0.1:8080/capture', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 0, index: 0, webrtc: true })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to start VP9 capture');
+            }
+            
+            status.textContent = 'VP9 capture started, connecting stream...';
+            status.className = 'success';
+            
+            // Create MediaSource for VP9 playback
+            mediaSource = new MediaSource();
+            video.src = URL.createObjectURL(mediaSource);
+            
+            mediaSource.addEventListener('sourceopen', () => {
+                sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="vp9"');
+                sourceBuffer.mode = 'sequence';
+                
+                // Start WebSocket for VP9 frames
+                connectWebSocket();
+            });
+        }
+        
+        function connectWebSocket() {
+            ws = new WebSocket('ws://localhost:3030/vp9-stream');
+            ws.binaryType = 'arraybuffer';
+            
+            ws.onopen = () => {
+                status.textContent = 'VP9 stream connected!';
+                status.className = 'success';
+                setTimeout(() => status.style.display = 'none', 2000);
+                
+                // Start polling for VP9 frames
+                pollVP9Frames();
+            };
+            
+            ws.onerror = (error) => {
+                status.textContent = 'WebSocket error: ' + error;
+                status.className = 'error';
+            };
+            
+            ws.onclose = () => {
+                status.textContent = 'Stream disconnected';
+                status.className = 'error';
+                status.style.display = 'block';
+            };
+        }
+        
+        async function pollVP9Frames() {
+            const pollInterval = setInterval(async () => {
+                if (ws.readyState !== WebSocket.OPEN) {
+                    clearInterval(pollInterval);
+                    return;
+                }
+                
+                try {
+                    const response = await fetch('http://127.0.0.1:8080/vp9-frame');
+                    
+                    if (response.status === 200) {
+                        const frameData = await response.arrayBuffer();
+                        
+                        // Wrap VP9 frame in WebM container if needed
+                        // For now, assume server sends properly formatted data
+                        
+                        if (!sourceBuffer.updating && frameData.byteLength > 0) {
+                            sourceBuffer.appendBuffer(frameData);
+                            
+                            frameCount++;
+                            bytesReceived += frameData.byteLength;
+                            updateStats();
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error fetching VP9 frame:', error);
+                }
+            }, 33); // ~30 FPS
+        }
+        
+        function updateStats() {
+            const now = Date.now();
+            const elapsed = (now - lastFrameTime) / 1000;
+            
+            if (elapsed >= 1) {
+                const fps = frameCount / elapsed;
+                const bitrate = (bytesReceived * 8) / (elapsed * 1000000); // Mbps
+                
+                document.getElementById('fps').textContent = fps.toFixed(1);
+                document.getElementById('bitrate').textContent = bitrate.toFixed(2);
+                
+                frameCount = 0;
+                bytesReceived = 0;
+                lastFrameTime = now;
+            }
+        }
+        
+        // Handle mouse events
+        video.addEventListener('click', async (e) => {
+            const rect = video.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Scale to video resolution
+            const scaleX = video.videoWidth / rect.width;
+            const scaleY = video.videoHeight / rect.height;
+            
+            const scaledX = Math.round(x * scaleX);
+            const scaledY = Math.round(y * scaleY);
+            
+            // Send click via HTTP API
+            await fetch('http://127.0.0.1:8080/click', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ x: scaledX, y: scaledY })
+            });
+        });
+        
+        // Handle keyboard events
+        document.addEventListener('keydown', async (e) => {
+            e.preventDefault();
+            
+            await fetch('http://127.0.0.1:8080/key', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: e.key })
+            });
+        });
+        
+        // Start the stream
+        startVP9Stream().catch(error => {
+            status.textContent = 'Failed to start VP9 stream: ' + error.message;
+            status.className = 'error';
+        });
+    </script>
+</body>
+</html>
