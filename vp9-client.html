@@ -108,7 +108,7 @@
             const response = await fetch('http://127.0.0.1:8080/capture', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ type: 0, index: 0, webrtc: true })
+                body: JSON.stringify({ type: 0, index: 0, vp9: true })
             });
             
             if (!response.ok) {

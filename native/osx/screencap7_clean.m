@@ -846,10 +846,10 @@ typedef enum {
 }
 
 - (void)startCaptureWithType:(CaptureType)captureType targetIndex:(int)targetIndex {
-    [self startCaptureWithType:captureType targetIndex:targetIndex webrtcMode:NO];
+    [self startCaptureWithType:captureType targetIndex:targetIndex vp9Mode:NO];
 }
 
-- (void)startCaptureWithType:(CaptureType)captureType targetIndex:(int)targetIndex webrtcMode:(BOOL)useVP9 {
+- (void)startCaptureWithType:(CaptureType)captureType targetIndex:(int)targetIndex vp9Mode:(BOOL)useVP9 {
     self.captureType = captureType;
     self.targetIndex = targetIndex;
     self.useVP9Mode = useVP9;
@@ -864,10 +864,10 @@ typedef enum {
 }
 
 - (void)startCaptureWithWindowID:(UInt32)windowID {
-    [self startCaptureWithWindowID:windowID webrtcMode:NO];
+    [self startCaptureWithWindowID:windowID vp9Mode:NO];
 }
 
-- (void)startCaptureWithWindowID:(UInt32)windowID webrtcMode:(BOOL)useVP9 {
+- (void)startCaptureWithWindowID:(UInt32)windowID vp9Mode:(BOOL)useVP9 {
     NSLog(@"🎯 startCaptureWithWindowID called with ID: %u, VP9: %@", windowID, useVP9 ? @"YES" : @"NO");
     
     // Special method for capturing specific windows by CGWindowID
@@ -1647,12 +1647,12 @@ void listApplicationsAndWindows() {
     
     int type = [json[@"type"] intValue]; // 0=desktop, 1=app
     int index = [json[@"index"] intValue];
-    BOOL webrtcMode = [json[@"webrtc"] boolValue]; // WebRTC hardware acceleration
+    BOOL vp9Mode = [json[@"vp9"] boolValue]; // VP9 hardware acceleration
     
     [self.captureServer stopCapture];
-    [self.captureServer startCaptureWithType:type targetIndex:index webrtcMode:webrtcMode];
+    [self.captureServer startCaptureWithType:type targetIndex:index vp9Mode:vp9Mode];
     
-    NSString *modeStr = webrtcMode ? @"VP9" : @"MJPEG";
+    NSString *modeStr = vp9Mode ? @"VP9" : @"MJPEG";
     [self sendJSONResponse:client_fd data:@{
         @"status": @"capture_started", 
         @"type": @(type), 
@@ -1711,9 +1711,9 @@ void listApplicationsAndWindows() {
         return;
     }
     
-    BOOL webrtcMode = [json[@"webrtc"] boolValue]; // WebRTC hardware acceleration
+    BOOL vp9Mode = [json[@"vp9"] boolValue]; // VP9 hardware acceleration
     
-    NSLog(@"🪟 Window selection request: CGWindowID %u, WebRTC: %@", windowID, webrtcMode ? @"YES" : @"NO");
+    NSLog(@"🪟 Window selection request: CGWindowID %u, VP9: %@", windowID, vp9Mode ? @"YES" : @"NO");
     
     if (!self.captureServer) {
         NSLog(@"❌ Capture server not initialized!");
@@ -1728,10 +1728,10 @@ void listApplicationsAndWindows() {
         [self.captureServer stopCapture];
         NSLog(@"📌 Stop capture completed, starting window capture...");
         
-        [self.captureServer startCaptureWithWindowID:windowID webrtcMode:webrtcMode];
+        [self.captureServer startCaptureWithWindowID:windowID vp9Mode:vp9Mode];
         NSLog(@"📌 Window capture started successfully");
         
-        NSString *modeStr = webrtcMode ? @"VP9" : @"MJPEG";
+        NSString *modeStr = vp9Mode ? @"VP9" : @"MJPEG";
         [self sendJSONResponse:client_fd data:@{
             @"status": @"window_capture_started", 
             @"cgWindowID": @(windowID),

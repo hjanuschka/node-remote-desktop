@@ -22,27 +22,36 @@
 
 - (void)setupEncoder {
     OSStatus status;
+    CMVideoCodecType codecType;
     
-    // VP9 codec type (available in macOS 13.0+)
-    CMVideoCodecType codecType = kCMVideoCodecType_VP9;
+    // Check macOS version and try codecs in order of preference
+    if (@available(macOS 13.0, *)) {
+        // Try VP9 first
+        codecType = kCMVideoCodecType_VP9;
+        status = VTCompressionSessionCreate(
+            kCFAllocatorDefault,
+            self.width,
+            self.height,
+            codecType,
+            NULL, NULL, NULL,
+            compressionOutputCallback,
+            (__bridge void *)self,
+            &_compressionSession
+        );
+        
+        if (status == noErr) {
+            NSLog(@"✅ VP9 encoder initialized successfully");
+        } else {
+            NSLog(@"⚠️ VP9 not available (status: %d), trying HEVC...", status);
+            codecType = 0; // Reset for fallback
+        }
+    } else {
+        NSLog(@"⚠️ macOS < 13.0, VP9 not available");
+        codecType = 0;
+    }
     
-    // Create compression session
-    status = VTCompressionSessionCreate(
-        kCFAllocatorDefault,
-        self.width,
-        self.height,
-        codecType,
-        NULL, // encoder specification
-        NULL, // source image buffer attributes
-        NULL, // compressed data allocator
-        compressionOutputCallback,
-        (__bridge void *)self,
-        &_compressionSession
-    );
-    
-    if (status != noErr) {
-        NSLog(@"❌ Failed to create VP9 compression session: %d", status);
-        // Fallback to H.265
+    // Fallback to HEVC if VP9 failed or unavailable
+    if (codecType == 0 || _compressionSession == NULL) {
         codecType = kCMVideoCodecType_HEVC;
         status = VTCompressionSessionCreate(
             kCFAllocatorDefault,
@@ -55,18 +64,45 @@
             &_compressionSession
         );
         
-        if (status != noErr) {
-            NSLog(@"❌ Failed to create HEVC compression session: %d", status);
-            return;
+        if (status == noErr) {
+            NSLog(@"✅ HEVC encoder initialized successfully");
+        } else {
+            // Final fallback to H.264
+            NSLog(@"⚠️ HEVC not available (status: %d), trying H.264...", status);
+            codecType = kCMVideoCodecType_H264;
+            status = VTCompressionSessionCreate(
+                kCFAllocatorDefault,
+                self.width,
+                self.height,
+                codecType,
+                NULL, NULL, NULL,
+                compressionOutputCallback,
+                (__bridge void *)self,
+                &_compressionSession
+            );
+            
+            if (status != noErr) {
+                NSLog(@"❌ Failed to create any compression session! H.264 status: %d", status);
+                return;
+            }
+            NSLog(@"✅ H.264 encoder initialized successfully");
         }
-        NSLog(@"⚠️ Falling back to HEVC encoding");
-    } else {
-        NSLog(@"✅ VP9 encoder initialized successfully");
     }
     
-    // Configure encoder properties
+    // Configure encoder properties only if session was created
+    if (_compressionSession == NULL) {
+        NSLog(@"❌ No compression session available!");
+        return;
+    }
+    
     VTSessionSetProperty(_compressionSession, kVTCompressionPropertyKey_RealTime, kCFBooleanTrue);
-    VTSessionSetProperty(_compressionSession, kVTCompressionPropertyKey_ProfileLevel, kVTProfileLevel_HEVC_Main_AutoLevel);
+    
+    // Set profile based on codec type
+    if (codecType == kCMVideoCodecType_HEVC) {
+        VTSessionSetProperty(_compressionSession, kVTCompressionPropertyKey_ProfileLevel, kVTProfileLevel_HEVC_Main_AutoLevel);
+    } else if (codecType == kCMVideoCodecType_H264) {
+        VTSessionSetProperty(_compressionSession, kVTCompressionPropertyKey_ProfileLevel, kVTProfileLevel_H264_High_AutoLevel);
+    }
     
     // Set bitrate
     int bitrateBps = self.bitrate;
