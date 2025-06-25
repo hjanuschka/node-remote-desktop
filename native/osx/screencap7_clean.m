@@ -1174,10 +1174,24 @@ typedef enum {
             } else {
                 NSLog(@"✅ Found window: %@ (ID: %u)", targetWindow.title, windowID);
                 
-                // Create filter for full desktop to include menu bar and context
-                // Window mode now shows full desktop (like fullscreen) but targets specific window
+                // Bring the window to foreground when starting capture
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self activateWindowIfNeeded:windowID];
+                });
+                
+                // Create filter that shows desktop with menu bar but excludes all other windows
+                // This gives a clean view with only the target window visible
                 SCDisplay *display = content.displays.firstObject;
-                filter = [[SCContentFilter alloc] initWithDisplay:display excludingWindows:@[]];
+                
+                // Build list of windows to exclude (all except target)
+                NSMutableArray *windowsToExclude = [NSMutableArray array];
+                for (SCWindow *window in content.windows) {
+                    if (window.windowID != windowID) {
+                        [windowsToExclude addObject:window];
+                    }
+                }
+                
+                filter = [[SCContentFilter alloc] initWithDisplay:display excludingWindows:windowsToExclude];
                 
                 // Configure stream for full desktop to include menu bar
                 config.width = (int)display.width;
@@ -1583,8 +1597,9 @@ void listApplicationsAndWindows() {
     // Strip query string from path (e.g., "/frame?123" -> "/frame")
     NSString *path = [fullPath componentsSeparatedByString:@"?"][0];
     
-    // Only log non-frame and non-display requests to reduce spam
-    if (![path isEqualToString:@"/frame"] && ![path isEqualToString:@"/display"]) {
+    // Only log non-GET requests and important GET endpoints to reduce spam
+    if (![method isEqualToString:@"GET"] || 
+        ([path isEqualToString:@"/"] || [path isEqualToString:@"/windows"])) {
         NSLog(@"📨 %@ %@", method, fullPath);
     }
     
@@ -1781,7 +1796,7 @@ void listApplicationsAndWindows() {
 }
 
 - (void)sendHLSSegmentResponse:(int)client_fd path:(NSString *)path {
-    NSLog(@"📺 HLS segment request: %@", path);
+    // NSLog(@"📺 HLS segment request: %@", path); // Removed to reduce spam
     
     if (!self.captureServer.useVP9Mode) {
         NSLog(@"❌ HLS segment requested but not in video mode");
@@ -1805,7 +1820,7 @@ void listApplicationsAndWindows() {
                             (unsigned long)frameData.length];
         send(client_fd, [headers UTF8String], headers.length, 0);
         send(client_fd, frameData.bytes, frameData.length, 0);
-        NSLog(@"⚠️ HLS segment sent as MJPEG fallback");
+        // NSLog(@"⚠️ HLS segment sent as MJPEG fallback");
         return;
     }
     
@@ -1815,7 +1830,7 @@ void listApplicationsAndWindows() {
     
     send(client_fd, [headers UTF8String], headers.length, 0);
     send(client_fd, videoData.bytes, videoData.length, 0);
-    NSLog(@"✅ HLS segment sent (H.264 video data)");
+    // NSLog(@"✅ HLS segment sent (H.264 video data)"); // Removed to reduce spam
 }
 
 - (void)sendFPSResponse:(int)client_fd {
